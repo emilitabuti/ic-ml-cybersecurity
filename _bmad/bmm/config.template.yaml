@@ -1,0 +1,24 @@
+# BMM Module Configuration — TEMPLATE
+# ─────────────────────────────────────────────────────────────
+# Repositório compartilhado: cada colaboradora possui sua config pessoal.
+#
+# COMO USAR:
+#   1. Copie este arquivo para config.yaml (mesma pasta)
+#   2. Substitua {seu-nome} pelo seu nome em minúsculas (emili | isabela | caroline)
+#   3. config.yaml está no .gitignore — suas configs não serão sobrescritas pelo git
+# ─────────────────────────────────────────────────────────────
+
+project_name: ic-ml-cybersecurity
+user_skill_level: intermediate
+planning_artifacts: "{project-root}/_bmad-output/{seu-nome}/planning-artifacts"
+implementation_artifacts: "{project-root}/_bmad-output/compartilhado/implementation-artifacts"
+project_knowledge: "{project-root}/docs"
+
+# Core Configuration Values
+# ⚠️ Substitua {seu-nome} pelo seu nome em minúsculas (emili | isabela | caroline).
+#    Apenas user_name, planning_artifacts e output_folder mudam por pessoa.
+#    implementation_artifacts é sempre compartilhado — não altere.
+user_name: {seu-nome}
+communication_language: Portuguese
+document_output_language: Portuguese
+output_folder: "{project-root}/_bmad-output/{seu-nome}"

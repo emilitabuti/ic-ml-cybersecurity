@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UX Design Directions — ic-ml-cybersecurity</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #080B12; color: #F1F5F9; }
+
+  /* Navigation */
+  .nav { background: #0F1117; border-bottom: 1px solid #2E3147; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .nav-title { font-size: 15px; font-weight: 600; color: #F1F5F9; }
+  .nav-subtitle { font-size: 12px; color: #6B7280; margin-top: 2px; }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab { padding: 6px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; color: #94A3B8; }
+  .nav-tab:hover { background: #1A1D27; color: #F1F5F9; }
+  .nav-tab.active { background: #1A1D27; border-color: #3B82F6; color: #3B82F6; font-weight: 500; }
+
+  /* Sections */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* Direction header */
+  .direction-header { padding: 28px 32px 20px; border-bottom: 1px solid #2E3147; }
+  .direction-badge { display: inline-flex; align-items: center; gap: 6px; background: #1A1D27; border: 1px solid #2E3147; border-radius: 20px; padding: 4px 12px; font-size: 11px; color: #94A3B8; margin-bottom: 12px; }
+  .direction-name { font-size: 22px; font-weight: 700; color: #F1F5F9; }
+  .direction-desc { font-size: 13px; color: #94A3B8; margin-top: 6px; max-width: 600px; line-height: 1.5; }
+
+  /* ===========================
+     DIRECTION A — Command Center
+     =========================== */
+  .dir-a { background: #0F1117; min-height: 100vh; }
+  .dir-a-layout { display: flex; height: calc(100vh - 180px); min-height: 500px; }
+
+  .sidebar-a { width: 220px; background: #0D1017; border-right: 1px solid #1E2235; padding: 20px 0; display: flex; flex-direction: column; flex-shrink: 0; }
+  .sidebar-logo { padding: 0 16px 20px; border-bottom: 1px solid #1E2235; margin-bottom: 8px; }
+  .sidebar-logo-text { font-size: 13px; font-weight: 700; color: #F1F5F9; letter-spacing: 0.05em; }
+  .sidebar-logo-sub { font-size: 10px; color: #4B5563; margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+  .sidebar-nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: #6B7280; cursor: pointer; transition: all 0.1s; position: relative; }
+  .sidebar-nav-item:hover { color: #94A3B8; background: #141722; }
+  .sidebar-nav-item.active { color: #F1F5F9; background: #1A1D27; }
+  .sidebar-nav-item.active::before { content: ''; position: absolute; left: 0; top: 4px; bottom: 4px; width: 2px; background: #3B82F6; border-radius: 0 2px 2px 0; }
+  .sidebar-nav-icon { width: 16px; height: 16px; opacity: 0.7; }
+  .sidebar-nav-item.active .sidebar-nav-icon { opacity: 1; }
+  .badge-count { margin-left: auto; background: #EF4444; color: #fff; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 10px; }
+  .sidebar-section-label { padding: 16px 16px 6px; font-size: 10px; font-weight: 600; color: #374151; letter-spacing: 0.1em; text-transform: uppercase; }
+  .sidebar-status { margin-top: auto; padding: 16px; border-top: 1px solid #1E2235; }
+  .status-indicator { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 6px #10B981; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{ opacity:1 } 50%{ opacity:0.5 } }
+  .status-text { color: #6B7280; }
+  .status-value { color: #10B981; font-weight: 500; }
+
+  .main-a { flex: 1; overflow-y: auto; padding: 20px 24px; background: #0F1117; }
+  .topbar-a { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .topbar-title { font-size: 16px; font-weight: 600; }
+  .topbar-actions { display: flex; gap: 8px; align-items: center; }
+  .btn-sm { padding: 5px 12px; border-radius: 5px; font-size: 12px; cursor: pointer; border: 1px solid #2E3147; background: #1A1D27; color: #94A3B8; transition: all 0.15s; }
+  .btn-sm:hover { border-color: #3B82F6; color: #3B82F6; }
+  .btn-primary-sm { background: #1D4ED8; border-color: #1D4ED8; color: #fff; }
+  .btn-primary-sm:hover { background: #2563EB; border-color: #2563EB; }
+
+  .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .metric-card { background: #1A1D27; border: 1px solid #2E3147; border-radius: 8px; padding: 14px 16px; }
+  .metric-label { font-size: 11px; color: #6B7280; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+  .metric-value { font-size: 24px; font-weight: 700; margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+  .metric-value.red { color: #EF4444; }
+  .metric-value.yellow { color: #F59E0B; }
+  .metric-value.green { color: #10B981; }
+  .metric-value.blue { color: #3B82F6; }
+  .metric-sub { font-size: 11px; color: #4B5563; margin-top: 3px; }
+
+  .content-grid { display: grid; grid-template-columns: 1fr 340px; gap: 16px; }
+  .alerts-panel { background: #1A1D27; border: 1px solid #2E3147; border-radius: 8px; overflow: hidden; }
+  .panel-header { padding: 12px 16px; border-bottom: 1px solid #2E3147; display: flex; align-items: center; justify-content: space-between; }
+  .panel-title { font-size: 13px; font-weight: 600; color: #F1F5F9; }
+  .panel-tag { font-size: 10px; color: #6B7280; background: #242736; padding: 2px 8px; border-radius: 4px; }
+  .alert-item { padding: 12px 16px; border-bottom: 1px solid #1E2235; display: flex; gap: 12px; align-items: flex-start; cursor: pointer; transition: background 0.1s; }
+  .alert-item:hover { background: #242736; }
+  .alert-item.selected { background: #1E2C4A; border-left: 2px solid #3B82F6; }
+  .alert-sev { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .alert-sev.critical { background: #EF4444; box-shadow: 0 0 5px #EF4444; }
+  .alert-sev.warning { background: #F59E0B; box-shadow: 0 0 5px #F59E0B; }
+  .alert-sev.info { background: #3B82F6; }
+  .alert-body { flex: 1; min-width: 0; }
+  .alert-type { font-size: 12px; font-weight: 600; color: #F1F5F9; }
+  .alert-meta { font-size: 11px; color: #6B7280; margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+  .alert-confidence { font-size: 11px; font-weight: 600; margin-top: 4px; }
+  .alert-confidence.high { color: #EF4444; }
+  .alert-confidence.med { color: #F59E0B; }
+  .alert-time { font-size: 10px; color: #4B5563; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; }
+
+  .detail-panel { background: #1A1D27; border: 1px solid #2E3147; border-radius: 8px; overflow: hidden; }
+  .detail-header { padding: 12px 16px; border-bottom: 1px solid #2E3147; }
+  .detail-sev-badge { display: inline-flex; align-items: center; gap: 6px; background: #2D1515; border: 1px solid #7F1D1D; border-radius: 4px; padding: 3px 10px; font-size: 11px; color: #EF4444; font-weight: 600; margin-bottom: 8px; }
+  .detail-title { font-size: 14px; font-weight: 700; color: #F1F5F9; }
+  .detail-time { font-size: 11px; color: #4B5563; font-family: 'JetBrains Mono', monospace; margin-top: 3px; }
+  .detail-body { padding: 14px 16px; }
+  .detail-section { margin-bottom: 16px; }
+  .detail-section-title { font-size: 10px; font-weight: 600; color: #4B5563; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .confidence-bar-wrap { background: #242736; border-radius: 4px; height: 6px; overflow: hidden; margin-bottom: 4px; }
+  .confidence-bar { height: 100%; border-radius: 4px; background: #EF4444; transition: width 0.5s; }
+  .confidence-label { font-size: 20px; font-weight: 700; color: #EF4444; font-family: 'JetBrains Mono', monospace; }
+  .feature-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1E2235; }
+  .feature-name { font-size: 11px; color: #94A3B8; font-family: 'JetBrains Mono', monospace; }
+  .feature-val { font-size: 11px; font-weight: 600; color: #7DD3FC; font-family: 'JetBrains Mono', monospace; }
+  .feature-delta { font-size: 10px; color: #EF4444; }
+  .action-row { display: flex; gap: 8px; margin-top: 14px; }
+  .btn-confirm { flex: 1; padding: 8px; background: #064E3B; border: 1px solid #065F46; border-radius: 6px; color: #10B981; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; }
+  .btn-fp { flex: 1; padding: 8px; background: #1A1D27; border: 1px solid #2E3147; border-radius: 6px; color: #6B7280; font-size: 12px; cursor: pointer; text-align: center; }
+  .btn-fp:hover { border-color: #4B5563; color: #94A3B8; }
+
+  /* ===========================
+     DIRECTION B — Split Focus
+     =========================== */
+  .dir-b { background: #080B12; min-height: 100vh; }
+  .dir-b-header { background: #0F1117; border-bottom: 1px solid #2E3147; padding: 0 28px; display: flex; align-items: center; gap: 0; height: 48px; }
+  .dir-b-logo { font-size: 13px; font-weight: 700; color: #F1F5F9; padding-right: 24px; border-right: 1px solid #2E3147; margin-right: 8px; }
+  .dir-b-nav { display: flex; }
+  .dir-b-nav-item { padding: 0 16px; height: 48px; display: flex; align-items: center; font-size: 13px; color: #6B7280; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.1s; }
+  .dir-b-nav-item:hover { color: #94A3B8; }
+  .dir-b-nav-item.active { color: #3B82F6; border-bottom-color: #3B82F6; }
+  .dir-b-status { margin-left: auto; display: flex; align-items: center; gap: 20px; }
+  .dir-b-status-chip { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6B7280; }
+  .alert-count-badge { background: #EF4444; color: #fff; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 12px; }
+
+  .dir-b-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; height: calc(100vh - 228px); min-height: 460px; }
+  .dir-b-left { border-right: 1px solid #2E3147; overflow-y: auto; }
+  .dir-b-section-head { padding: 12px 20px; border-bottom: 1px solid #1E2235; display: flex; align-items: center; justify-content: space-between; background: #0F1117; position: sticky; top: 0; z-index: 10; }
+  .dir-b-section-title { font-size: 12px; font-weight: 600; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.06em; }
+  .alert-item-b { padding: 14px 20px; border-bottom: 1px solid #1A1D27; cursor: pointer; transition: background 0.1s; }
+  .alert-item-b:hover { background: #141722; }
+  .alert-item-b.active { background: #111827; border-left: 3px solid #EF4444; }
+  .alert-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .alert-b-type { font-size: 13px; font-weight: 600; color: #F1F5F9; }
+  .sev-pill { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .sev-pill.critical { background: #2D1515; color: #EF4444; border: 1px solid #7F1D1D; }
+  .sev-pill.warning { background: #2D1F08; color: #F59E0B; border: 1px solid #78350F; }
+  .alert-b-meta { font-size: 11px; color: #4B5563; font-family: 'JetBrains Mono', monospace; }
+  .alert-b-conf { font-size: 12px; margin-top: 6px; }
+
+  .dir-b-right { overflow-y: auto; background: #0A0D14; }
+  .dir-b-detail-header { padding: 20px; border-bottom: 1px solid #1E2235; background: #0F1117; }
+  .dir-b-detail-tag { font-size: 11px; color: #EF4444; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .dir-b-detail-title { font-size: 18px; font-weight: 700; color: #F1F5F9; line-height: 1.3; }
+  .dir-b-detail-time { font-size: 11px; color: #4B5563; font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
+  .dir-b-detail-body { padding: 20px; }
+  .conf-display { background: #2D1515; border: 1px solid #7F1D1D; border-radius: 8px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .conf-big { font-size: 36px; font-weight: 800; color: #EF4444; font-family: 'JetBrains Mono', monospace; }
+  .conf-label { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+  .features-title { font-size: 11px; font-weight: 600; color: #4B5563; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .feature-b-row { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; padding: 7px 0; border-bottom: 1px solid #1A1D27; }
+  .feature-b-name { font-size: 11px; color: #94A3B8; font-family: 'JetBrains Mono', monospace; }
+  .feature-b-val { font-size: 12px; font-weight: 600; color: #7DD3FC; font-family: 'JetBrains Mono', monospace; text-align: right; }
+  .feature-b-trend { font-size: 10px; color: #EF4444; font-weight: 600; }
+  .action-b-row { display: flex; gap: 10px; margin-top: 16px; }
+  .btn-b-confirm { flex: 1; padding: 10px; background: #065F46; border: none; border-radius: 6px; color: #10B981; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-b-fp { flex: 1; padding: 10px; background: #1A1D27; border: 1px solid #2E3147; border-radius: 6px; color: #6B7280; font-size: 13px; cursor: pointer; }
+
+  /* ===========================
+     DIRECTION C — Minimal Alert
+     =========================== */
+  .dir-c { background: #0A0D14; min-height: 100vh; }
+  .dir-c-header { padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1A1D27; }
+  .dir-c-logo { display: flex; align-items: center; gap: 10px; }
+  .dir-c-logo-dot { width: 10px; height: 10px; background: #3B82F6; border-radius: 50%; box-shadow: 0 0 8px #3B82F6; }
+  .dir-c-logo-text { font-size: 14px; font-weight: 700; letter-spacing: -0.02em; }
+  .dir-c-header-right { display: flex; align-items: center; gap: 16px; }
+  .dir-c-pill { display: flex; align-items: center; gap: 6px; background: #2D1515; border: 1px solid #7F1D1D; border-radius: 20px; padding: 5px 14px; font-size: 12px; color: #EF4444; font-weight: 600; }
+  .dir-c-pill-safe { background: #052E16; border-color: #14532D; color: #10B981; }
+  .dir-c-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .dir-c-body { max-width: 900px; margin: 32px auto; padding: 0 32px; }
+  .dir-c-state-bar { background: #2D1515; border: 1px solid #7F1D1D; border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+  .dir-c-state-icon { font-size: 22px; }
+  .dir-c-state-text { flex: 1; }
+  .dir-c-state-title { font-size: 14px; font-weight: 700; color: #EF4444; }
+  .dir-c-state-sub { font-size: 12px; color: #9CA3AF; margin-top: 2px; }
+  .dir-c-state-time { font-size: 11px; color: #4B5563; font-family: 'JetBrains Mono', monospace; }
+
+  .dir-c-card { background: #111520; border: 1px solid #1E2235; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
+  .dir-c-card-top { padding: 16px 20px; display: flex; align-items: flex-start; gap: 14px; }
+  .dir-c-card-sev { width: 4px; align-self: stretch; border-radius: 2px; flex-shrink: 0; }
+  .dir-c-card-sev.critical { background: #EF4444; }
+  .dir-c-card-sev.warning { background: #F59E0B; }
+  .dir-c-card-content { flex: 1; }
+  .dir-c-card-title { font-size: 14px; font-weight: 600; color: #F1F5F9; }
+  .dir-c-card-meta { font-size: 11px; color: #4B5563; font-family: 'JetBrains Mono', monospace; margin-top: 3px; }
+  .dir-c-card-conf-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .dir-c-conf-bar { flex: 1; height: 4px; background: #1E2235; border-radius: 2px; overflow: hidden; }
+  .dir-c-conf-fill { height: 100%; border-radius: 2px; background: #EF4444; }
+  .dir-c-conf-fill.yellow { background: #F59E0B; }
+  .dir-c-conf-val { font-size: 12px; font-weight: 700; color: #EF4444; font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
+  .dir-c-conf-val.yellow { color: #F59E0B; }
+  .dir-c-card-actions { border-top: 1px solid #1A1D27; display: flex; }
+  .dir-c-action-btn { flex: 1; padding: 10px; font-size: 12px; cursor: pointer; background: none; border: none; color: #6B7280; transition: all 0.1s; text-align: center; }
+  .dir-c-action-btn:hover { background: #1A1D27; color: #94A3B8; }
+  .dir-c-action-btn.primary { color: #10B981; }
+  .dir-c-action-btn.primary:hover { background: #052E16; }
+  .dir-c-action-btn + .dir-c-action-btn { border-left: 1px solid #1A1D27; }
+  .dir-c-features-row { padding: 0 20px 14px 36px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .dir-c-feature-chip { background: #0F1826; border: 1px solid #1E3A5F; border-radius: 4px; padding: 3px 9px; font-size: 10px; color: #7DD3FC; font-family: 'JetBrains Mono', monospace; }
+
+  /* ===========================
+     DIRECTION D — Scientific
+     =========================== */
+  .dir-d { background: #0B0E18; min-height: 100vh; }
+  .dir-d-topbar { background: #0F1117; border-bottom: 1px solid #1E2235; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .dir-d-logo { font-size: 12px; font-weight: 700; color: #94A3B8; letter-spacing: 0.1em; text-transform: uppercase; }
+  .dir-d-breadcrumb { font-size: 11px; color: #374151; }
+  .dir-d-breadcrumb span { color: #3B82F6; }
+  .dir-d-main { display: grid; grid-template-columns: 260px 1fr; gap: 0; height: calc(100vh - 228px); min-height: 480px; }
+
+  .dir-d-sidebar { background: #0D1017; border-right: 1px solid #1E2235; padding: 16px 0; overflow-y: auto; }
+  .dir-d-model-section { padding: 0 14px 16px; border-bottom: 1px solid #1E2235; margin-bottom: 12px; }
+  .dir-d-model-label { font-size: 10px; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .model-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-radius: 6px; cursor: pointer; transition: background 0.1s; }
+  .model-row:hover { background: #141722; }
+  .model-row.active { background: #1A1D27; }
+  .model-name { font-size: 12px; font-weight: 600; color: #94A3B8; font-family: 'JetBrains Mono', monospace; }
+  .model-row.active .model-name { color: #F1F5F9; }
+  .model-acc { font-size: 10px; color: #4B5563; }
+  .model-row.active .model-acc { color: #10B981; }
+  .model-best-badge { font-size: 9px; background: #064E3B; color: #10B981; border: 1px solid #065F46; padding: 1px 5px; border-radius: 3px; }
+  .dir-d-alert-list { padding: 0 14px; }
+  .dir-d-alert-mini { padding: 8px 10px; border-radius: 6px; cursor: pointer; margin-bottom: 4px; border-left: 2px solid transparent; }
+  .dir-d-alert-mini:hover { background: #141722; }
+  .dir-d-alert-mini.critical { border-left-color: #EF4444; }
+  .dir-d-alert-mini.warning { border-left-color: #F59E0B; }
+  .dir-d-alert-mini-type { font-size: 11px; font-weight: 600; color: #94A3B8; }
+  .dir-d-alert-mini-conf { font-size: 10px; font-family: 'JetBrains Mono', monospace; margin-top: 1px; }
+
+  .dir-d-content { overflow-y: auto; padding: 20px 24px; }
+  .dir-d-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  .dir-d-card { background: #111520; border: 1px solid #1E2235; border-radius: 8px; padding: 16px; }
+  .dir-d-card-title { font-size: 11px; font-weight: 600; color: #4B5563; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+  .metric-d-big { font-size: 28px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+  .metric-d-big.red { color: #EF4444; }
+  .metric-d-big.green { color: #10B981; }
+  .metric-d-sub { font-size: 11px; color: #4B5563; margin-top: 4px; }
+  .model-compare-table { width: 100%; border-collapse: collapse; }
+  .model-compare-table th { font-size: 10px; color: #4B5563; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; padding: 6px 8px; border-bottom: 1px solid #1E2235; text-align: left; }
+  .model-compare-table td { font-size: 12px; padding: 7px 8px; border-bottom: 1px solid #141722; font-family: 'JetBrains Mono', monospace; color: #94A3B8; }
+  .model-compare-table tr.best td { color: #F1F5F9; background: #0F1826; }
+  .model-compare-table td.best-val { color: #10B981; font-weight: 700; }
+  .dir-d-window-chart { background: #111520; border: 1px solid #1E2235; border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .chart-mock { height: 80px; display: flex; align-items: flex-end; gap: 3px; position: relative; padding-top: 8px; }
+  .chart-bar { border-radius: 2px 2px 0 0; min-width: 8px; transition: height 0.3s; }
+  .chart-bar.normal { background: #1E3A5F; }
+  .chart-bar.elevated { background: #78350F; }
+  .chart-bar.alert { background: #7F1D1D; }
+  .chart-annotation { position: absolute; right: 0; top: 0; font-size: 10px; color: #EF4444; font-family: 'JetBrains Mono', monospace; }
+
+  /* Comparison section */
+  .comparison-section { padding: 28px 32px; border-top: 1px solid #2E3147; background: #0A0D14; }
+  .comp-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .comp-sub { font-size: 12px; color: #6B7280; margin-bottom: 20px; line-height: 1.5; }
+  .comp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .comp-card { background: #1A1D27; border: 1px solid #2E3147; border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s; }
+  .comp-card:hover { border-color: #3B82F6; transform: translateY(-1px); }
+  .comp-card.selected { border-color: #3B82F6; background: #1E2C4A; }
+  .comp-card-letter { font-size: 22px; font-weight: 800; color: #3B82F6; font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; }
+  .comp-card-name { font-size: 12px; font-weight: 600; color: #F1F5F9; margin-bottom: 6px; }
+  .comp-card-desc { font-size: 11px; color: #6B7280; line-height: 1.4; }
+  .comp-card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+  .comp-tag { font-size: 10px; background: #242736; border: 1px solid #2E3147; padding: 2px 7px; border-radius: 3px; color: #94A3B8; }
+</style>
+</head>
+<body>
+
+<!-- Top Navigation -->
+<div class="nav">
+  <div>
+    <div class="nav-title">🎨 UX Design Directions — ic-ml-cybersecurity</div>
+    <div class="nav-subtitle">Explore as 4 direções visuais e escolha a que melhor representa o projeto</div>
+  </div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showDir('a')">A · Command Center</div>
+    <div class="nav-tab" onclick="showDir('b')">B · Split Focus</div>
+    <div class="nav-tab" onclick="showDir('c')">C · Minimal Alert</div>
+    <div class="nav-tab" onclick="showDir('d')">D · Scientific</div>
+  </div>
+</div>
+
+<!-- ============================
+     DIRECTION A — Command Center
+     ============================ -->
+<div id="dir-a" class="section active dir-a">
+  <div class="direction-header">
+    <div class="direction-badge">Direção A</div>
+    <div class="direction-name">Command Center</div>
+    <div class="direction-desc">Sidebar de navegação fixa + dashboard denso com métricas em destaque. Sensação de controle total. Inspirado no Grafana — layout clássico de ferramentas de segurança profissional.</div>
+  </div>
+  <div class="dir-a-layout">
+    <!-- Sidebar -->
+    <div class="sidebar-a">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-text">ML-CYBERWATCH</div>
+        <div class="sidebar-logo-sub">ic-ml-cybersecurity</div>
+      </div>
+      <div class="sidebar-nav-item active">
+        <svg class="sidebar-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Monitor
+      </div>
+      <div class="sidebar-nav-item">
+        <svg class="sidebar-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        Alertas
+        <span class="badge-count">3</span>
+      </div>
+      <div class="sidebar-nav-item">
+        <svg class="sidebar-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Histórico
+      </div>
+      <div class="sidebar-section-label">Análise</div>
+      <div class="sidebar-nav-item">
+        <svg class="sidebar-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+        Modelos
+      </div>
+      <div class="sidebar-status">
+        <div class="status-indicator">
+          <div class="status-dot"></div>
+          <div>
+            <div class="status-text" style="font-size:10px">Sistema ativo</div>
+            <div class="status-value" style="font-size:10px">Monitorando</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Main content -->
+    <div class="main-a">
+      <div class="topbar-a">
+        <div class="topbar-title">Monitor em Tempo Real</div>
+        <div class="topbar-actions">
+          <div class="btn-sm">Janela: 30s</div>
+          <div class="btn-sm">Modelo: LSTM</div>
+          <div class="btn-sm btn-primary-sm">▶ Modo Demo</div>
+        </div>
+      </div>
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="metric-label">Alertas Ativos</div>
+          <div class="metric-value red">3</div>
+          <div class="metric-sub">↑2 na última hora</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Janelas Analisadas</div>
+          <div class="metric-value blue">1,847</div>
+          <div class="metric-sub">Últimas 24h</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Precisão LSTM</div>
+          <div class="metric-value green">94.2%</div>
+          <div class="metric-sub">Melhor modelo ativo</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Latência Média</div>
+          <div class="metric-value yellow">6.8s</div>
+          <div class="metric-sub">Meta: ≤10s ✓</div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <!-- Alert list -->
+        <div class="alerts-panel">
+          <div class="panel-header">
+            <span class="panel-title">Alertas Recentes</span>
+            <span class="panel-tag">3 ativos</span>
+          </div>
+          <div class="alert-item selected">
+            <div class="alert-sev critical"></div>
+            <div class="alert-body">
+              <div class="alert-type">DDoS — Volumétrico</div>
+              <div class="alert-meta">192.168.1.45 → 10.0.0.1</div>
+              <div class="alert-confidence high">Confiança: 91.3% · LSTM</div>
+            </div>
+            <div class="alert-time">01:47:22</div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-sev warning"></div>
+            <div class="alert-body">
+              <div class="alert-type">Port Scan — Sistemático</div>
+              <div class="alert-meta">10.0.2.33 → múltiplos</div>
+              <div class="alert-confidence med">Confiança: 73.1% · RF</div>
+            </div>
+            <div class="alert-time">01:44:08</div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-sev warning"></div>
+            <div class="alert-body">
+              <div class="alert-type">Brute Force — SSH</div>
+              <div class="alert-meta">172.16.0.88 → 10.0.0.5</div>
+              <div class="alert-confidence med">Confiança: 68.5% · DT</div>
+            </div>
+            <div class="alert-time">01:41:55</div>
+          </div>
+          <div class="alert-item" style="opacity:0.4">
+            <div class="alert-sev info"></div>
+            <div class="alert-body">
+              <div class="alert-type">Anomalia — Tráfego Incomum</div>
+              <div class="alert-meta">10.0.1.12 → externo</div>
+              <div class="alert-confidence" style="color:#3B82F6">Confiança: 52.0% · LSTM · FP confirmado</div>
+            </div>
+            <div class="alert-time">01:38:10</div>
+          </div>
+        </div>
+        <!-- Detail panel -->
+        <div class="detail-panel">
+          <div class="detail-header">
+            <div class="detail-sev-badge">● CRÍTICO</div>
+            <div class="detail-title">DDoS — Ataque Volumétrico Previsto</div>
+            <div class="detail-time">2026-02-21 · 01:47:22 UTC · LSTM</div>
+          </div>
+          <div class="detail-body">
+            <div class="detail-section">
+              <div class="detail-section-title">Confiança da Predição</div>
+              <div class="confidence-label">91.3%</div>
+              <div class="confidence-bar-wrap" style="margin-top:6px">
+                <div class="confidence-bar" style="width:91.3%"></div>
+              </div>
+            </div>
+            <div class="detail-section">
+              <div class="detail-section-title">Top Features de Tráfego</div>
+              <div class="feature-row">
+                <span class="feature-name">pkt_rate</span>
+                <span class="feature-val">48,320 pkt/s</span>
+                <span class="feature-delta">↑ 18× baseline</span>
+              </div>
+              <div class="feature-row">
+                <span class="feature-name">flow_bytes_s</span>
+                <span class="feature-val">127.4 MB/s</span>
+                <span class="feature-delta">↑ 24× baseline</span>
+              </div>
+              <div class="feature-row">
+                <span class="feature-name">iat_mean</span>
+                <span class="feature-val">0.021 ms</span>
+                <span class="feature-delta">↓ 94% baseline</span>
+              </div>
+            </div>
+            <div class="action-row">
+              <div class="btn-confirm">✓ Confirmar Ameaça</div>
+              <div class="btn-fp">✕ Falso Positivo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     DIRECTION B — Split Focus
+     ============================ -->
+<div id="dir-b" class="section dir-b">
+  <div class="direction-header">
+    <div class="direction-badge">Direção B</div>
+    <div class="direction-name">Split Focus</div>
+    <div class="direction-desc">Layout dividido 50/50: lista de alertas à esquerda, detalhe completo à direita. Foco total na leitura e decisão. Ideal para analistas que trabalham com um alerta de cada vez.</div>
+  </div>
+  <div class="dir-b-header">
+    <div class="dir-b-logo">CYBERWATCH</div>
+    <div class="dir-b-nav">
+      <div class="dir-b-nav-item active">Monitor</div>
+      <div class="dir-b-nav-item">Alertas</div>
+      <div class="dir-b-nav-item">Histórico</div>
+      <div class="dir-b-nav-item">Modelos</div>
+    </div>
+    <div class="dir-b-status">
+      <div class="dir-b-status-chip"><span class="status-dot" style="width:6px;height:6px;background:#10B981"></span> Sistema ativo</div>
+      <div class="dir-b-status-chip">Alertas: <span class="alert-count-badge">3</span></div>
+    </div>
+  </div>
+  <div class="dir-b-body">
+    <!-- Left: alert list -->
+    <div class="dir-b-left">
+      <div class="dir-b-section-head">
+        <div class="dir-b-section-title">Alertas Ativos</div>
+        <div style="font-size:11px;color:#4B5563">3 pendentes</div>
+      </div>
+      <div class="alert-item-b active">
+        <div class="alert-top-row">
+          <div class="alert-b-type">DDoS — Volumétrico</div>
+          <div class="sev-pill critical">Crítico</div>
+        </div>
+        <div class="alert-b-meta">192.168.1.45 · 01:47:22</div>
+        <div class="alert-b-conf" style="color:#EF4444">Confiança 91.3% · LSTM</div>
+      </div>
+      <div class="alert-item-b">
+        <div class="alert-top-row">
+          <div class="alert-b-type">Port Scan — Sistemático</div>
+          <div class="sev-pill warning">Suspeito</div>
+        </div>
+        <div class="alert-b-meta">10.0.2.33 · 01:44:08</div>
+        <div class="alert-b-conf" style="color:#F59E0B">Confiança 73.1% · RF</div>
+      </div>
+      <div class="alert-item-b">
+        <div class="alert-top-row">
+          <div class="alert-b-type">Brute Force — SSH</div>
+          <div class="sev-pill warning">Suspeito</div>
+        </div>
+        <div class="alert-b-meta">172.16.0.88 · 01:41:55</div>
+        <div class="alert-b-conf" style="color:#F59E0B">Confiança 68.5% · DT</div>
+      </div>
+    </div>
+    <!-- Right: detail -->
+    <div class="dir-b-right">
+      <div class="dir-b-detail-header">
+        <div class="dir-b-detail-tag">● CRÍTICO · LSTM</div>
+        <div class="dir-b-detail-title">DDoS — Ataque Volumétrico Previsto</div>
+        <div class="dir-b-detail-time">2026-02-21 01:47:22 UTC · Origem: 192.168.1.45 → 10.0.0.1</div>
+      </div>
+      <div class="dir-b-detail-body">
+        <div class="conf-display">
+          <div class="conf-big">91.3%</div>
+          <div class="conf-label">Confiança da Predição</div>
+        </div>
+        <div class="features-title">Features que motivaram a predição</div>
+        <div class="feature-b-row">
+          <div class="feature-b-name">pkt_rate</div>
+          <div class="feature-b-val">48,320 pkt/s</div>
+          <div class="feature-b-trend">↑ 18×</div>
+        </div>
+        <div class="feature-b-row">
+          <div class="feature-b-name">flow_bytes_s</div>
+          <div class="feature-b-val">127.4 MB/s</div>
+          <div class="feature-b-trend">↑ 24×</div>
+        </div>
+        <div class="feature-b-row">
+          <div class="feature-b-name">iat_mean</div>
+          <div class="feature-b-val">0.021 ms</div>
+          <div class="feature-b-trend">↓ 94%</div>
+        </div>
+        <div class="feature-b-row">
+          <div class="feature-b-name">active_flows</div>
+          <div class="feature-b-val">2,847</div>
+          <div class="feature-b-trend">↑ 12×</div>
+        </div>
+        <div class="action-b-row">
+          <div class="btn-b-confirm">✓ Confirmar Ameaça</div>
+          <div class="btn-b-fp">✕ Falso Positivo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     DIRECTION C — Minimal Alert
+     ============================ -->
+<div id="dir-c" class="section dir-c">
+  <div class="direction-header">
+    <div class="direction-badge">Direção C</div>
+    <div class="direction-name">Minimal Alert</div>
+    <div class="direction-desc">Design centrado no alerta, sem sidebar. Estado global visível no header. Cards de alerta expandíveis com ações inline. Máxima clareza, mínima complexidade — ideal para o escopo do IC.</div>
+  </div>
+  <div class="dir-c-header">
+    <div class="dir-c-logo">
+      <div class="dir-c-logo-dot"></div>
+      <div class="dir-c-logo-text">ic-ml-cybersecurity</div>
+    </div>
+    <div class="dir-c-header-right">
+      <div style="display:flex;gap:8px;font-size:12px;color:#6B7280">
+        <span>Monitor</span><span style="color:#2E3147">|</span>
+        <span>Histórico</span><span style="color:#2E3147">|</span>
+        <span>Modelos</span>
+      </div>
+      <div class="dir-c-pill">
+        <div class="dir-c-dot"></div>
+        3 alertas ativos
+      </div>
+    </div>
+  </div>
+  <div class="dir-c-body">
+    <!-- State bar -->
+    <div class="dir-c-state-bar">
+      <div class="dir-c-state-icon">⚠️</div>
+      <div class="dir-c-state-text">
+        <div class="dir-c-state-title">Ameaça prevista detectada</div>
+        <div class="dir-c-state-sub">3 alertas ativos · LSTM monitorando 1.847 janelas/24h · Latência: 6.8s</div>
+      </div>
+      <div class="dir-c-state-time">Atualizado 01:47:22</div>
+    </div>
+
+    <!-- Alert card 1 (expanded) -->
+    <div class="dir-c-card">
+      <div class="dir-c-card-top">
+        <div class="dir-c-card-sev critical"></div>
+        <div class="dir-c-card-content">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="dir-c-card-title">DDoS — Ataque Volumétrico Previsto</div>
+            <div class="sev-pill critical">Crítico</div>
+          </div>
+          <div class="dir-c-card-meta">192.168.1.45 → 10.0.0.1 · LSTM · 01:47:22</div>
+          <div class="dir-c-card-conf-row">
+            <div class="dir-c-conf-bar"><div class="dir-c-conf-fill" style="width:91.3%"></div></div>
+            <div class="dir-c-conf-val">91.3%</div>
+          </div>
+        </div>
+      </div>
+      <div class="dir-c-features-row">
+        <div class="dir-c-feature-chip">pkt_rate: 48k↑18×</div>
+        <div class="dir-c-feature-chip">flow_bytes: 127MB/s↑24×</div>
+        <div class="dir-c-feature-chip">iat_mean: 0.02ms↓94%</div>
+      </div>
+      <div class="dir-c-card-actions">
+        <button class="dir-c-action-btn primary">✓ Confirmar Ameaça</button>
+        <button class="dir-c-action-btn">✕ Falso Positivo</button>
+        <button class="dir-c-action-btn">↗ Detalhes</button>
+      </div>
+    </div>
+
+    <!-- Alert card 2 -->
+    <div class="dir-c-card">
+      <div class="dir-c-card-top">
+        <div class="dir-c-card-sev warning"></div>
+        <div class="dir-c-card-content">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="dir-c-card-title">Port Scan — Sistemático</div>
+            <div class="sev-pill warning">Suspeito</div>
+          </div>
+          <div class="dir-c-card-meta">10.0.2.33 → múltiplos destinos · RF · 01:44:08</div>
+          <div class="dir-c-card-conf-row">
+            <div class="dir-c-conf-bar"><div class="dir-c-conf-fill yellow" style="width:73.1%"></div></div>
+            <div class="dir-c-conf-val yellow">73.1%</div>
+          </div>
+        </div>
+      </div>
+      <div class="dir-c-card-actions">
+        <button class="dir-c-action-btn primary">✓ Confirmar Ameaça</button>
+        <button class="dir-c-action-btn">✕ Falso Positivo</button>
+        <button class="dir-c-action-btn">↗ Detalhes</button>
+      </div>
+    </div>
+
+    <!-- Alert card 3 -->
+    <div class="dir-c-card">
+      <div class="dir-c-card-top">
+        <div class="dir-c-card-sev warning"></div>
+        <div class="dir-c-card-content">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="dir-c-card-title">Brute Force — SSH</div>
+            <div class="sev-pill warning">Suspeito</div>
+          </div>
+          <div class="dir-c-card-meta">172.16.0.88 → 10.0.0.5 · DT · 01:41:55</div>
+          <div class="dir-c-card-conf-row">
+            <div class="dir-c-conf-bar"><div class="dir-c-conf-fill yellow" style="width:68.5%"></div></div>
+            <div class="dir-c-conf-val yellow">68.5%</div>
+          </div>
+        </div>
+      </div>
+      <div class="dir-c-card-actions">
+        <button class="dir-c-action-btn primary">✓ Confirmar Ameaça</button>
+        <button class="dir-c-action-btn">✕ Falso Positivo</button>
+        <button class="dir-c-action-btn">↗ Detalhes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     DIRECTION D — Scientific
+     ============================ -->
+<div id="dir-d" class="section dir-d">
+  <div class="direction-header">
+    <div class="direction-badge">Direção D</div>
+    <div class="direction-name">Scientific Dashboard</div>
+    <div class="direction-desc">Foco duplo: operacional (alertas) + científico (comparação de modelos). Sidebar com painel de modelos RF/DT/LSTM + gráfico de janela deslizante em destaque. Ideal para apresentação no seminário de IC.</div>
+  </div>
+  <div class="dir-d-topbar">
+    <div class="dir-d-logo">IC · ML · CYBERSECURITY</div>
+    <div class="dir-d-breadcrumb">Monitor <span>/ Alertas Ativos</span></div>
+  </div>
+  <div class="dir-d-main">
+    <!-- Left sidebar with models + mini alert list -->
+    <div class="dir-d-sidebar">
+      <div class="dir-d-model-section">
+        <div class="dir-d-model-label">Modelos Ativos</div>
+        <div class="model-row active">
+          <div>
+            <div class="model-name">LSTM</div>
+            <div class="model-acc">Acc: 94.2%</div>
+          </div>
+          <div class="model-best-badge">BEST</div>
+        </div>
+        <div class="model-row">
+          <div>
+            <div class="model-name">RF</div>
+            <div class="model-acc">Acc: 91.8%</div>
+          </div>
+        </div>
+        <div class="model-row">
+          <div>
+            <div class="model-name">DT</div>
+            <div class="model-acc">Acc: 87.3%</div>
+          </div>
+        </div>
+      </div>
+      <div class="dir-d-model-label" style="padding:0 14px;margin-bottom:8px">Alertas</div>
+      <div class="dir-d-alert-list">
+        <div class="dir-d-alert-mini critical">
+          <div class="dir-d-alert-mini-type">DDoS Volumétrico</div>
+          <div class="dir-d-alert-mini-conf" style="color:#EF4444">91.3% · LSTM</div>
+        </div>
+        <div class="dir-d-alert-mini warning">
+          <div class="dir-d-alert-mini-type">Port Scan</div>
+          <div class="dir-d-alert-mini-conf" style="color:#F59E0B">73.1% · RF</div>
+        </div>
+        <div class="dir-d-alert-mini warning">
+          <div class="dir-d-alert-mini-type">Brute Force SSH</div>
+          <div class="dir-d-alert-mini-conf" style="color:#F59E0B">68.5% · DT</div>
+        </div>
+      </div>
+    </div>
+    <!-- Right content -->
+    <div class="dir-d-content">
+      <div class="dir-d-grid">
+        <div class="dir-d-card">
+          <div class="dir-d-card-title">Alerta Ativo — Crítico</div>
+          <div class="metric-d-big red">DDoS</div>
+          <div class="metric-d-sub">Volumétrico · 192.168.1.45 → 10.0.0.1</div>
+          <div style="margin-top:12px;font-size:12px;color:#6B7280">Confiança: <span style="color:#EF4444;font-weight:700;font-family:monospace">91.3%</span> · Modelo: <span style="color:#3B82F6">LSTM</span></div>
+        </div>
+        <div class="dir-d-card">
+          <div class="dir-d-card-title">Comparação de Modelos</div>
+          <table class="model-compare-table">
+            <tr><th>Modelo</th><th>Acc</th><th>F1</th><th>FPR</th></tr>
+            <tr class="best"><td>LSTM</td><td class="best-val">94.2%</td><td class="best-val">0.93</td><td>6.1%</td></tr>
+            <tr><td>RF</td><td>91.8%</td><td>0.90</td><td>8.3%</td></tr>
+            <tr><td>DT</td><td>87.3%</td><td>0.85</td><td>11.2%</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="dir-d-window-chart">
+        <div class="dir-d-card-title">Janela Deslizante — Tráfego (últimos 60s)</div>
+        <div class="chart-mock">
+          <div class="chart-annotation">⚠ Anomalia detectada</div>
+          <div class="chart-bar normal" style="height:20%"></div>
+          <div class="chart-bar normal" style="height:25%"></div>
+          <div class="chart-bar normal" style="height:18%"></div>
+          <div class="chart-bar normal" style="height:22%"></div>
+          <div class="chart-bar normal" style="height:19%"></div>
+          <div class="chart-bar normal" style="height:24%"></div>
+          <div class="chart-bar normal" style="height:21%"></div>
+          <div class="chart-bar normal" style="height:20%"></div>
+          <div class="chart-bar normal" style="height:23%"></div>
+          <div class="chart-bar normal" style="height:19%"></div>
+          <div class="chart-bar elevated" style="height:35%"></div>
+          <div class="chart-bar elevated" style="height:48%"></div>
+          <div class="chart-bar alert" style="height:72%"></div>
+          <div class="chart-bar alert" style="height:85%"></div>
+          <div class="chart-bar alert" style="height:95%"></div>
+          <div class="chart-bar alert" style="height:100%"></div>
+        </div>
+        <div style="display:flex;gap:14px;margin-top:8px;font-size:10px;color:#4B5563">
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;background:#1E3A5F;border-radius:2px;display:inline-block"></span>Normal</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;background:#78350F;border-radius:2px;display:inline-block"></span>Elevado</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;background:#7F1D1D;border-radius:2px;display:inline-block"></span>Alerta</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <div class="btn-confirm" style="flex:none;padding:8px 20px">✓ Confirmar DDoS</div>
+        <div class="btn-fp" style="flex:none;padding:8px 16px">✕ Falso Positivo</div>
+        <div class="btn-sm" style="padding:8px 16px">▶ Modo Demo — Seminário</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Comparison Section -->
+<div class="comparison-section">
+  <div class="comp-title">📊 Comparar Direções</div>
+  <div class="comp-sub">Clique em cada direção acima para visualizá-la. Use as descrições abaixo para comparar as abordagens e decidir qual melhor se encaixa no projeto.</div>
+  <div class="comp-grid">
+    <div class="comp-card" onclick="showDir('a')">
+      <div class="comp-card-letter">A</div>
+      <div class="comp-card-name">Command Center</div>
+      <div class="comp-card-desc">Sidebar + dashboard denso. Sensação de controle máximo. Mais próximo de ferramentas profissionais como Grafana.</div>
+      <div class="comp-card-tags">
+        <div class="comp-tag">Sidebar fixa</div>
+        <div class="comp-tag">Métricas em destaque</div>
+        <div class="comp-tag">Profissional</div>
+      </div>
+    </div>
+    <div class="comp-card" onclick="showDir('b')">
+      <div class="comp-card-letter">B</div>
+      <div class="comp-card-name">Split Focus</div>
+      <div class="comp-card-desc">50/50 lista + detalhe. Foco total na decisão. Ideal para análise profunda de um alerta por vez.</div>
+      <div class="comp-card-tags">
+        <div class="comp-tag">Split view</div>
+        <div class="comp-tag">Foco no detalhe</div>
+        <div class="comp-tag">Decisão clara</div>
+      </div>
+    </div>
+    <div class="comp-card" onclick="showDir('c')">
+      <div class="comp-card-letter">C</div>
+      <div class="comp-card-name">Minimal Alert</div>
+      <div class="comp-card-desc">Cards de alerta expandíveis sem sidebar. Máxima clareza, mínima complexidade. Mais simples de implementar.</div>
+      <div class="comp-card-tags">
+        <div class="comp-tag">Sem sidebar</div>
+        <div class="comp-tag">Cards expandíveis</div>
+        <div class="comp-tag">Simples</div>
+      </div>
+    </div>
+    <div class="comp-card" onclick="showDir('d')">
+      <div class="comp-card-letter">D</div>
+      <div class="comp-card-name">Scientific</div>
+      <div class="comp-card-desc">Operacional + científico. Comparação RF/DT/LSTM em destaque. Gráfico de janela deslizante. Ideal para seminário de IC.</div>
+      <div class="comp-card-tags">
+        <div class="comp-tag">Comparação modelos</div>
+        <div class="comp-tag">Gráfico temporal</div>
+        <div class="comp-tag">Seminário IC</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showDir(dir) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('dir-' + dir).classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  const map = {a:0, b:1, c:2, d:3};
+  tabs[map[dir]].classList.add('active');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+# ─────────────────────────────────────────────────────────────
+# BMAD — Configurações pessoais (não versionadas)
+# Cada colaboradora mantém sua própria config.yaml localmente.
+# Use os arquivos config.template.yaml como ponto de partida.
+# ─────────────────────────────────────────────────────────────
+_bmad/bmm/config.yaml
+_bmad/core/config.yaml
+_bmad/_memory/config.yaml
+
+# Memória de sessão pessoal dos agentes BMAD
+_bmad/_memory/storyteller-sidecar/stories-told.md
+_bmad/_memory/storyteller-sidecar/story-preferences.md
+
+# Sessões locais do Copilot
+.copilot/
+
+# ─────────────────────────────────────────────────────────────
+# Dados — nunca commitar datasets (arquivos grandes)
+# Cada pesquisadora mantém os dados localmente.
+# Veja as instruções de download no README do ml-pipeline.
+# ─────────────────────────────────────────────────────────────
+data/
+ml-pipeline/data/
+*.csv
+*.pcap
+*.parquet
+
+# Modelos treinados (podem ser grandes — compartilhar via Drive/release)
+*.pkl
+*.joblib
+*.h5
+*.pt
+*.pth
+ml-pipeline/models/
+
+# Artefatos de experimentos MLflow (volumosos)
+mlruns/
+ml-pipeline/mlruns/
+
+# Ambientes virtuais Python
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Dependências Node.js
+node_modules/
+dashboard/node_modules/
+
+# Build do dashboard
+dist/
+dashboard/dist/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/settings.json
+*.swp
+*.swo
