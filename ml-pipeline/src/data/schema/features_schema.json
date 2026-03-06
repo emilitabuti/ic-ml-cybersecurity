@@ -1,6 +1,6 @@
 {
   "_comment": "Contrato formal de features — CIC-IDS2017 model-ready. Caroline ↔ Emili.",
-  "_version": "1.0.0",
+  "_version": "1.1.0",
   "_dataset": "CIC-IDS2017",
   "_generated_by": "Caroline Guimarães Campos — pipeline de pré-processamento",
   "_consumed_by": "Emili Tabuti — ml-pipeline (data_loader.py)",
@@ -75,5 +75,15 @@
       "approximate_records_raw": 2280090,
       "columns_raw": 50
     }
+  },
+
+  "split_contract": {
+    "test_size": 0.2,
+    "train_size": 0.8,
+    "stratify_by": "Binary_Label",
+    "random_state_source": "config.RANDOM_SEED (default: 42)",
+    "leakage_prevention_policy": "split_first",
+    "split_applied_before": ["feature_selection", "sliding_window", "additional_scaling"],
+    "description": "O split train/test deve ser aplicado ANTES de qualquer transformação de features para prevenir data leakage. Ver src/data/data_splitter.py."
   }
 }
