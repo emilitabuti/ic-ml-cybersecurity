@@ -1,6 +1,6 @@
 # Story 1.2: Configuração da Reprodutibilidade Científica
 
-Status: in-progress
+Status: review
 
 ## Story
 
@@ -29,32 +29,32 @@ Para que qualquer experimento seja 100% reprodutível em qualquer máquina.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Verificar e completar `config.py` (AC: #1, #2)
-  - [ ] Confirmar que `RANDOM_SEED = 42` existe como constante em `config.py`
-  - [ ] Confirmar que `WINDOW_SIZE`, `CONFIDENCE_THRESHOLD`, `MODEL_PATH` existem em `config.py`
-  - [ ] Confirmar que `.env.example` documenta todas as variáveis com valores padrão
-  - [ ] Adicionar `PYTHONHASHSEED=42` ao `.env.example` (determinismo de hashing Python)
+- [x] Task 1: Verificar e completar `config.py` (AC: #1, #2)
+  - [x] Confirmar que `RANDOM_SEED = 42` existe como constante em `config.py`
+  - [x] Confirmar que `WINDOW_SIZE`, `CONFIDENCE_THRESHOLD`, `MODEL_PATH` existem em `config.py`
+  - [x] Confirmar que `.env.example` documenta todas as variáveis com valores padrão
+  - [x] Adicionar `PYTHONHASHSEED=42` ao `.env.example` (determinismo de hashing Python)
 
-- [ ] Task 2: Criar módulo `src/utils/seed.py` com função `set_global_seed` (AC: #3, #4)
-  - [ ] Criar pasta `ml-pipeline/src/utils/` com `__init__.py`
-  - [ ] Criar `ml-pipeline/src/utils/seed.py` com função `set_global_seed(seed: int) -> None`
-  - [ ] Aplicar seed em: `random.seed`, `numpy.random.seed`, `os.environ["PYTHONHASHSEED"]`
-  - [ ] Aplicar seed em `tensorflow` via `tf.random.set_seed` (importação condicional — não falhar se ausente)
-  - [ ] Logar o seed aplicado com `logging.getLogger(__name__).info(f"Global seed set to {seed}")`
+- [x] Task 2: Criar módulo `src/utils/seed.py` com função `set_global_seed` (AC: #3, #4)
+  - [x] Criar pasta `ml-pipeline/src/utils/` com `__init__.py`
+  - [x] Criar `ml-pipeline/src/utils/seed.py` com função `set_global_seed(seed: int) -> None`
+  - [x] Aplicar seed em: `random.seed`, `numpy.random.seed`, `os.environ["PYTHONHASHSEED"]`
+  - [x] Aplicar seed em `tensorflow` via `tf.random.set_seed` (importação condicional — não falhar se ausente)
+  - [x] Logar o seed aplicado com `logging.getLogger(__name__).info(f"Global seed set to {seed}")`
 
-- [ ] Task 3: Escrever testes de reprodutibilidade (AC: #1, #3, #4)
-  - [ ] Criar `ml-pipeline/tests/test_reproducibility.py`
-  - [ ] Teste: `test_config_random_seed_is_42` — importa `config.RANDOM_SEED` e verifica `== 42`
-  - [ ] Teste: `test_config_variables_exist` — verifica `WINDOW_SIZE`, `CONFIDENCE_THRESHOLD`, `MODEL_PATH` existem e têm tipos corretos
-  - [ ] Teste: `test_set_global_seed_returns_none` — chama `set_global_seed(42)` e verifica que não lança exceção
-  - [ ] Teste: `test_numpy_reproducibility` — chama `set_global_seed(42)`, gera array aleatório, chama novamente, verifica arrays idênticos
-  - [ ] Teste: `test_random_module_reproducibility` — mesmo padrão com `random.random()`
-  - [ ] Teste: `test_sklearn_reproducibility` — usa `RandomState(RANDOM_SEED)` e verifica resultados idênticos em duas chamadas
+- [x] Task 3: Escrever testes de reprodutibilidade (AC: #1, #3, #4)
+  - [x] Criar `ml-pipeline/tests/test_reproducibility.py`
+  - [x] Teste: `test_config_random_seed_is_42` — importa `config.RANDOM_SEED` e verifica `== 42`
+  - [x] Teste: `test_config_variables_exist` — verifica `WINDOW_SIZE`, `CONFIDENCE_THRESHOLD`, `MODEL_PATH` existem e têm tipos corretos
+  - [x] Teste: `test_set_global_seed_returns_none` — chama `set_global_seed(42)` e verifica que não lança exceção
+  - [x] Teste: `test_numpy_reproducibility` — chama `set_global_seed(42)`, gera array aleatório, chama novamente, verifica arrays idênticos
+  - [x] Teste: `test_random_module_reproducibility` — mesmo padrão com `random.random()`
+  - [x] Teste: `test_sklearn_reproducibility` — usa `RandomState(RANDOM_SEED)` e verifica resultados idênticos em duas chamadas
 
-- [ ] Task 4: Validar e fazer commit (AC: #4)
-  - [ ] Executar `pytest tests/test_reproducibility.py -v` — todos os testes devem passar
-  - [ ] Executar `pytest tests/` — sem regressões nos testes da story 1.1
-  - [ ] Commit: `feat(story-1.2): reprodutibilidade científica — seed global e testes`
+- [x] Task 4: Validar e fazer commit (AC: #4)
+  - [x] Executar `pytest tests/test_reproducibility.py -v` — todos os testes devem passar
+  - [x] Executar `pytest tests/` — sem regressões nos testes da story 1.1
+  - [x] Commit: `feat(story-1.2): reprodutibilidade científica — seed global e testes`
 
 ## Dev Notes
 
@@ -162,6 +162,29 @@ Claude Sonnet 4.6 (claude-sonnet-4.6) via GitHub Copilot
 
 ### Debug Log References
 
+- `config.py` e `.env.example` já existiam da Story 1.1 — apenas adicionado `PYTHONHASHSEED=42` ao `.env.example`
+- `src/utils/` criada manualmente com `__init__.py` vazio e `seed.py`
+- Fase RED: 8 testes falhando (src.utils não existia), 6 passando (config)
+- Fase GREEN: 14/14 passando após criação de `seed.py`
+- Suite completa: 51/51 passando (sem regressões)
+- TensorFlow: importação condicional funcionando corretamente (não instalado no ambiente)
+- Commit: `734abad feat(story-1.2): reprodutibilidade científica — seed global e testes`
+
 ### Completion Notes List
 
+- ✅ `config.py` confirmado: `RANDOM_SEED=42`, `WINDOW_SIZE`, `CONFIDENCE_THRESHOLD`, `MODEL_PATH` (já existia da Story 1.1)
+- ✅ `.env.example` atualizado: adicionado `PYTHONHASHSEED=42` com documentação
+- ✅ `src/utils/__init__.py` criado (registra pacote Python)
+- ✅ `src/utils/seed.py` criado com `set_global_seed()` — aplica seed em `random`, `numpy`, `os.environ["PYTHONHASHSEED"]` e `tensorflow` (importação condicional)
+- ✅ 14 novos testes em `tests/test_reproducibility.py`: config (4), set_global_seed (4), numpy (2), random (2), sklearn (2)
+- ✅ 51/51 testes passando (14 novos + 37 da story 1.1) — sem regressões
+- ✅ Commit: `feat(story-1.2): reprodutibilidade científica — seed global e testes`
+
 ### File List
+
+ml-pipeline/src/utils/__init__.py
+ml-pipeline/src/utils/seed.py
+ml-pipeline/.env.example
+ml-pipeline/tests/test_reproducibility.py
+_bmad-output/compartilhado/implementation-artifacts/1-2-configuracao-da-reprodutibilidade-cientifica.md
+_bmad-output/compartilhado/implementation-artifacts/sprint-status.yaml
