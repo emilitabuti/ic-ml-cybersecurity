@@ -7,7 +7,7 @@ Valida que:
 - data_validator detecta e reporta NaN, infinitos e Binary_Label inválido
 - Erros de validação são descritivos (não silenciados)
 """
-import os
+import pathlib
 
 import numpy as np
 import pandas as pd
@@ -55,7 +55,7 @@ def valid_attacktype_df(valid_binary_df: pd.DataFrame) -> pd.DataFrame:
 
 
 @pytest.fixture
-def binary_parquet(tmp_path: pytest.TempPathFactory, valid_binary_df: pd.DataFrame) -> str:
+def binary_parquet(tmp_path: "pathlib.Path", valid_binary_df: pd.DataFrame) -> str:
     """Parquet temporário com dataset binário válido."""
     path = tmp_path / "cic_ids2017_model_ready_binary.parquet"
     valid_binary_df.to_parquet(path, index=False)
@@ -64,7 +64,7 @@ def binary_parquet(tmp_path: pytest.TempPathFactory, valid_binary_df: pd.DataFra
 
 @pytest.fixture
 def attacktype_parquet(
-    tmp_path: pytest.TempPathFactory, valid_attacktype_df: pd.DataFrame
+    tmp_path: "pathlib.Path", valid_attacktype_df: pd.DataFrame
 ) -> str:
     """Parquet temporário com dataset de tipo de ataque válido."""
     path = tmp_path / "cic_ids2017_model_ready_attacktype.parquet"

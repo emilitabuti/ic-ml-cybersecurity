@@ -35,7 +35,6 @@
   },
 
   "known_attack_types_cic_ids2017": [
-    "BENIGN",
     "Bot",
     "DDoS",
     "DoS GoldenEye",
@@ -51,6 +50,8 @@
     "Web Attack – SQL Injection",
     "Web Attack – XSS"
   ],
+
+  "_note_attack_type_dataset": "O dataset de tipo de ataque contém apenas Binary_Label=1. 'BENIGN' NÃO aparece como Attack_Type neste dataset.",
 
   "structural_guarantees": {
     "no_missing_values": true,

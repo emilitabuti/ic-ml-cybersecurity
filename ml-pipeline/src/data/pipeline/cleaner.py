@@ -79,8 +79,8 @@ def clean_cic_ids2017() -> None:
     df = remove_duplicate_columns(df)
     df = clean_column_names(df)
 
-    # Corrige caracteres corrompidos no campo Label
-    df["Label"] = df["Label"].str.replace("\\ufffd", "", regex=False).str.strip()
+    # Corrige caracteres corrompidos no campo Label (U+FFFD = replacement character)
+    df["Label"] = df["Label"].str.replace("\ufffd", "", regex=False).str.strip()
 
     # Cria coluna binária
     df["Binary_Label"] = df["Label"].apply(lambda x: 0 if x == "BENIGN" else 1)
