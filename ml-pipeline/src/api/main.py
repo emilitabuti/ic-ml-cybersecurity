@@ -18,4 +18,4 @@ app.add_middleware(
 
 @app.get("/health", tags=["infra"])
 def health_check() -> dict:
-    return {"status": "ok", "version": "0.1.0"}
+    return {"status": "ok", "version": app.version}

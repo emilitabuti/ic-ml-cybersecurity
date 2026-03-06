@@ -1,6 +1,6 @@
 # Story 1.1: Inicialização do Monorepo e Scaffolding dos Projetos
 
-Status: review
+Status: done
 
 ## Story
 
@@ -258,15 +258,18 @@ Claude Sonnet 4.6 (claude-sonnet-4.6) via GitHub Copilot
 - ✅ `config.py` com `RANDOM_SEED=42`, `WINDOW_SIZE`, `CONFIDENCE_THRESHOLD`, `MODEL_PATH`
 - ✅ `requirements.txt` gerado via `pip freeze` com 92 pacotes fixados
 - ✅ `.env.example` documenta `WINDOW_SIZE`, `CONFIDENCE_THRESHOLD`, `MODEL_PATH`
-- ✅ `src/api/main.py`: FastAPI com `/health` + CORS para `localhost:5173`
+- ✅ `src/api/main.py`: FastAPI com `/health` + CORS para `localhost:5173`; `/health` retorna `app.version` (sem duplicação)
 - ✅ `dashboard/` criado com Vite 5 + React 18 + TypeScript
-- ✅ Tailwind CSS 3 configurado com `content` paths e `darkMode: "class"`
+- ✅ `tailwind.config.js` configurado com mapeamento completo de variáveis CSS (cores, bordas, fontes) — compatível com shadcn + Tailwind v3
 - ✅ TanStack Query v5 com `QueryClientProvider` em `main.tsx`
-- ✅ Recharts 2 instalado
+- ✅ Recharts **v3** instalado (v3.7.0 — upgrade intencional sobre v2 especificado; API de componentes é retrocompatível para uso desta story)
 - ✅ `src/config.ts` com `API_BASE_URL` e `POLLING_INTERVAL_MS=5000`
 - ✅ `src/services/api.ts` — ponto único de acesso à FastAPI
+- ✅ `npm run build` ✅ (80 módulos, sem erros)
+- ✅ 37/37 testes passando: `pytest tests/test_scaffolding.py`
 - ✅ Commit: `9effc81 feat(epic1): scaffolding monorepo ml-pipeline e dashboard`
-- ⚠️ shadcn/ui não instalado automaticamente (requer TTY interativo). Executar manualmente: `cd dashboard && npx shadcn@latest init`
+- ⚠️ **tensorflow ausente no `requirements.txt`**: não instalável no ambiente atual (incompatibilidade de plataforma). Instalar manualmente quando necessário: `pip install tensorflow==2.16.*`. Impacto: apenas stories do Epic 3 (treino LSTM/MLP).
+- ⚠️ shadcn/ui inicialização interativa (`npx shadcn@latest init`) não executada automaticamente. O scaffolding CSS e configuração foram gerados manualmente e estão funcionais.
 
 ### File List
 

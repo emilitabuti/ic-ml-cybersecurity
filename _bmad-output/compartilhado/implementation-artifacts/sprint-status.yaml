@@ -42,7 +42,7 @@ story_location: _bmad-output/implementation-artifacts
 development_status:
   # ─── Epic 1: Fundação — Ambiente, Repositório e Contrato de Dados ───
   epic-1: in-progress
-  1-1-inicializacao-do-monorepo-e-scaffolding-dos-projetos: review
+  1-1-inicializacao-do-monorepo-e-scaffolding-dos-projetos: done
   1-2-configuracao-da-reprodutibilidade-cientifica: backlog
   1-3-ingestao-e-validacao-do-dataset-cicids2017: backlog
   1-4-divisao-train-test-estratificada-e-formalizacao-do-contrato-de-dados: backlog
