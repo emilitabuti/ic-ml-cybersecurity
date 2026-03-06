@@ -61,6 +61,18 @@ class TestSplitTrainTestBasic:
         assert X_train.shape[0] == y_train.shape[0]
         assert X_test.shape[0] == y_test.shape[0]
 
+    def test_returns_numpy_arrays(self, synthetic_binary_data: tuple) -> None:
+        """Todos os arrays retornados devem ser np.ndarray."""
+        import numpy as np
+        from src.data.data_splitter import split_train_test
+
+        X, y = synthetic_binary_data
+        X_train, X_test, y_train, y_test = split_train_test(X, y)
+        assert isinstance(X_train, np.ndarray)
+        assert isinstance(X_test, np.ndarray)
+        assert isinstance(y_train, np.ndarray)
+        assert isinstance(y_test, np.ndarray)
+
 
 class TestSplitReproducibility:
     """AC #2 — reprodutibilidade com mesmo seed."""
@@ -170,6 +182,22 @@ class TestSplitCustomParams:
             X, y, test_size=config.TEST_SIZE, random_state=config.RANDOM_SEED
         )
         np.testing.assert_array_equal(result_none[1], result_explicit[1])
+
+    def test_invalid_test_size_above_1_raises_value_error(self, synthetic_binary_data: tuple) -> None:
+        """test_size >= 1.0 deve lançar ValueError descritivo."""
+        from src.data.data_splitter import split_train_test
+
+        X, y = synthetic_binary_data
+        with pytest.raises(ValueError, match="test_size deve estar no intervalo"):
+            split_train_test(X, y, test_size=1.5)
+
+    def test_invalid_test_size_zero_raises_value_error(self, synthetic_binary_data: tuple) -> None:
+        """test_size <= 0.0 deve lançar ValueError descritivo."""
+        from src.data.data_splitter import split_train_test
+
+        X, y = synthetic_binary_data
+        with pytest.raises(ValueError, match="test_size deve estar no intervalo"):
+            split_train_test(X, y, test_size=0.0)
 
 
 class TestSplitNoLeakage:

@@ -3,7 +3,7 @@
   "_version": "1.1.0",
   "_dataset": "CIC-IDS2017",
   "_generated_by": "Caroline Guimarães Campos — pipeline de pré-processamento",
-  "_consumed_by": "Emili Tabuti — ml-pipeline (data_loader.py)",
+  "_consumed_by": "Emili Tabuti — ml-pipeline (data_loader.py, data_splitter.py)",
 
   "required_columns": [
     "Binary_Label"
