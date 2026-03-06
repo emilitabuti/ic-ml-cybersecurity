@@ -21,6 +21,9 @@ _bmad/_memory/storyteller-sidecar/story-preferences.md
 # ─────────────────────────────────────────────────────────────
 data/
 ml-pipeline/data/
+# Exceção: src/data/ é código-fonte, não dados — deve ser versionado
+!ml-pipeline/src/data/
+!ml-pipeline/src/data/**
 *.csv
 *.pcap
 *.parquet

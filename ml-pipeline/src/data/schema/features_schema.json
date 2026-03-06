@@ -1,0 +1,78 @@
+{
+  "_comment": "Contrato formal de features — CIC-IDS2017 model-ready. Caroline ↔ Emili.",
+  "_version": "1.0.0",
+  "_dataset": "CIC-IDS2017",
+  "_generated_by": "Caroline Guimarães Campos — pipeline de pré-processamento",
+  "_consumed_by": "Emili Tabuti — ml-pipeline (data_loader.py)",
+
+  "required_columns": [
+    "Binary_Label"
+  ],
+
+  "target_columns": {
+    "binary_task": "Binary_Label",
+    "attacktype_task": "Attack_Type_ID"
+  },
+
+  "label_values": {
+    "Binary_Label": {
+      "type": "int",
+      "values": [0, 1],
+      "description": "0 = Benigno, 1 = Ataque"
+    }
+  },
+
+  "preprocessing_applied": {
+    "duplicates_removed": true,
+    "infinite_values_handled": true,
+    "missing_values_handled": true,
+    "column_names_standardized": "snake_case",
+    "scaling": "log1p + RobustScaler (apenas colunas numéricas não-alvo)",
+    "encoding": {
+      "target_multiclass": "LabelEncoder → Attack_Type_ID",
+      "categorical_features": "One-Hot Encoding (apenas UNSW-NB15: proto, state, service)"
+    }
+  },
+
+  "known_attack_types_cic_ids2017": [
+    "BENIGN",
+    "Bot",
+    "DDoS",
+    "DoS GoldenEye",
+    "DoS Hulk",
+    "DoS Slowhttptest",
+    "DoS slowloris",
+    "FTP-Patator",
+    "Heartbleed",
+    "Infiltration",
+    "PortScan",
+    "SSH-Patator",
+    "Web Attack – Brute Force",
+    "Web Attack – SQL Injection",
+    "Web Attack – XSS"
+  ],
+
+  "structural_guarantees": {
+    "no_missing_values": true,
+    "no_infinite_values": true,
+    "outliers_preserved": true,
+    "note": "Outliers preservados — em detecção de intrusão valores extremos representam comportamento malicioso legítimo"
+  },
+
+  "data_sources": {
+    "primary": {
+      "name": "CIC-IDS2017",
+      "origin": "Canadian Institute for Cybersecurity",
+      "url": "https://www.unb.ca/cic/datasets/ids-2017.html",
+      "approximate_records_raw": 1200000,
+      "columns_raw": 80
+    },
+    "secondary": {
+      "name": "UNSW-NB15",
+      "origin": "University of New South Wales",
+      "url": "https://research.unsw.edu.au/projects/unsw-nb15-dataset",
+      "approximate_records_raw": 2280090,
+      "columns_raw": 50
+    }
+  }
+}
