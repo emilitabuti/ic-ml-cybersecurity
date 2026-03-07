@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 # ── Caminhos dos datasets model-ready ─────────────────────────────────────────
 
-_PROCESSED_DIR = Path("data/processed")
+_PROCESSED_DIR = Path(__file__).parent.parent.parent / "data" / "processed"
 
 _PATHS = {
     "cic": {
@@ -132,7 +132,9 @@ def load_attacktype_dataset(
 
 
 def get_feature_names(dataset: DatasetName = "cic", task: TaskName = "binary") -> list[str]:
-    """Retorna a lista de nomes das features do dataset.
+    """Retorna a lista de nomes das features sem carregar o dataset completo.
+
+    Lê apenas o schema do parquet (metadados) — operação de O(KB), não O(GB).
 
     Args:
         dataset: Nome do dataset.
@@ -141,5 +143,22 @@ def get_feature_names(dataset: DatasetName = "cic", task: TaskName = "binary") -
     Returns:
         Lista de strings com os nomes das colunas de features.
     """
-    df = load_dataset(dataset=dataset, task=task)
-    return [c for c in df.columns if c not in _NON_FEATURE_COLS]
+    if dataset not in _PATHS:
+        raise ValueError(f"Dataset inválido: '{dataset}'. Opções: {list(_PATHS.keys())}")
+    if task not in _PATHS[dataset]:
+        raise ValueError(f"Task inválida: '{task}'. Opções: binary, attacktype")
+
+    path = _PATHS[dataset][task]
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Dataset não encontrado: {path}\n"
+            "Execute o pipeline de pré-processamento de Caroline primeiro:\n"
+            "  python -m src.data.pipeline.collector\n"
+            "  python -m src.data.pipeline.cleaner\n"
+            "  python -m src.data.pipeline.scaler\n"
+            "  python -m src.data.pipeline.preprocessor"
+        )
+
+    import pyarrow.parquet as pq
+    schema = pq.read_schema(path)
+    return [c for c in schema.names if c not in _NON_FEATURE_COLS]

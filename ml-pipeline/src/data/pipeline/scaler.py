@@ -9,9 +9,11 @@ Uso:
     python -m src.data.pipeline.scaler --dataset unsw
 """
 import logging
+import joblib
 
 import numpy as np
 import pandas as pd
+from pathlib import Path
 from sklearn.preprocessing import RobustScaler
 
 logger = logging.getLogger(__name__)
@@ -58,6 +60,11 @@ def scale_dataset(input_path: str, output_path: str) -> None:
     scaler = RobustScaler()
     df_scaled[numeric_cols] = scaler.fit_transform(df_scaled[numeric_cols])
     logger.info("RobustScaler aplicado")
+
+    # Persiste o scaler para reprodutibilidade em inferência (Epic 4)
+    scaler_path = Path(output_path).with_suffix(".joblib")
+    joblib.dump(scaler, scaler_path)
+    logger.info("Scaler salvo em: %s", scaler_path)
 
     df_scaled.to_parquet(output_path, index=False)
     logger.info("Dataset escalado salvo em: %s", output_path)

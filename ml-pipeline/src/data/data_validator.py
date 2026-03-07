@@ -16,7 +16,7 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-SCHEMA_PATH = Path("src/data/schema/features_schema.json")
+SCHEMA_PATH = Path(__file__).parent / "schema" / "features_schema.json"
 
 
 class DataValidationError(Exception):

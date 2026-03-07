@@ -63,11 +63,11 @@ def remove_duplicate_rows(df: pd.DataFrame) -> pd.DataFrame:
 
 def treat_infinite_and_missing(df: pd.DataFrame) -> pd.DataFrame:
     """Substitui inf/-inf por NaN e preenche NaN com 0."""
-    df.replace([np.inf, -np.inf], np.nan, inplace=True)
+    df = df.replace([np.inf, -np.inf], np.nan)
     nan_count = df.isnull().sum().sum()
     if nan_count > 0:
         logger.info("Preenchendo %d valores NaN/inf com 0", nan_count)
-    df.fillna(0, inplace=True)
+    df = df.fillna(0)
     return df
 
 

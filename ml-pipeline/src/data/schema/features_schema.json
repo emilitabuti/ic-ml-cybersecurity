@@ -8,6 +8,7 @@
   "required_columns": [
     "Binary_Label"
   ],
+  "_todo_required_columns": "Expandir com as feature columns do CIC-IDS2017 após validação com Caroline — atualmente cobre apenas Binary_Label",
 
   "target_columns": {
     "binary_task": "Binary_Label",
