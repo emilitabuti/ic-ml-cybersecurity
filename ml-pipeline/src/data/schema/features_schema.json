@@ -1,0 +1,90 @@
+{
+  "_comment": "Contrato formal de features — CIC-IDS2017 model-ready. Caroline ↔ Emili.",
+  "_version": "1.1.0",
+  "_dataset": "CIC-IDS2017",
+  "_generated_by": "Caroline Guimarães Campos — pipeline de pré-processamento",
+  "_consumed_by": "Emili Tabuti — ml-pipeline (data_loader.py, data_splitter.py)",
+
+  "required_columns": [
+    "Binary_Label"
+  ],
+  "_todo_required_columns": "Expandir com as feature columns do CIC-IDS2017 após validação com Caroline — atualmente cobre apenas Binary_Label",
+
+  "target_columns": {
+    "binary_task": "Binary_Label",
+    "attacktype_task": "Attack_Type_ID"
+  },
+
+  "label_values": {
+    "Binary_Label": {
+      "type": "int",
+      "values": [0, 1],
+      "description": "0 = Benigno, 1 = Ataque"
+    }
+  },
+
+  "preprocessing_applied": {
+    "duplicates_removed": true,
+    "infinite_values_handled": true,
+    "missing_values_handled": true,
+    "column_names_standardized": "snake_case",
+    "scaling": "log1p + RobustScaler (apenas colunas numéricas não-alvo)",
+    "encoding": {
+      "target_multiclass": "LabelEncoder → Attack_Type_ID",
+      "categorical_features": "One-Hot Encoding (apenas UNSW-NB15: proto, state, service)"
+    }
+  },
+
+  "known_attack_types_cic_ids2017": [
+    "Bot",
+    "DDoS",
+    "DoS GoldenEye",
+    "DoS Hulk",
+    "DoS Slowhttptest",
+    "DoS slowloris",
+    "FTP-Patator",
+    "Heartbleed",
+    "Infiltration",
+    "PortScan",
+    "SSH-Patator",
+    "Web Attack – Brute Force",
+    "Web Attack – SQL Injection",
+    "Web Attack – XSS"
+  ],
+
+  "_note_attack_type_dataset": "O dataset de tipo de ataque contém apenas Binary_Label=1. 'BENIGN' NÃO aparece como Attack_Type neste dataset.",
+
+  "structural_guarantees": {
+    "no_missing_values": true,
+    "no_infinite_values": true,
+    "outliers_preserved": true,
+    "note": "Outliers preservados — em detecção de intrusão valores extremos representam comportamento malicioso legítimo"
+  },
+
+  "data_sources": {
+    "primary": {
+      "name": "CIC-IDS2017",
+      "origin": "Canadian Institute for Cybersecurity",
+      "url": "https://www.unb.ca/cic/datasets/ids-2017.html",
+      "approximate_records_raw": 1200000,
+      "columns_raw": 80
+    },
+    "secondary": {
+      "name": "UNSW-NB15",
+      "origin": "University of New South Wales",
+      "url": "https://research.unsw.edu.au/projects/unsw-nb15-dataset",
+      "approximate_records_raw": 2280090,
+      "columns_raw": 50
+    }
+  },
+
+  "split_contract": {
+    "test_size": 0.2,
+    "train_size": 0.8,
+    "stratify_by": "Binary_Label",
+    "random_state_source": "config.RANDOM_SEED (default: 42)",
+    "leakage_prevention_policy": "split_first",
+    "split_applied_before": ["feature_selection", "sliding_window", "additional_scaling"],
+    "description": "O split train/test deve ser aplicado ANTES de qualquer transformação de features para prevenir data leakage. Ver src/data/data_splitter.py."
+  }
+}

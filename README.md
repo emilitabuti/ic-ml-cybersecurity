@@ -17,6 +17,7 @@
 7. [Como usar o BMAD no dia a dia](#7-como-usar-o-bmad-no-dia-a-dia)
 8. [Fluxo de trabalho — do início ao fim](#8-fluxo-de-trabalho--do-início-ao-fim)
 9. [Protocolos de colaboração](#9-protocolos-de-colaboração)
+10. [Reprodução dos Experimentos](#10-reprodução-dos-experimentos)
 
 ---
 
@@ -307,6 +308,36 @@ Os dados **não são versionados no git** — o CICIDS2017 tem ~2,8 GB e excede 
 | Dataset CICIDS2017 | [Canadian Institute for Cybersecurity](https://www.unb.ca/cic/datasets/ids-2017.html) — download direto |
 | Modelos treinados (`.pkl`, `.joblib`, `.h5`) | Compartilhar via Google Drive ou GitHub Releases quando necessário |
 | Experimentos MLflow (`mlruns/`) | Local de cada pesquisadora |
+
+---
+
+## 10. Reprodução dos Experimentos
+
+Para reproduzir os experimentos científicos descritos no artigo:
+
+**Setup estimado: ≤ 30 minutos** — pré-requisitos: Python 3.10+, pip, git e o dataset CICIDS2017.
+
+O sistema aplica Random Forest, Decision Tree e LSTM sobre **janelas temporais deslizantes** (*sliding window*) do dataset CICIDS2017 para **previsão antecipada** de ataques cibernéticos. Todos os experimentos são rastreados com MLflow e são determinísticos via `RANDOM_SEED = 42`.
+
+**Para reproduzir:**
+1. Siga as instruções passo a passo em [`ml-pipeline/README.md#reprodutibilidade-científica`](ml-pipeline/README.md#reprodutibilidade-científica)
+2. Use `RANDOM_SEED = 42` (padrão em `config.py`) para resultados exatos
+3. Após treinar, visualize métricas em `http://127.0.0.1:5000` com `mlflow ui`
+
+**Componente Dashboard** *(Epic 5 — a implementar)*
+
+Para rodar o ambiente de desenvolvimento do dashboard (requer Node.js 18+):
+
+```bash
+cd dashboard
+npm install
+npm run dev
+# Acesse: http://localhost:5173
+```
+
+> ⚠️ O dashboard está em desenvolvimento (Epic 5). A integração com a API de predição ocorrerá nas Stories 5.2–5.3.
+
+**Dataset:** [CICIDS2017](https://www.unb.ca/cic/datasets/ids-2017.html) — Canadian Institute for Cybersecurity (~2,8 GB, não versionado no repositório).
 
 ---
 
