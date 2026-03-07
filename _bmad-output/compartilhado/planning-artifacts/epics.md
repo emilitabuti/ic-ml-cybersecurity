@@ -2,10 +2,17 @@
 stepsCompleted: ['step-01-validate-prerequisites', 'step-02-design-epics', 'step-03-create-stories', 'step-04-final-validation']
 workflowStatus: 'complete'
 completedAt: '2026-02-21'
+lastStatusUpdate: '2026-03-06'
 inputDocuments:
   - "_bmad-output/planning-artifacts/prd.md"
   - "_bmad-output/planning-artifacts/architecture.md"
   - "_bmad-output/planning-artifacts/ux-design-specification.md"
+implementationStatus:
+  epic1: "done"
+  epic2: "not_started"
+  epic3: "not_started"
+  epic4: "not_started"
+  epic5: "scaffolding_only"
 ---
 
 # ic-ml-cybersecurity - Epic Breakdown
@@ -189,6 +196,7 @@ O analista de segurança (e a pesquisadora na demo do seminário) consegue monit
 Emili consegue inicializar o monorepo completo com os dois projetos (ML Pipeline + Dashboard React), configurar o ambiente reprodutível com seed fixo e dependências versionadas, e validar/carregar os dados do CICIDS2017 com o contrato formal de interface entre Caroline e Emili.
 
 ### Story 1.1: Inicialização do Monorepo e Scaffolding dos Projetos
+> **Status: ✅ CONCLUÍDA** — `ml-pipeline/` e `dashboard/` scaffoldados, estrutura de diretórios completa, `requirements.txt`, `README.md`, `config.py`, FastAPI `/health` funcionando.
 
 Como pesquisadora de IC,
 Quero inicializar o repositório monorepo com os dois projetos scaffoldados (ML Pipeline e Dashboard React),
@@ -205,6 +213,7 @@ Para que toda a equipe parta de uma base estruturada, padronizada e pronta para 
 **E** ambos os projetos iniciam sem erros (`uvicorn src/api/main:app` e `npm run dev`)
 
 ### Story 1.2: Configuração da Reprodutibilidade Científica
+> **Status: ✅ CONCLUÍDA** — `src/utils/seed.py` com `set_global_seed()`, `RANDOM_SEED=42` em `config.py`, `CONFIDENCE_THRESHOLD=0.8`, testes de reprodutibilidade completos em `tests/test_reproducibility.py`.
 
 Como pesquisadora de IC,
 Quero um sistema com seed global fixo e dependências documentadas,
@@ -220,6 +229,7 @@ Para que qualquer experimento seja 100% reprodutível em qualquer máquina.
 **E** executando o pipeline duas vezes com os mesmos dados, as métricas são idênticas (variação ≤ 0.01%)
 
 ### Story 1.3: Ingestão e Validação do Dataset CICIDS2017
+> **Status: ✅ CONCLUÍDA** — `src/data/data_loader.py` (carrega Parquet model-ready, suporte a CIC e UNSW) + `src/data/data_validator.py` (validação de NaN, infinitos, Binary_Label) + pipeline completo em `src/data/pipeline/` (collector, cleaner, scaler, preprocessor) + testes em `tests/test_data_loader.py`. ⚠️ Formato alterado de CSV para Parquet (decisão registrada na arquitetura §12.1).
 
 Como pesquisadora de ML (Emili),
 Quero carregar e validar o dataset CSV do CICIDS2017 com verificação de schema formal,
@@ -238,6 +248,7 @@ Para que erros de formato ou dados inválidos sejam detectados antes do treiname
 **Então** uma exceção clara é lançada informando quais colunas estão ausentes ou inválidas
 
 ### Story 1.4: Divisão Train/Test Estratificada e Formalização do Contrato de Dados
+> **Status: 🔴 NÃO INICIADA** — `src/data/` tem data_loader e data_validator mas o módulo de split train/test e o `features_schema.json` ainda não foram implementados.
 
 Como pesquisadora de ML (Emili),
 Quero dividir os dados em treino e teste antes de qualquer transformação e formalizar o schema de interface com Caroline,
@@ -256,6 +267,7 @@ Para que não haja data leakage e o contrato de dados esteja documentado formalm
 **Então** os conjuntos são idênticos nas duas execuções
 
 ### Story 1.5: README de Reprodutibilidade
+> **Status: 🟡 PARCIAL** — `ml-pipeline/README.md` existe com instruções de instalação e execução da API. Faltam: instruções do pipeline de treino completo, referência ao MLflow UI e tempo de setup do experimento end-to-end.
 
 Como pesquisador externo,
 Quero instruções claras de instalação e execução do projeto,
@@ -275,6 +287,7 @@ Para que consiga reproduzir os experimentos principais em ≤ 30 minutos de setu
 Emili consegue preparar os dados do CICIDS2017 para treinamento — executando feature selection sobre o conjunto de treino e transformando as sequências em janelas deslizantes (sliding window), com garantia de ausência de data leakage entre treino e teste.
 
 ### Story 2.1: Feature Selection sobre o Conjunto de Treino
+> **Status: 🔴 NÃO INICIADA** — `src/features/` existe mas contém apenas `__init__.py`. `feature_selector.py` não implementado.
 
 Como pesquisadora de ML (Emili),
 Quero executar feature selection sobre o conjunto de treino para selecionar as top-N features mais relevantes,
@@ -294,6 +307,7 @@ Para que o modelo treine com as features de maior poder preditivo, reduzindo ru�
 **Então** o resultado é idêntico nas duas execuções
 
 ### Story 2.2: Transformação em Sliding Window
+> **Status: 🔴 NÃO INICIADA** — `feature_engineer.py` não implementado. `WINDOW_SIZE` está configurado em `config.py` mas a transformação ainda não existe.
 
 Como pesquisadora de ML (Emili),
 Quero transformar sequências de registros de tráfego em janelas deslizantes de tamanho N configurável,
@@ -313,6 +327,7 @@ Para que os modelos sequenciais (LSTM) capturem dependências temporais que prec
 **Então** cada amostra tem shape `(10, num_features)` para modelos sequenciais (LSTM) e `(10 * num_features,)` para modelos tabulares (RF, DT)
 
 ### Story 2.3: Validação Anti-Leakage do Pipeline de Features
+> **Status: 🔴 NÃO INICIADA** — Depende de 2.1 e 2.2. `tests/test_feature_engineer.py` não existe.
 
 Como pesquisadora de IC,
 Quero validar que o pipeline de features não vaza dados do teste para o treino,
@@ -334,6 +349,7 @@ Para que a validade metodológica do experimento e a publicabilidade do artigo s
 Emili consegue treinar os três modelos (RF, DT, LSTM/MLP) com k-fold k=5, avaliar comparativamente com todas as métricas científicas exigidas (F1, AUC-ROC, Precision, Recall, FPR reportadas com média e desvio padrão), rastrear automaticamente todos os experimentos no MLflow e exportar resultados em CSV para o artigo científico.
 
 ### Story 3.1: Setup do MLflow e Infraestrutura de Rastreamento
+> **Status: 🟡 PARCIAL** — `mlflow` está no `requirements.txt` e o diretório `mlruns/` existe (gerado automaticamente). Falta: configuração explícita do `mlflow.sklearn.autolog()`, nomenclatura de experimentos `ic-ml-cybersecurity-{model_type}` e script de setup.
 
 Como pesquisadora de ML (Emili),
 Quero configurar o MLflow local com nomenclatura padronizada de experimentos,
@@ -349,6 +365,7 @@ Para que todos os runs de treino sejam automaticamente rastreados sem boilerplat
 **E** o diretório `mlruns/` é criado em `ml-pipeline/` e está no `.gitignore`
 
 ### Story 3.2: Treino e Avaliação do Random Forest com k-fold
+> **Status: 🔴 NÃO INICIADA** — `src/training/` existe mas contém apenas `__init__.py`. `train_rf.py` não implementado.
 
 Como pesquisadora de ML (Emili),
 Quero treinar o Random Forest com k-fold k=5 e registrar todas as métricas científicas no MLflow,
@@ -365,6 +382,7 @@ Para que tenha evidência empírica replicável do desempenho do RF para o artig
 **E** o treino completo do RF sobre CICIDS2017 termina em ≤ 2 horas em CPU (Intel Core i5, 8GB RAM)
 
 ### Story 3.3: Treino e Avaliação do Decision Tree com k-fold
+> **Status: 🔴 NÃO INICIADA** — `train_dt.py` não implementado.
 
 Como pesquisadora de ML (Emili),
 Quero treinar o Decision Tree com k-fold k=5 nas mesmas condições do RF,
@@ -379,6 +397,7 @@ Para que a comparação entre algoritmos seja metodologicamente válida (mesmo s
 **E** o experimento MLflow está sob o nome `ic-ml-cybersecurity-decision_tree`
 
 ### Story 3.4: Treino e Avaliação do LSTM/MLP com k-fold
+> **Status: 🔴 NÃO INICIADA** — `train_lstm.py` não implementado. TensorFlow/Keras não está no `requirements.txt` ainda (usar Google Colab ou instalar localmente).
 
 Como pesquisadora de ML (Emili),
 Quero treinar o LSTM (ou MLP como fallback) com k-fold k=5 nas mesmas condições dos modelos anteriores,
@@ -394,6 +413,7 @@ Para que a comparação temporal vs. tabular tenha suporte empírico sólido.
 **E** se LSTM for inviável no prazo, MLP é executado como substituto e documentado explicitamente no relatório
 
 ### Story 3.5: Tabela Comparativa de Métricas e Exportação CSV
+> **Status: 🔴 NÃO INICIADA** — Depende de 3.2, 3.3, 3.4. `evaluator.py` não implementado.
 
 Como pesquisadora de IC (Emili),
 Quero gerar a tabela comparativa de desempenho entre RF, DT e LSTM e exportá-la em CSV,
@@ -409,6 +429,7 @@ Para que tenha a evidência empírica central do artigo científico formatada pa
 **E** o CSV exportado é compatível com importação direta em LaTeX/Word para o artigo
 
 ### Story 3.6: Relatório de Desempenho por Tipo de Ataque
+> **Status: 🔴 NÃO INICIADA** — Depende de 3.2–3.4.
 
 Como pesquisadora de IC (Emili),
 Quero gerar um relatório de desempenho dos modelos por tipo de ataque do CICIDS2017,
@@ -431,6 +452,7 @@ Emili consegue exportar o modelo vencedor com todo o pipeline de pré-processame
 > ⚠️ **ORDEM DE IMPLEMENTAÇÃO:** Story 4.4 (Endpoint Mock) deve ser implementada **ANTES** das Stories 4.1–4.3. Isso habilita o desenvolvimento paralelo do Dashboard (Epic 5) sem aguardar o modelo real. Isabela pode iniciar o Epic 5 assim que Story 4.4 estiver concluída.
 
 ### Story 4.1: Serialização do Modelo Vencedor com Pipeline Completo
+> **Status: 🔴 NÃO INICIADA** — `src/models/` existe com apenas `__init__.py`. `model_serializer.py` não implementado. Depende do Epic 3.
 
 Como pesquisadora de ML (Emili),
 Quero serializar o modelo vencedor junto com todo o pipeline de pré-processamento (scaler + encoder + modelo),
@@ -449,6 +471,7 @@ Para que a inferência funcione em qualquer ambiente limpo sem acesso ao código
 **Então** a predição falha com erro descritivo indicando dependência faltante — não silencia o problema
 
 ### Story 4.2: Endpoint de Predição `POST /predict`
+> **Status: 🔴 NÃO INICIADA** — `src/api/routes/` e `src/api/schemas/` existem mas contêm apenas `__init__.py`. `predict.py` não implementado.
 
 Como sistema de alertas da Isabela,
 Quero enviar uma janela de tráfego via HTTP e receber a predição do modelo,
@@ -467,6 +490,7 @@ Para que o dashboard exiba alertas em tempo real com tipo de ameaça e nível de
 **Então** retorna HTTP 422 com `{ "detail": "...", "code": "INVALID_FEATURES" }`
 
 ### Story 4.3: Endpoints de Saúde, Metadados e Histórico
+> **Status: 🟡 PARCIAL** — `GET /health` implementado e funcional em `src/api/main.py`. Faltam: `GET /model/info`, `GET /history`, e carregamento do modelo no startup.
 
 Como desenvolvedora do dashboard (Isabela),
 Quero endpoints para verificar o estado da API, metadados do modelo ativo e histórico de predições,
@@ -488,6 +512,7 @@ Para que o dashboard mostre informações do sistema e o analista possa acessar 
 ### Story 4.4: Endpoint Mock para Desenvolvimento Paralelo
 
 > 🚀 **PRIORIDADE MÁXIMA — Implementar antes das Stories 4.1–4.3** (habilita Epic 5 em paralelo)
+> **Status: 🔴 NÃO INICIADA** — ⚠️ **BLOQUEADOR do Epic 5.** `POST /predict/mock` não implementado. Isabela não pode iniciar o desenvolvimento do dashboard sem este endpoint.
 
 Como desenvolvedora do dashboard (Isabela),
 Quero um endpoint mock que retorna predições fixas sem depender do modelo real,
@@ -508,6 +533,7 @@ Para que possa desenvolver e testar a interface sem aguardar a conclusão do Epi
 O analista de segurança (e a pesquisadora na demo do seminário) consegue monitorar previsões de ataques em tempo real via interface visual em tema escuro (Command Center), receber alertas com tipo de ameaça + nível de confiança + features motivadoras, gerenciar histórico com feedback (confirmar / falso positivo), configurar threshold de confiança e comparar desempenho dos modelos (RF / DT / LSTM) — com modo de demonstração/replay para o seminário de IC.
 
 ### Story 5.1: Scaffolding do Dashboard e Layout Command Center
+> **Status: 🔴 NÃO INICIADA** — Scaffolding técnico existe (Vite + React + TS + Tailwind + shadcn + recharts + TanStack Query + `src/config.ts` + `src/services/api.ts`). Porém `App.tsx` ainda é o template padrão do Vite. A UI do dashboard (sidebar, header, tema escuro) não foi implementada.
 
 Como desenvolvedora do dashboard (Isabela),
 Quero o layout base do dashboard com sidebar fixa, header de métricas e tema escuro configurado,
@@ -524,6 +550,7 @@ Para que todas as histórias seguintes tenham uma estrutura visual consistente p
 **E** nenhum dado pessoal ou sensível é processado — apenas dados simulados/públicos (NFR12)
 
 ### Story 5.2: Integração com API via Polling e Exibição de Alertas em Tempo Real
+> **Status: 🔴 NÃO INICIADA** — Depende de 5.1 e 4.4 (mock). `src/services/api.ts` existe como base, mas hooks e componentes não implementados.
 
 Como analista de segurança (Ana),
 Quero receber alertas de ameaças previstas automaticamente no dashboard sem refresh manual,
@@ -540,6 +567,7 @@ Para que possa monitorar a rede de forma passiva e ser notificada antes da concr
 **E** o badge de contagem de alertas ativos no título da aba do browser atualiza em tempo real
 
 ### Story 5.3: Painel de Detalhe do Alerta com Ações de Decisão
+> **Status: 🔴 NÃO INICIADA** — Depende de 5.2.
 
 Como analista de segurança (Ana),
 Quero clicar em um alerta e ver seus detalhes completos com opções de decisão inline,
@@ -556,6 +584,7 @@ Para que possa avaliar a ameaça e agir em ≤ 2 cliques sem sair do dashboard.
 **E** o alerta tratado muda de cor/estado imediatamente sem recarregar a página
 
 ### Story 5.4: Histórico de Alertas com Filtros e Feedback do Analista
+> **Status: 🔴 NÃO INICIADA** — Depende de 5.3 e `GET /history` (Story 4.3).
 
 Como analista de segurança (Ana),
 Quero acessar o histórico completo de alertas tratados com status e poder registrar feedback,
@@ -571,6 +600,7 @@ Para que possa auditar decisões passadas e calibrar minha confiança no modelo 
 **E** o registro de feedback de cada alerta fica vinculado ao alerta no histórico para análise posterior
 
 ### Story 5.5: Configuração de Threshold e Painel de Comparação de Modelos
+> **Status: 🔴 NÃO INICIADA** — Depende de 5.1 e dados de avaliação do Epic 3.
 
 Como analista de segurança (Ana) e pesquisadora (Isabela),
 Quero configurar o threshold mínimo de confiança para disparo de alertas e comparar visualmente o desempenho dos modelos,
@@ -586,6 +616,7 @@ Para que possa calibrar o sistema para minha rede e apresentar os resultados cie
 **E** um botão "Exportar métricas CSV" faz download da tabela comparativa para o artigo
 
 ### Story 5.6: Modo de Demonstração para o Seminário de IC
+> **Status: 🔴 NÃO INICIADA** — Depende de 5.2–5.5.
 
 Como pesquisadora (Isabela),
 Quero um modo de demonstração que reproduz sessões históricas de alertas em velocidade controlada,
@@ -603,6 +634,7 @@ Para que possa apresentar o sistema funcionando ao vivo no seminário de IC sem 
 ### Story 5.7: Gráfico da Janela Deslizante no Painel de Detalhe (Pós-MVP)
 
 > 📌 **Escopo:** Growth feature — implementar após conclusão das Stories 5.1–5.6 caso o prazo permita.
+> **Status: 🔴 NÃO INICIADA** — Pós-MVP.
 
 Como analista de segurança (Ana),
 Quero ver um gráfico de barras da janela temporal de tráfego que gerou o alerta no painel de detalhe,

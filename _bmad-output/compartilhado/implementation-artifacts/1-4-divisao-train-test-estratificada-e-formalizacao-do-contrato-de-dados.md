@@ -1,6 +1,6 @@
 # Story 1.4: Divisão Train/Test Estratificada e Formalização do Contrato de Dados
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -244,10 +244,27 @@ sliding_window(X_train_selected), sliding_window(X_test_selected)  ← Story 2.2
 
 ### Agent Model Used
 
-_a preencher pelo agente de desenvolvimento_
+Claude Sonnet 4.6 (claude-sonnet-4.6) via GitHub Copilot
 
 ### Debug Log References
 
+- Suite rodada com `.venv/bin/pytest` (venv do projeto)
+- 19/19 novos testes passando na fase GREEN
+- 91/91 suite completa sem regressões
+
 ### Completion Notes List
 
+- ✅ `config.py` — adicionado `TEST_SIZE: float = float(os.getenv("TEST_SIZE", "0.2"))`
+- ✅ `src/data/data_splitter.py` — `split_train_test()` com stratify, logging descritivo, type hints
+- ✅ `src/data/schema/features_schema.json` — atualizado v1.0.0→v1.1.0 com seção `split_contract`
+- ✅ `tests/test_data_splitter.py` — 19 testes em 6 classes cobrindo AC #1–#4
+- ✅ 91/91 testes passando — sem regressões
+
 ### File List
+
+ml-pipeline/config.py
+ml-pipeline/src/data/data_splitter.py
+ml-pipeline/src/data/schema/features_schema.json
+ml-pipeline/tests/test_data_splitter.py
+_bmad-output/compartilhado/implementation-artifacts/sprint-status.yaml
+_bmad-output/compartilhado/implementation-artifacts/1-4-divisao-train-test-estratificada-e-formalizacao-do-contrato-de-dados.md

@@ -760,20 +760,25 @@ Requisitos arquiteturais de acessibilidade — não opcionais:
 
 ### 12.1 Contrato de Dados — Caroline → Emili
 
-Acordo formal sobre o formato do CSV entregue por Caroline para o pipeline de Emili.
+Acordo formal sobre o formato dos dados entregues por Caroline para o pipeline de Emili.
 
 | Campo | Especificação |
 |---|---|
-| **Formato** | CSV com separador vírgula |
-| **Encoding** | UTF-8 |
+| **Formato de entrega** | Parquet (`.parquet`) — adotado por Emili em substituição ao CSV planejado originalmente para melhor performance de I/O e preservação de tipos |
+| **Encoding** | UTF-8 (campos string) |
 | **Features** | Subconjunto das 78 features originais do CICIDS2017 (após normalização por Caroline) |
-| **Nomenclatura** | Nomes originais do CICIDS2017 (ex: `Flow Duration`, `Total Fwd Packets`) |
+| **Nomenclatura** | Nomes originais do CICIDS2017 em snake_case (ex: `Flow_Duration`, `Total_Fwd_Packets`) |
 | **Coluna label** | `Label` — valores: `BENIGN` + categorias de ataque em string |
+| **Coluna binária** | `Binary_Label` — `0` = benigno, `1` = ataque (gerada pelo pipeline de Emili) |
 | **Encoding de labels** | Strings (ex: `"DDoS"`, `"BENIGN"`) — encoding numérico é responsabilidade de Emili |
-| **Valores nulos** | Removidos ou imputados por Caroline antes da entrega |
-| **Duplicatas** | Removidas por Caroline |
-| **Normalização** | Min-Max Scaling — documentado no cabeçalho ou README do dataset |
+| **Valores nulos** | Tratados no pipeline Emili (`cleaner.py`: `fillna(0)` após `replace([inf, -inf], nan)`) |
+| **Duplicatas** | Removidas no pipeline Emili (`cleaner.py`: `drop_duplicates()`) |
+| **Normalização** | `log1p` em features assimétricas + `RobustScaler` (usa mediana+IQR, robusto a outliers) |
 | **Arquivo de contrato** | `data/schema/features_schema.json` |
+
+> **📌 Decisão registrada (2026-03-06):** O pipeline de pré-processamento foi implementado por Emili em `src/data/pipeline/` (`collector.py`, `cleaner.py`, `scaler.py`, `preprocessor.py`) em vez de receber o CSV pré-processado de Caroline. Motivação: (1) necessidade de controle total sobre o pipeline para reprodutibilidade científica; (2) suporte expandido para UNSW-NB15 como segundo dataset de validação (não previsto no PRD original, adicionado como melhoria). O formato Parquet foi preferido ao CSV por performance (~10x mais rápido para leitura, preservação nativa de tipos). Os arquivos intermediários seguem a cadeia: `*_raw_merged.parquet` → `*_cleaned.parquet` → `*_scaled.parquet` → `*_model_ready_binary.parquet` + `*_model_ready_attacktype.parquet`.
+
+> **Datasets suportados:** CIC-IDS2017 (escopo principal do PRD) e UNSW-NB15 (adição de Emili para análise comparativa no artigo).
 
 ### 12.2 Contrato REST — FastAPI → Dashboard (React)
 
