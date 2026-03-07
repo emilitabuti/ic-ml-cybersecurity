@@ -324,6 +324,19 @@ O sistema aplica Random Forest, Decision Tree e LSTM sobre **janelas temporais d
 2. Use `RANDOM_SEED = 42` (padrão em `config.py`) para resultados exatos
 3. Após treinar, visualize métricas em `http://127.0.0.1:5000` com `mlflow ui`
 
+**Componente Dashboard** *(Epic 5 — a implementar)*
+
+Para rodar o ambiente de desenvolvimento do dashboard (requer Node.js 18+):
+
+```bash
+cd dashboard
+npm install
+npm run dev
+# Acesse: http://localhost:5173
+```
+
+> ⚠️ O dashboard está em desenvolvimento (Epic 5). A integração com a API de predição ocorrerá nas Stories 5.2–5.3.
+
 **Dataset:** [CICIDS2017](https://www.unb.ca/cic/datasets/ids-2017.html) — Canadian Institute for Cybersecurity (~2,8 GB, não versionado no repositório).
 
 ---

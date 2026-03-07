@@ -1,6 +1,6 @@
 # Story 1.5: README de Reprodutibilidade
 
-Status: review
+Status: done
 
 ## Story
 
@@ -243,6 +243,7 @@ Claude Sonnet 4.6 (claude-sonnet-4.6) via GitHub Copilot
 - `mlflow 3.10.1` confirmado importável no venv do projeto
 - `load_binary_dataset`, `split_train_test`, `config.RANDOM_SEED=42` confirmados funcionais
 - Paths (`src/data/`, `src/training/`) conferidos contra estrutura real do repositório
+- **Code review (2026-03-07):** URL de clone corrigida (`emili-tabuti` → `emilitabuti`), descrição de `data/processed/` desambiguada, instrução de execução do pipeline clarificada, contagem de testes atualizada para 94+, bloco gitignore ajustado para refletir entradas reais, seção 10 da raiz expandida com instruções básicas do dashboard
 
 ### Completion Notes List
 
@@ -250,6 +251,12 @@ Claude Sonnet 4.6 (claude-sonnet-4.6) via GitHub Copilot
 - ✅ `README.md` (raiz) — adicionado item 10 ao índice e seção "Reprodução dos Experimentos" com contexto científico, link para `ml-pipeline/README.md#reprodutibilidade-científica`, tempo ≤ 30 min e referência ao dataset CICIDS2017
 - ✅ 94/94 testes passando — sem regressões
 - ✅ Todos os comandos documentados verificados no estado atual do repositório
+- ✅ **[Code Review Fix]** URL de clone corrigida: `emili-tabuti` → `emilitabuti` (H1)
+- ✅ **[Code Review Fix]** `data/processed/` — descrição desambiguada na seção Estrutura (M3)
+- ✅ **[Code Review Fix]** Passo 4 — instrução de execução via `python run_data_pipeline.py` adicionada (M2)
+- ✅ **[Code Review Fix]** Seção 10 da raiz — instruções básicas do `dashboard/` adicionadas com marcação Epic 5 (M1)
+- ✅ **[Code Review Fix]** Contagem de testes atualizada para `94+` (L1)
+- ✅ **[Code Review Fix]** Bloco `gitignore` corrigido para refletir entradas reais do `.gitignore` (L2)
 
 ### File List
 

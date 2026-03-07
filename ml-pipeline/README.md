@@ -27,7 +27,7 @@ ml-pipeline/
 ├── requirements.txt    # Dependências com versões fixadas
 ├── data/
 │   ├── raw/            # Dataset CICIDS2017 original (não versionado)
-│   ├── processed/      # CSV pré-processado por Caroline
+│   ├── processed/      # Dados processados (gerados localmente pelo pipeline ou fornecidos pela equipe — não versionados)
 │   └── schema/         # features_schema.json — contrato de dados
 ├── models/             # Modelos serializados (.pkl, .h5)
 ├── notebooks/          # Exploração e prototipagem
@@ -66,7 +66,7 @@ Todas as execuções usam `RANDOM_SEED = 42` definido em `config.py`, garantindo
 ### 1. Clonar e instalar (≈ 5 min)
 
 ```bash
-git clone https://github.com/emili-tabuti/ic-ml-cybersecurity.git
+git clone https://github.com/emilitabuti/ic-ml-cybersecurity.git
 cd ic-ml-cybersecurity/ml-pipeline
 
 python -m venv .venv
@@ -82,7 +82,7 @@ cp .env.example .env
 ```bash
 # Dentro de ml-pipeline/ com o venv ativo
 python -m pytest tests/ -v
-# Esperado: todos os testes passando — sem falhas
+# Esperado: 94+ testes passando — sem falhas
 ```
 
 ### 3. Preparar o dataset (≈ variável)
@@ -110,7 +110,7 @@ ml-pipeline/data/raw/
 O pipeline de dados está implementado em `src/data/pipeline/`. Após preparar o dataset:
 
 ```python
-# Exemplo de uso — execute via Python REPL ou notebook
+# Salve como run_data_pipeline.py na pasta ml-pipeline/ e execute: python run_data_pipeline.py
 from src.data.data_loader import load_binary_dataset
 from src.data.data_splitter import split_train_test
 import config
@@ -159,13 +159,14 @@ O MLflow UI exibe: comparação de runs, métricas por experimento, hiperparâme
 
 ### O que NÃO está versionado
 
-```gitignore
-data/raw/       # Dataset CICIDS2017 (~2,8 GB) — obter via link acima
-data/processed/ # Dados intermediários gerados localmente
-models/         # Modelos serializados (.pkl, .joblib, .h5)
-mlruns/         # Experimentos MLflow — gerados localmente ao treinar
-.env            # Variáveis de ambiente locais
-.venv/          # Ambiente virtual Python
+```
+# Entradas relevantes do .gitignore
+ml-pipeline/data/    # Dataset e dados processados (~2,8 GB)
+ml-pipeline/models/  # Modelos serializados (.pkl, .joblib, .h5)
+ml-pipeline/mlruns/  # Experimentos MLflow — gerados localmente ao treinar
+mlruns/
+.env                 # Variáveis de ambiente locais
+.venv/               # Ambiente virtual Python
 __pycache__/
 ```
 
