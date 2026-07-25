@@ -52,7 +52,13 @@ def train_lstm_or_mlp(
 ) -> ExperimentResult:
     """Treina LSTM se TensorFlow existir; caso contrario usa MLP documentado."""
     set_global_seed(config.RANDOM_SEED)
+    print("[LSTM] Carregando e preparando dataset (pode levar alguns segundos)...", flush=True)
     dataset = prepared or prepare_windowed_binary_dataset()
+    print(
+        f"[LSTM] Dataset pronto: X_sequential={dataset.X_sequential.shape}, "
+        f"y={dataset.y.shape}",
+        flush=True,
+    )
     if tensorflow_available():
         return _run_tensorflow_lstm(
             prepared=dataset,
@@ -121,7 +127,7 @@ def _run_tensorflow_lstm(
             folds.split(prepared.X_tabular, prepared.y),
             start=1,
         ):
-            print(f"[LSTM] Fold {fold_index}/{resolved_n_splits} iniciando...")
+            print(f"[LSTM] Fold {fold_index}/{resolved_n_splits} iniciando...", flush=True)
             tf.random.set_seed(config.RANDOM_SEED)
             model = _build_keras_lstm(prepared.X_sequential.shape[1:])
             model.fit(
