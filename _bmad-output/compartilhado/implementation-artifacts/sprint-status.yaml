@@ -50,10 +50,10 @@ development_status:
   epic-1-retrospective: optional
 
   # ─── Epic 2: Pipeline de Feature Engineering ───
-  epic-2: backlog
-  2-1-feature-selection-sobre-o-conjunto-de-treino: backlog
-  2-2-transformacao-em-sliding-window: backlog
-  2-3-validacao-anti-leakage-do-pipeline-de-features: backlog
+  epic-2: done
+  2-1-feature-selection-sobre-o-conjunto-de-treino: done
+  2-2-transformacao-em-sliding-window: done
+  2-3-validacao-anti-leakage-do-pipeline-de-features: done
   epic-2-retrospective: optional
 
   # ─── Epic 3: Treinamento, Avaliação e Rastreamento de Experimentos ───
