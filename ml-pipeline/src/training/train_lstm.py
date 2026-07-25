@@ -121,6 +121,7 @@ def _run_tensorflow_lstm(
             folds.split(prepared.X_tabular, prepared.y),
             start=1,
         ):
+            print(f"[LSTM] Fold {fold_index}/{resolved_n_splits} iniciando...")
             tf.random.set_seed(config.RANDOM_SEED)
             model = _build_keras_lstm(prepared.X_sequential.shape[1:])
             model.fit(
@@ -132,7 +133,7 @@ def _run_tensorflow_lstm(
                 ),
                 epochs=config.LSTM_EPOCHS,
                 batch_size=config.LSTM_BATCH_SIZE,
-                verbose=0,
+                verbose=2,
             )
             y_score = model.predict(prepared.X_sequential[val_index], verbose=0).ravel()
             y_pred = (y_score >= 0.5).astype(int)
