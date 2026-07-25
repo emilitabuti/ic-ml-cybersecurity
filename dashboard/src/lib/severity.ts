@@ -1,0 +1,34 @@
+/**
+ * severity.ts — Mapeamento de severidade de alertas (Command Center).
+ *
+ * Conceito de classificação por severidade validado de forma independente no
+ * protótipo da Isabela (branch `Isa252-patch-1`, não mesclada) e formalizado
+ * aqui na paleta semântica oficial (ux-design-specification.md).
+ *
+ * Regra de acessibilidade (WCAG AA): severidade NUNCA é comunicada apenas por
+ * cor — sempre cor + ícone + label textual.
+ */
+import { AlertOctagon, AlertTriangle, ShieldCheck, Info, type LucideIcon } from "lucide-react";
+
+export type Severity = "critical" | "warning" | "safe" | "info";
+
+interface SeverityConfig {
+  label: string;
+  colorVar: string;
+  icon: LucideIcon;
+}
+
+export const SEVERITY_CONFIG: Record<Severity, SeverityConfig> = {
+  critical: { label: "Crítico", colorVar: "var(--status-critical)", icon: AlertOctagon },
+  warning: { label: "Suspeito", colorVar: "var(--status-warning)", icon: AlertTriangle },
+  safe: { label: "Seguro", colorVar: "var(--status-safe)", icon: ShieldCheck },
+  info: { label: "Informativo", colorVar: "var(--status-info)", icon: Info },
+};
+
+/** Deriva a severidade a partir do nível de confiança do modelo (0-1). */
+export function severityFromConfidence(confidence: number): Severity {
+  if (confidence >= 0.9) return "critical";
+  if (confidence >= 0.7) return "warning";
+  if (confidence >= 0.4) return "info";
+  return "safe";
+}

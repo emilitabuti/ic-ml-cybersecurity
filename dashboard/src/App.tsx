@@ -1,35 +1,32 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { Sidebar, type Section } from "@/components/layout/Sidebar";
+import { Header } from "@/components/layout/Header";
+import { MonitorSection } from "@/components/sections/MonitorSection";
+import { PlaceholderSection } from "@/components/sections/PlaceholderSection";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [section, setSection] = useState<Section>("monitor");
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="flex min-h-screen bg-background text-foreground">
+      <Sidebar active={section} onSelect={setSection} />
+      <div className="flex flex-1 flex-col">
+        <Header />
+        <main className="flex-1 overflow-auto p-6">
+          {section === "monitor" && <MonitorSection />}
+          {section === "alertas" && (
+            <PlaceholderSection title="Alertas" story="Story 5.3 (Painel de Detalhe do Alerta)" />
+          )}
+          {section === "historico" && (
+            <PlaceholderSection title="Histórico" story="Story 5.4 (Histórico de Alertas)" />
+          )}
+          {section === "modelos" && (
+            <PlaceholderSection title="Modelos" story="Story 5.5 (Configuração de Threshold e Comparação de Modelos)" />
+          )}
+        </main>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;

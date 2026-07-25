@@ -532,6 +532,15 @@ Para que possa desenvolver e testar a interface sem aguardar a conclusão do Epi
 
 O analista de segurança (e a pesquisadora na demo do seminário) consegue monitorar previsões de ataques em tempo real via interface visual em tema escuro (Command Center), receber alertas com tipo de ameaça + nível de confiança + features motivadoras, gerenciar histórico com feedback (confirmar / falso positivo), configurar threshold de confiança e comparar desempenho dos modelos (RF / DT / LSTM) — com modo de demonstração/replay para o seminário de IC.
 
+> **Nota de reconciliação (2026-07-25):** revisado o protótipo isolado de Isabela na branch não mesclada `Isa252-patch-1` (Flask + Flask-SQLAlchemy + MySQL, modelo `Event` com `hora/categoria/severidade/origem/descricao`). Decisão: **manter a arquitetura oficial sem banco de dados** (já registrada em `architecture.md` — "banco de dados formal está fora do escopo desta IC"), descartando Flask/MySQL. Avaliação campo a campo:
+> - `hora` → já coberto por `timestamp` (FR27, ISO 8601).
+> - `categoria` → já coberto por "tipo de ameaça" (FR27); campo redundante.
+> - `severidade` → já coberto e mais sofisticado no design oficial (badge de cor + ícone + label, derivado da confiança do modelo — ver `ux-design-specification.md`); nenhuma mudança necessária.
+> - `origem` (fonte do evento) e `descricao` (texto livre) → **não portáveis**: o schema atual do CICIDS2017 pós feature-selection (`ml-pipeline/src/data/schema/features_schema.json`) não retém identificadores de origem (IP/host); adicionar esse campo exigiria reabrir o contrato de dados do Epic 1/2, fora do escopo desta reconciliação.
+> - Cards de resumo ("Nº de Eventos", "Tipos de Anomalia") → conceito já absorvido pelos 4 cards de métrica do header da Story 5.1 (alertas ativos, janelas analisadas, precisão do modelo, latência).
+>
+> **Conclusão:** o contrato de alertas oficial (FR27–FR29, Stories 5.1–5.5) já cobre ou supera tudo que era estruturalmente viável no protótipo. Nenhuma alteração de schema foi necessária — o valor do protótipo foi confirmar, por validação independente, que o design já planejado está correto.
+
 ### Story 5.1: Scaffolding do Dashboard e Layout Command Center
 > **Status: 🔴 NÃO INICIADA** — Scaffolding técnico existe (Vite + React + TS + Tailwind + shadcn + recharts + TanStack Query + `src/config.ts` + `src/services/api.ts`). Porém `App.tsx` ainda é o template padrão do Vite. A UI do dashboard (sidebar, header, tema escuro) não foi implementada.
 

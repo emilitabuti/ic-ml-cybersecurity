@@ -75,8 +75,8 @@ development_status:
   epic-4-retrospective: optional
 
   # ─── Epic 5: Dashboard de Monitoramento e Alertas ───
-  epic-5: backlog
-  5-1-scaffolding-do-dashboard-e-layout-command-center: backlog
+  epic-5: in-progress
+  5-1-scaffolding-do-dashboard-e-layout-command-center: done
   5-2-integracao-com-api-via-polling-e-exibicao-de-alertas-em-tempo-real: backlog
   5-3-painel-de-detalhe-do-alerta-com-acoes-de-decisao: backlog
   5-4-historico-de-alertas-com-filtros-e-feedback-do-analista: backlog
