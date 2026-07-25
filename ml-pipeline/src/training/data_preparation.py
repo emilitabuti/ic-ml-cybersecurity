@@ -32,10 +32,13 @@ def prepare_windowed_binary_dataset(
     df = load_dataset(dataset=dataset, task="binary")
     feature_cols = [column for column in df.columns if column not in _NON_FEATURE_COLS]
     # Alguns datasets (ex.: UNSW-NB15) guardam campos numéricos (portas, contadores)
-    # como string. Coerção explícita evita falha em .to_numpy(dtype=float64) sem
+    # como string. Coerção explícita evita falha em .to_numpy(dtype=float32) sem
     # descartar sinal — valores realmente não numéricos viram 0.
     features_df = df[feature_cols].apply(pd.to_numeric, errors="coerce").fillna(0)
-    X = features_df.to_numpy(dtype=np.float64)
+    # float32 (nao float64): com window_size=10 o array de janelas ja duplica os
+    # dados em ~10x; em datasets reais grandes (ex.: UNSW-NB15, 1.5M+ linhas) o
+    # float64 estoura a RAM de ambientes limitados (ex.: Colab free tier ~12.7GB).
+    X = features_df.to_numpy(dtype=np.float32)
     y = df["Binary_Label"].to_numpy(dtype=int)
     attack_types = _resolve_attack_types(df, y)
     return prepare_windowed_binary_arrays(
@@ -56,7 +59,7 @@ def prepare_windowed_binary_arrays(
 ) -> PreparedDataset:
     """Cria representações 3D e achatada a partir de arrays em memória."""
     resolved_window_size = int(window_size or config.WINDOW_SIZE)
-    X_array = np.asarray(X, dtype=np.float64)
+    X_array = np.asarray(X, dtype=np.float32)
     y_array = np.asarray(y, dtype=int)
     resolved_attack_types = _resolve_attack_array(attack_types, y_array)
 
