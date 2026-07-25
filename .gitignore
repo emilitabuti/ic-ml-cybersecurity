@@ -48,6 +48,8 @@ ml-pipeline/models/
 # Artefatos de experimentos MLflow (volumosos)
 mlruns/
 ml-pipeline/mlruns/
+mlflow.db
+ml-pipeline/mlflow.db
 
 # Ambientes virtuais Python
 .venv/

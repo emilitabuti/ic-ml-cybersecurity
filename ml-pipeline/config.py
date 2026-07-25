@@ -19,3 +19,15 @@ FEATURE_SELECTION_ARTIFACT_PATH: str = os.getenv(
     "FEATURE_SELECTION_ARTIFACT_PATH",
     "models/feature_selection.json",
 )
+
+K_FOLDS: int = int(os.getenv("K_FOLDS", "5"))
+MLFLOW_TRACKING_URI: str = os.getenv("MLFLOW_TRACKING_URI", "mlruns")
+TRAINING_REPORTS_DIR: str = os.getenv("TRAINING_REPORTS_DIR", "reports")
+
+RF_N_ESTIMATORS: int = int(os.getenv("RF_N_ESTIMATORS", "100"))
+RF_MAX_DEPTH: str | None = os.getenv("RF_MAX_DEPTH") or None
+DT_MAX_DEPTH: str | None = os.getenv("DT_MAX_DEPTH") or None
+MLP_HIDDEN_LAYER_SIZES: str = os.getenv("MLP_HIDDEN_LAYER_SIZES", "64,32")
+MLP_MAX_ITER: int = int(os.getenv("MLP_MAX_ITER", "200"))
+LSTM_EPOCHS: int = int(os.getenv("LSTM_EPOCHS", "10"))
+LSTM_BATCH_SIZE: int = int(os.getenv("LSTM_BATCH_SIZE", "256"))

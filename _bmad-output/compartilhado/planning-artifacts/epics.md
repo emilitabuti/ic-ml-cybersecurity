@@ -348,8 +348,10 @@ Para que a validade metodológica do experimento e a publicabilidade do artigo s
 
 Emili consegue treinar os três modelos (RF, DT, LSTM/MLP) com k-fold k=5, avaliar comparativamente com todas as métricas científicas exigidas (F1, AUC-ROC, Precision, Recall, FPR reportadas com média e desvio padrão), rastrear automaticamente todos os experimentos no MLflow e exportar resultados em CSV para o artigo científico.
 
+> **Status: ✅ CONCLUÍDO** (2026-07-25) — `src/training/` implementa MLflow local, k-fold k=5 para RF/DT/LSTM-MLP, exportação de métricas comparativas e relatório por tipo de ataque. Epic 4 permanece fora do escopo.
+
 ### Story 3.1: Setup do MLflow e Infraestrutura de Rastreamento
-> **Status: � NÃO INICIADA** (corrigido 2026-07-25) — `mlflow` está fixado no `requirements.txt`, mas nenhuma chamada a `mlflow.sklearn.autolog()`/`mlflow.tensorflow.autolog()` existe no código e o diretório `mlruns/` ainda não foi gerado (nenhum treino foi executado). Depende do Epic 2.
+> **Status: ✅ CONCLUÍDA** (2026-07-25) — `src/training/mlflow_utils.py` configura tracking local em `mlruns/`, experimento `ic-ml-cybersecurity-{model_type}` e autolog sklearn/tensorflow. `ml-pipeline/mlruns/` foi criado localmente e já está no `.gitignore`.
 
 Como pesquisadora de ML (Emili),
 Quero configurar o MLflow local com nomenclatura padronizada de experimentos,
@@ -365,7 +367,7 @@ Para que todos os runs de treino sejam automaticamente rastreados sem boilerplat
 **E** o diretório `mlruns/` é criado em `ml-pipeline/` e está no `.gitignore`
 
 ### Story 3.2: Treino e Avaliação do Random Forest com k-fold
-> **Status: 🔴 NÃO INICIADA** — `src/training/` existe mas contém apenas `__init__.py`. `train_rf.py` não implementado.
+> **Status: ✅ CONCLUÍDA** (2026-07-25) — `src/training/train_rf.py` treina RF com `StratifiedKFold(k=5, random_state=42)`, calcula F1/AUC-ROC/Precision/Recall/FPR por fold e exporta média +/- desvio padrão.
 
 Como pesquisadora de ML (Emili),
 Quero treinar o Random Forest com k-fold k=5 e registrar todas as métricas científicas no MLflow,
@@ -382,7 +384,7 @@ Para que tenha evidência empírica replicável do desempenho do RF para o artig
 **E** o treino completo do RF sobre CICIDS2017 termina em ≤ 2 horas em CPU (Intel Core i5, 8GB RAM)
 
 ### Story 3.3: Treino e Avaliação do Decision Tree com k-fold
-> **Status: 🔴 NÃO INICIADA** — `train_dt.py` não implementado.
+> **Status: ✅ CONCLUÍDA** (2026-07-25) — `src/training/train_dt.py` usa o mesmo helper de k-fold, mesmo seed e mesmas features do RF, com experimento MLflow `ic-ml-cybersecurity-decision_tree`.
 
 Como pesquisadora de ML (Emili),
 Quero treinar o Decision Tree com k-fold k=5 nas mesmas condições do RF,
@@ -397,7 +399,7 @@ Para que a comparação entre algoritmos seja metodologicamente válida (mesmo s
 **E** o experimento MLflow está sob o nome `ic-ml-cybersecurity-decision_tree`
 
 ### Story 3.4: Treino e Avaliação do LSTM/MLP com k-fold
-> **Status: 🔴 NÃO INICIADA** — `train_lstm.py` não implementado. TensorFlow/Keras não está no `requirements.txt` ainda (usar Google Colab ou instalar localmente).
+> **Status: ✅ CONCLUÍDA** (2026-07-25) — `src/training/train_lstm.py` implementa caminho TensorFlow/Keras LSTM para Colab GPU T4 e fallback local MLP explícito quando TensorFlow não está disponível, registrando `fallback_used=true` e o motivo no resultado.
 
 Como pesquisadora de ML (Emili),
 Quero treinar o LSTM (ou MLP como fallback) com k-fold k=5 nas mesmas condições dos modelos anteriores,
@@ -413,7 +415,7 @@ Para que a comparação temporal vs. tabular tenha suporte empírico sólido.
 **E** se LSTM for inviável no prazo, MLP é executado como substituto e documentado explicitamente no relatório
 
 ### Story 3.5: Tabela Comparativa de Métricas e Exportação CSV
-> **Status: 🔴 NÃO INICIADA** — Depende de 3.2, 3.3, 3.4. `evaluator.py` não implementado.
+> **Status: ✅ CONCLUÍDA** (2026-07-25) — `src/training/evaluator.py` gera tabela RF x DT x LSTM/MLP com F1/AUC-ROC/Precision/Recall/FPR em média +/- desvio padrão, destaca melhores métricas em `best_metrics` e exporta CSV.
 
 Como pesquisadora de IC (Emili),
 Quero gerar a tabela comparativa de desempenho entre RF, DT e LSTM e exportá-la em CSV,
@@ -429,7 +431,7 @@ Para que tenha a evidência empírica central do artigo científico formatada pa
 **E** o CSV exportado é compatível com importação direta em LaTeX/Word para o artigo
 
 ### Story 3.6: Relatório de Desempenho por Tipo de Ataque
-> **Status: 🔴 NÃO INICIADA** — Depende de 3.2–3.4.
+> **Status: ✅ CONCLUÍDA** (2026-07-25) — `evaluator.py` gera relatório por tipo de ataque a partir dos CSVs de predições por fold, com F1/Precision/Recall/FPR, exportação CSV/Markdown e marcação melhor/pior por F1.
 
 Como pesquisadora de IC (Emili),
 Quero gerar um relatório de desempenho dos modelos por tipo de ataque do CICIDS2017,

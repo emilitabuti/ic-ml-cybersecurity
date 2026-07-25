@@ -129,20 +129,28 @@ O split é reprodutível: usa `RANDOM_SEED = 42` e é estratificado por label (p
 
 ### 5. Executar o pipeline de treino
 
-> ⚠️ **Nota:** Os scripts de treino serão implementados no Epic 3. Os comandos abaixo mostram a estrutura esperada e serão funcionais após as Stories 3.2–3.4.
-
 ```bash
-# [a implementar — Story 3.2] Random Forest com k-fold
+# Story 3.2 — Random Forest com k-fold k=5
 python src/training/train_rf.py
 
-# [a implementar — Story 3.3] Decision Tree com k-fold
+# Story 3.3 — Decision Tree com o mesmo split/seed do RF
 python src/training/train_dt.py
 
-# [a implementar — Story 3.4] LSTM/MLP com k-fold
+# Story 3.4 — LSTM; se TensorFlow não existir localmente, fallback MLP explícito
 python src/training/train_lstm.py
 ```
 
-Quando implementados, cada script registra automaticamente no MLflow: hiperparâmetros, métricas (F1, AUC-ROC, FPR por classe), artefatos do modelo e seed usado.
+Cada script usa `K_FOLDS=5`, `RANDOM_SEED=42`, `WINDOW_SIZE=10` por padrão e registra os runs em experimentos MLflow nomeados como `ic-ml-cybersecurity-{model_type}`. As métricas exportadas por fold e agregadas são F1, AUC-ROC, Precision, Recall e FPR.
+
+Os resultados tabulares ficam em:
+
+```
+reports/
+├── metrics/{model_type}_metrics.json
+└── predictions/{model_type}_fold_predictions.csv
+```
+
+**Decisão LSTM/MLP:** o LSTM completo deve ser executado preferencialmente no Google Colab com GPU T4, conforme planejado no PRD/epics. O ambiente local do repositório permanece leve e executável em CPU; quando TensorFlow não está instalado, `train_lstm.py` usa `MLPClassifier` como fallback explícito, marca `fallback_used=true` no resultado e imprime o motivo no terminal. Essa substituição não é silenciosa.
 
 ### 6. Acessar métricas no MLflow UI (≈ 1 min)
 
@@ -157,6 +165,17 @@ mlflow ui --backend-store-uri ./mlruns
 
 O MLflow UI exibe: comparação de runs, métricas por experimento, hiperparâmetros usados e artefatos gerados.
 
+### 7. Exportar tabelas para o artigo
+
+```bash
+python src/training/evaluator.py \
+  --comparison-csv reports/comparison_metrics.csv \
+  --attack-csv reports/attack_type_metrics.csv \
+  --attack-md reports/attack_type_metrics.md
+```
+
+`comparison_metrics.csv` contém RF x DT x LSTM nas colunas F1, AUC-ROC, Precision, Recall e FPR como média +/- desvio padrão, com uma coluna `best_metrics` indicando o melhor modelo por métrica. `attack_type_metrics.csv` detalha F1, Precision, Recall e FPR por tipo de ataque e marca melhor/pior modelo por F1 para cada ataque.
+
 ### O que NÃO está versionado
 
 ```
@@ -169,4 +188,3 @@ mlruns/
 .venv/               # Ambiente virtual Python
 __pycache__/
 ```
-

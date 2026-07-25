@@ -57,13 +57,13 @@ development_status:
   epic-2-retrospective: optional
 
   # ─── Epic 3: Treinamento, Avaliação e Rastreamento de Experimentos ───
-  epic-3: backlog
-  3-1-setup-do-mlflow-e-infraestrutura-de-rastreamento: backlog
-  3-2-treino-e-avaliacao-do-random-forest-com-k-fold: backlog
-  3-3-treino-e-avaliacao-do-decision-tree-com-k-fold: backlog
-  3-4-treino-e-avaliacao-do-lstm-mlp-com-k-fold: backlog
-  3-5-tabela-comparativa-de-metricas-e-exportacao-csv: backlog
-  3-6-relatorio-de-desempenho-por-tipo-de-ataque: backlog
+  epic-3: done
+  3-1-setup-do-mlflow-e-infraestrutura-de-rastreamento: done
+  3-2-treino-e-avaliacao-do-random-forest-com-k-fold: done
+  3-3-treino-e-avaliacao-do-decision-tree-com-k-fold: done
+  3-4-treino-e-avaliacao-do-lstm-mlp-com-k-fold: done
+  3-5-tabela-comparativa-de-metricas-e-exportacao-csv: done
+  3-6-relatorio-de-desempenho-por-tipo-de-ataque: done
   epic-3-retrospective: optional
 
   # ─── Epic 4: Exportação do Modelo e Serviço de Predição ───
