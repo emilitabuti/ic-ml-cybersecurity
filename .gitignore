@@ -24,6 +24,13 @@ ml-pipeline/data/
 # Exceção: src/data/ é código-fonte, não dados — deve ser versionado
 !ml-pipeline/src/data/
 !ml-pipeline/src/data/**
+!ml-pipeline/data/
+!ml-pipeline/data/raw/
+!ml-pipeline/data/raw/.gitkeep
+!ml-pipeline/data/processed/
+!ml-pipeline/data/processed/.gitkeep
+!ml-pipeline/data/schema/
+!ml-pipeline/data/schema/.gitkeep
 *.csv
 *.pcap
 *.parquet
@@ -35,6 +42,8 @@ ml-pipeline/data/
 *.pt
 *.pth
 ml-pipeline/models/
+!ml-pipeline/models/
+!ml-pipeline/models/.gitkeep
 
 # Artefatos de experimentos MLflow (volumosos)
 mlruns/
