@@ -25,7 +25,7 @@ flowchart LR
 |---|---|---|---|
 | **Caroline** | Coleta e pré-processamento de dados | **Epic 1** (Fundação) | ✅ `done` (1.1–1.5) |
 | **Emili** | Implementação e avaliação de algoritmos de ML | **Epic 2** (Feature Engineering) + **Epic 3** (Treino/Avaliação/MLflow) + **Epic 4** (Exportação/API) | ❌ `backlog` — nenhuma story criada, nenhum código em `ml-pipeline/src/models/` |
-| **Isabela** | Avaliação de desempenho/eficácia em ambiente simulado | **Epic 5** (Dashboard de Monitoramento) | ❌ `backlog` — apenas scaffolding padrão (`button.tsx`) |
+| **Isabela** | Avaliação de desempenho/eficácia em ambiente simulado | **Epic 5** (Dashboard de Monitoramento) | 🟡 `in-progress` — Story 5.1 (scaffolding + layout Command Center) `done`; Stories 5.2–5.7 `backlog` |
 
 ## 3. Conflitos identificados e resolução proposta
 
@@ -64,9 +64,11 @@ Hoje (2026-07-25) corresponde a aproximadamente o **mês 11 de 12** do cronogram
 
 ## 5. Ações recomendadas (próximos passos)
 
+> **Atualização (2026-07-25, mesma data):** a Story 5.1 (scaffolding do dashboard e layout Command Center) foi implementada e marcada `done` em `sprint-status.yaml`. O item 2 abaixo já foi cumprido; o próximo passo de Isabela é a Story 5.2 (integração via polling), que depende da Story 4.4 (endpoint mock) — ainda `backlog`.
+
 1. **Emili:** criar e executar as stories 2.1 → 2.2 → 2.3 (Epic 2) imediatamente; é o bloqueador de todo o resto.
-2. **Isabela:** pode adiantar o scaffolding do dashboard (Story 5.1) e a integração via **endpoint mock** (Story 4.4) *em paralelo*, sem esperar Emili terminar — isso recupera parte do atraso.
-3. **Caroline:** papel muda de "produção" para "suporte" — validar que o contrato de dados (Story 1.4) atende ao que Epic 2 precisa; documentar UNSW-NB15 como anexo exploratório, não como parte do pipeline principal.
+2. ~~**Isabela:** pode adiantar o scaffolding do dashboard (Story 5.1)~~ ✅ **concluído (2026-07-25)** — layout Command Center implementado (Sidebar, Header, tema escuro, fontes). Próximo passo: Story 5.2, que depende da Story 4.4 (**endpoint mock**, ainda `backlog`) para integrar dados reais em paralelo, sem esperar Emili terminar Epic 2–4.
+3. **Caroline:** papel muda de "produção" para "suporte" — validar que o contrato de dados (Story 1.4, já `done`) atende ao que Epic 2 precisa; documentar UNSW-NB15 como anexo exploratório, não como parte do pipeline principal (nota: `data_loader.py` já suporta UNSW-NB15 estruturalmente como opção, mas nenhuma story de Epic 2–4 foi implementada para além do escopo binário CICIDS2017).
 4. **Todas:** revisar os relatórios parciais para garantir que as atividades declaradas como "concluídas" tenham evidência rastreável (story `done` + código no repositório), evitando a divergência identificada na seção 3.
 
 ---

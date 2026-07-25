@@ -2,7 +2,7 @@
 stepsCompleted: ['step-01-validate-prerequisites', 'step-02-design-epics', 'step-03-create-stories', 'step-04-final-validation']
 workflowStatus: 'complete'
 completedAt: '2026-02-21'
-lastStatusUpdate: '2026-03-06'
+lastStatusUpdate: '2026-07-25'
 inputDocuments:
   - "_bmad-output/planning-artifacts/prd.md"
   - "_bmad-output/planning-artifacts/architecture.md"
@@ -12,7 +12,7 @@ implementationStatus:
   epic2: "not_started"
   epic3: "not_started"
   epic4: "not_started"
-  epic5: "scaffolding_only"
+  epic5: "in_progress"
 ---
 
 # ic-ml-cybersecurity - Epic Breakdown
@@ -248,7 +248,7 @@ Para que erros de formato ou dados inválidos sejam detectados antes do treiname
 **Então** uma exceção clara é lançada informando quais colunas estão ausentes ou inválidas
 
 ### Story 1.4: Divisão Train/Test Estratificada e Formalização do Contrato de Dados
-> **Status: 🔴 NÃO INICIADA** — `src/data/` tem data_loader e data_validator mas o módulo de split train/test e o `features_schema.json` ainda não foram implementados.
+> **Status: ✅ CONCLUÍDA** (atualizado 2026-07-25) — `src/data/data_splitter.py` implementado (split estratificado, `random_state=config.RANDOM_SEED`) e `src/data/schema/features_schema.json` (contrato formal v1.1.0 Caroline ↔ Emili) formalizados. Testes em `tests/test_data_splitter.py`.
 
 Como pesquisadora de ML (Emili),
 Quero dividir os dados em treino e teste antes de qualquer transformação e formalizar o schema de interface com Caroline,
@@ -267,7 +267,7 @@ Para que não haja data leakage e o contrato de dados esteja documentado formalm
 **Então** os conjuntos são idênticos nas duas execuções
 
 ### Story 1.5: README de Reprodutibilidade
-> **Status: 🟡 PARCIAL** — `ml-pipeline/README.md` existe com instruções de instalação e execução da API. Faltam: instruções do pipeline de treino completo, referência ao MLflow UI e tempo de setup do experimento end-to-end.
+> **Status: ✅ CONCLUÍDA** (atualizado 2026-07-25) — `ml-pipeline/README.md` documenta instalação, execução da API, seção "Reprodutibilidade Científica" com passos numerados, acesso ao MLflow UI (`mlflow ui`) e placeholders explícitos `[a implementar]` para o pipeline de treino (Epic 2/3, ainda não implementado).
 
 Como pesquisador externo,
 Quero instruções claras de instalação e execução do projeto,
@@ -349,7 +349,7 @@ Para que a validade metodológica do experimento e a publicabilidade do artigo s
 Emili consegue treinar os três modelos (RF, DT, LSTM/MLP) com k-fold k=5, avaliar comparativamente com todas as métricas científicas exigidas (F1, AUC-ROC, Precision, Recall, FPR reportadas com média e desvio padrão), rastrear automaticamente todos os experimentos no MLflow e exportar resultados em CSV para o artigo científico.
 
 ### Story 3.1: Setup do MLflow e Infraestrutura de Rastreamento
-> **Status: 🟡 PARCIAL** — `mlflow` está no `requirements.txt` e o diretório `mlruns/` existe (gerado automaticamente). Falta: configuração explícita do `mlflow.sklearn.autolog()`, nomenclatura de experimentos `ic-ml-cybersecurity-{model_type}` e script de setup.
+> **Status: � NÃO INICIADA** (corrigido 2026-07-25) — `mlflow` está fixado no `requirements.txt`, mas nenhuma chamada a `mlflow.sklearn.autolog()`/`mlflow.tensorflow.autolog()` existe no código e o diretório `mlruns/` ainda não foi gerado (nenhum treino foi executado). Depende do Epic 2.
 
 Como pesquisadora de ML (Emili),
 Quero configurar o MLflow local com nomenclatura padronizada de experimentos,
@@ -542,7 +542,7 @@ O analista de segurança (e a pesquisadora na demo do seminário) consegue monit
 > **Conclusão:** o contrato de alertas oficial (FR27–FR29, Stories 5.1–5.5) já cobre ou supera tudo que era estruturalmente viável no protótipo. Nenhuma alteração de schema foi necessária — o valor do protótipo foi confirmar, por validação independente, que o design já planejado está correto.
 
 ### Story 5.1: Scaffolding do Dashboard e Layout Command Center
-> **Status: 🔴 NÃO INICIADA** — Scaffolding técnico existe (Vite + React + TS + Tailwind + shadcn + recharts + TanStack Query + `src/config.ts` + `src/services/api.ts`). Porém `App.tsx` ainda é o template padrão do Vite. A UI do dashboard (sidebar, header, tema escuro) não foi implementada.
+> **Status: ✅ CONCLUÍDA** (2026-07-25) — Layout Command Center implementado em `App.tsx`: `Sidebar` fixa 220px (Monitor/Alertas/Histórico/Modelos, navegação via estado local — sem router), `Header` com os 4 cards de métrica (placeholders até a Story 5.2), tema escuro ativo (`bg-base #0F1117`), fontes Inter + JetBrains Mono aplicadas. Conceitos de severidade e tabela de eventos do protótipo de Isabela (`Isa252-patch-1`) reaproveitados em `lib/severity.ts` e `components/alerts/`. Ver detalhes em `5-1-scaffolding-do-dashboard-e-layout-command-center.md`.
 
 Como desenvolvedora do dashboard (Isabela),
 Quero o layout base do dashboard com sidebar fixa, header de métricas e tema escuro configurado,
