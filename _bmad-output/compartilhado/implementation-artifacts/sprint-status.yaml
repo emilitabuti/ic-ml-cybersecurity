@@ -41,7 +41,7 @@ story_location: _bmad-output/implementation-artifacts
 
 development_status:
   # ─── Epic 1: Fundação — Ambiente, Repositório e Contrato de Dados ───
-  epic-1: in-progress
+  epic-1: done
   1-1-inicializacao-do-monorepo-e-scaffolding-dos-projetos: done
   1-2-configuracao-da-reprodutibilidade-cientifica: done
   1-3-ingestao-e-validacao-do-dataset-cicids2017: done
@@ -75,8 +75,8 @@ development_status:
   epic-4-retrospective: optional
 
   # ─── Epic 5: Dashboard de Monitoramento e Alertas ───
-  epic-5: backlog
-  5-1-scaffolding-do-dashboard-e-layout-command-center: backlog
+  epic-5: in-progress
+  5-1-scaffolding-do-dashboard-e-layout-command-center: done
   5-2-integracao-com-api-via-polling-e-exibicao-de-alertas-em-tempo-real: backlog
   5-3-painel-de-detalhe-do-alerta-com-acoes-de-decisao: backlog
   5-4-historico-de-alertas-com-filtros-e-feedback-do-analista: backlog

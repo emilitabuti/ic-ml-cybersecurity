@@ -54,6 +54,13 @@ export default {
           border: "var(--sidebar-border)",
           ring: "var(--sidebar-ring)",
         },
+        // Paleta semântica de severidade (Command Center) — ux-design-specification.md
+        status: {
+          critical: "var(--status-critical)",
+          warning: "var(--status-warning)",
+          safe: "var(--status-safe)",
+          info: "var(--status-info)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -61,7 +68,8 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["Geist Variable", "sans-serif"],
+        sans: ["Inter Variable", "sans-serif"],
+        mono: ["JetBrains Mono Variable", "monospace"],
       },
     },
   },

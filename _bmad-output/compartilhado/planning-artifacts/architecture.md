@@ -162,9 +162,12 @@ pip freeze > requirements.txt
 | Decisão | Escolha | Versão | Rationale |
 |---|---|---|---|
 | Validação de schema CSV | Pydantic + pandera | pydantic 2.x + pandera 0.20.x | Pydantic já no FastAPI; pandera cobre DataFrame validation |
-| Contrato de dados | Schema formal CSV entre Caroline e Emili | — | Previne data leakage e incompatibilidade de features |
+| Contrato de dados | Schema formal entre Caroline e Emili (`features_schema.json` v1.1.0) | — | Previne data leakage e incompatibilidade de features |
 | Leakage prevention | Sliding window e feature selection aplicados **após** split train/test | — | Requisito científico fundamental |
 | Serialização | `joblib` para sklearn Pipeline (RF/DT) + `.h5` para Keras (LSTM) | joblib 1.3.x / keras 3.x | Pipeline completo embutido: scaler + encoder + modelo |
+| **Formato dos dados processados** | **Parquet** (não CSV) em `data/processed/` | pandas + pyarrow | **ADR (2026-07-25):** Caroline entrega os datasets model-ready em Parquet (`{dataset}_model_ready_{task}.parquet`), não CSV como originalmente especificado no PRD (FR1). Parquet preserva tipos de coluna nativamente (evita re-inferência de dtypes) e reduz tamanho em disco para o CICIDS2017 (~2,8 GB). `src/data/data_loader.py` já implementa `load_dataset(dataset: "cic"\|"unsw", task: "binary"\|"attacktype")` sobre Parquet, suportando também UNSW-NB15 como dataset alternativo (ver nota FR1 abaixo). O contrato formal em `features_schema.json` permanece a fonte de verdade para nomes/tipos de coluna, independente do formato de arquivo. |
+
+> **Nota sobre escopo de dataset (FR1):** o PRD/epics.md restringem o escopo formal do MVP a CICIDS2017 binário. Na prática, `data_loader.py` já suporta estruturalmente UNSW-NB15 e classificação multiclasse (`attacktype`) como parâmetros opcionais — isso é capacidade de infraestrutura reaproveitável, não implica que Epic 2/3/4 (feature engineering, treino, exportação) tenham sido implementados para além do escopo binário CICIDS2017 definido nos FRs.
 
 ---
 
@@ -175,7 +178,7 @@ pip freeze > requirements.txt
 | **Banco de dados** | **Nenhum (arquivo + memória)** | — | Ver justificativa abaixo |
 | Histórico de predições | Lista em memória na API (até 1000 entradas) | — | Suficiente para sessão de demonstração — sem necessidade de persistência entre reinicializações |
 | Modelos treinados | Arquivos `.pkl` / `.h5` no sistema de arquivos | — | Artefatos científicos versionados manualmente via MLflow |
-| Dataset de treino | CSV em `data/raw/` e `data/processed/` | — | CICIDS2017 é arquivo estático — não requer SGBD |
+| Dataset de treino | **Parquet** em `data/processed/` (ver ADR acima) | — | CICIDS2017/UNSW-NB15 são arquivos estáticos — não requerem SGBD |
 | Experimentos ML | MLflow local (`mlruns/`) | mlflow 2.x | Substitui banco de dados para rastreamento de runs e métricas |
 
 **Justificativa da ausência de banco de dados:**
@@ -502,43 +505,54 @@ ic-ml-cybersecurity/
     ├── .env.example
     │
     ├── src/
-    │   ├── main.tsx                   # Entry point
-    │   ├── App.tsx                    # Root component + QueryClientProvider
+    │   ├── main.tsx                   # Entry point + QueryClientProvider
+    │   ├── App.tsx                    # AppShell: Sidebar + Header + seção ativa (Story 5.1)
     │   ├── config.ts                  # POLLING_INTERVAL_MS, API_BASE_URL
     │   │
     │   ├── services/
     │   │   └── api.ts                 # Único ponto de acesso à FastAPI
     │   │
-    │   ├── hooks/
+    │   ├── hooks/                     # [a implementar — Story 5.2]
     │   │   ├── usePredictions.ts      # FR27: Polling + TanStack Query
     │   │   ├── useAlerts.ts           # FR28: Alertas por threshold
     │   │   └── useModelInfo.ts        # GET /model/info
     │   │
+    │   ├── lib/
+    │   │   ├── utils.ts                   # cn() — helper shadcn (clsx + tailwind-merge)
+    │   │   └── severity.ts                # Mapeamento severidade → cor/ícone/label (Story 5.1)
+    │   │
     │   ├── components/
-    │   │   ├── charts/
-    │   │   │   ├── PredictionChart.tsx    # FR27: Gráfico de predições (Recharts)
-    │   │   │   └── ConfidenceGauge.tsx
+    │   │   ├── layout/
+    │   │   │   ├── Sidebar.tsx            # Sidebar fixa 220px, 4 seções (Story 5.1)
+    │   │   │   └── Header.tsx             # 4 cards de métrica do header (Story 5.1)
+    │   │   ├── sections/
+    │   │   │   ├── MonitorSection.tsx     # Seção Monitor (Story 5.1, dados reais na 5.2)
+    │   │   │   └── PlaceholderSection.tsx # Placeholder para seções ainda não implementadas
     │   │   ├── cards/
-    │   │   │   ├── ModelInfoCard.tsx
-    │   │   │   └── StatsSummaryCard.tsx
+    │   │   │   └── MetricCard.tsx         # Card de métrica genérico reutilizável
     │   │   ├── alerts/
-    │   │   │   ├── AlertBanner.tsx        # FR28: Alerta visual de ataque
-    │   │   │   └── AlertHistory.tsx       # FR29: Histórico de alertas
+    │   │   │   ├── SeverityBadge.tsx      # Badge cor + ícone + label (WCAG AA)
+    │   │   │   ├── RecentEventsTable.tsx  # Tabela de eventos (mock — dados reais na 5.2)
+    │   │   │   ├── AlertBanner.tsx        # [a implementar — Story 5.2] FR28: Alerta visual
+    │   │   │   └── AlertHistory.tsx       # [a implementar — Story 5.4] FR29: Histórico de alertas
+    │   │   ├── charts/                    # [a implementar — Story 5.7, pós-MVP]
+    │   │   │   ├── PredictionChart.tsx
+    │   │   │   └── SlidingWindowChart.tsx
     │   │   └── ui/
-    │   │       ├── LoadingSpinner.tsx
-    │   │       └── ErrorAlert.tsx
+    │   │       ├── button.tsx             # shadcn/ui (Story 1.1)
+    │   │       ├── LoadingSpinner.tsx     # [a implementar — Story 5.2]
+    │   │       └── ErrorAlert.tsx         # [a implementar — Story 5.2]
     │   │
-    │   ├── pages/
-    │   │   └── Dashboard.tsx          # Single-page principal
-    │   │
-    │   └── types/
+    │   └── types/                     # [a implementar — Story 5.2]
     │       └── api.ts                 # TypeScript interfaces para respostas da API
     │
-    └── tests/
+    └── tests/                         # [a implementar]
         ├── AlertBanner.test.tsx
         ├── PredictionChart.test.tsx
         └── usePredictions.test.ts
 ```
+
+> **Nota de implementação (2026-07-25, Story 5.1):** a navegação por seções (Monitor/Alertas/Histórico/Modelos) foi implementada como estado local em `App.tsx` (sem `pages/` nem router — consistente com a decisão "Single-page (sem router)" já registrada em Frontend Architecture), substituindo o `pages/Dashboard.tsx` originalmente esboçado nesta árvore. `hooks/` e `types/api.ts` permanecem como planejado para a Story 5.2, quando a integração real com a API via polling for implementada.
 
 ### Architectural Boundaries
 
