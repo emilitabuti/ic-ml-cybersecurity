@@ -30,33 +30,33 @@ Para que não haja data leakage e o contrato de dados esteja completamente docum
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Criar `src/data/data_splitter.py` — módulo de divisão train/test (AC: #1, #2, #3)
-  - [ ] Subtask 1.1: Implementar `split_train_test(X, y, test_size=None, random_state=None) -> tuple` que retorna `(X_train, X_test, y_train, y_test)`
-  - [ ] Subtask 1.2: `test_size` padrão lido de `config.TEST_SIZE` (novo campo em `config.py`, default `0.2`)
-  - [ ] Subtask 1.3: `random_state` padrão lido de `config.RANDOM_SEED`
-  - [ ] Subtask 1.4: Usar `sklearn.model_selection.train_test_split` com `stratify=y`
-  - [ ] Subtask 1.5: Log descritivo: tamanho dos conjuntos, proporção de classes, seed usado
-  - [ ] Subtask 1.6: Type hints completos e docstring com exemplo de uso
+- [x] Task 1: Criar `src/data/data_splitter.py` — módulo de divisão train/test (AC: #1, #2, #3)
+  - [x] Subtask 1.1: Implementar `split_train_test(X, y, test_size=None, random_state=None) -> tuple` que retorna `(X_train, X_test, y_train, y_test)`
+  - [x] Subtask 1.2: `test_size` padrão lido de `config.TEST_SIZE` (novo campo em `config.py`, default `0.2`)
+  - [x] Subtask 1.3: `random_state` padrão lido de `config.RANDOM_SEED`
+  - [x] Subtask 1.4: Usar `sklearn.model_selection.train_test_split` com `stratify=y`
+  - [x] Subtask 1.5: Log descritivo: tamanho dos conjuntos, proporção de classes, seed usado
+  - [x] Subtask 1.6: Type hints completos e docstring com exemplo de uso
 
-- [ ] Task 2: Adicionar `TEST_SIZE` ao `config.py` (AC: #1)
-  - [ ] Subtask 2.1: `TEST_SIZE: float = float(os.getenv("TEST_SIZE", "0.2"))` — configurável via env var
+- [x] Task 2: Adicionar `TEST_SIZE` ao `config.py` (AC: #1)
+  - [x] Subtask 2.1: `TEST_SIZE: float = float(os.getenv("TEST_SIZE", "0.2"))` — configurável via env var
 
-- [ ] Task 3: Atualizar `src/data/schema/features_schema.json` com seção `split_contract` (AC: #4)
-  - [ ] Subtask 3.1: Adicionar campo `"split_contract"` com: `test_size`, `stratify_by`, `random_state_source`, `leakage_prevention_policy`, `split_applied_before`
-  - [ ] Subtask 3.2: Adicionar campo `"version"` ao schema para rastrear evolução (`"1.1.0"`)
+- [x] Task 3: Atualizar `src/data/schema/features_schema.json` com seção `split_contract` (AC: #4)
+  - [x] Subtask 3.1: Adicionar campo `"split_contract"` com: `test_size`, `stratify_by`, `random_state_source`, `leakage_prevention_policy`, `split_applied_before`
+  - [x] Subtask 3.2: Adicionar campo `"version"` ao schema para rastrear evolução (`"1.1.0"`)
 
-- [ ] Task 4: Escrever testes — `tests/test_data_splitter.py` (AC: #1–#4)
-  - [ ] Subtask 4.1: `TestSplitTrainTestBasic` — split retorna 4 arrays, tamanhos corretos (80/20)
-  - [ ] Subtask 4.2: `TestSplitReproducibility` — dois splits com mesmo seed produzem índices idênticos
-  - [ ] Subtask 4.3: `TestSplitStratification` — proporção de classes preservada em treino e teste (tolerância ±2%)
-  - [ ] Subtask 4.4: `TestSplitCustomParams` — `test_size` e `random_state` customizáveis via parâmetro
-  - [ ] Subtask 4.5: `TestSplitNoLeakage` — índices de treino e teste são disjuntos (sem sobreposição)
-  - [ ] Subtask 4.6: `TestConfigTestSize` — `config.TEST_SIZE` existe, é float, entre 0.1 e 0.5
+- [x] Task 4: Escrever testes — `tests/test_data_splitter.py` (AC: #1–#4)
+  - [x] Subtask 4.1: `TestSplitTrainTestBasic` — split retorna 4 arrays, tamanhos corretos (80/20)
+  - [x] Subtask 4.2: `TestSplitReproducibility` — dois splits com mesmo seed produzem índices idênticos
+  - [x] Subtask 4.3: `TestSplitStratification` — proporção de classes preservada em treino e teste (tolerância ±2%)
+  - [x] Subtask 4.4: `TestSplitCustomParams` — `test_size` e `random_state` customizáveis via parâmetro
+  - [x] Subtask 4.5: `TestSplitNoLeakage` — índices de treino e teste são disjuntos (sem sobreposição)
+  - [x] Subtask 4.6: `TestConfigTestSize` — `config.TEST_SIZE` existe, é float, entre 0.1 e 0.5
 
-- [ ] Task 5: Rodar suite completa e fazer commit (AC: todos)
-  - [ ] Subtask 5.1: `pytest tests/test_data_splitter.py -v` — todos os novos testes passando
-  - [ ] Subtask 5.2: `pytest tests/` — sem regressões na suite completa
-  - [ ] Subtask 5.3: Commit: `feat(story-1.4): split train/test estratificado e contrato de dados`
+- [x] Task 5: Rodar suite completa e fazer commit (AC: todos)
+  - [x] Subtask 5.1: `pytest tests/test_data_splitter.py -v` — todos os novos testes passando
+  - [x] Subtask 5.2: `pytest tests/` — sem regressões na suite completa
+  - [x] Subtask 5.3: Commit: `feat(story-1.4): split train/test estratificado e contrato de dados`
 
 ## Dev Notes
 

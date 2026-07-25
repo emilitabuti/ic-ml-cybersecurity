@@ -1,6 +1,6 @@
 # Story 1.2: Configuração da Reprodutibilidade Científica
 
-Status: review
+Status: done
 
 ## Story
 
