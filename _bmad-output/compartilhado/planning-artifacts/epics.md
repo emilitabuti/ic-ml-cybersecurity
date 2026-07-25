@@ -11,7 +11,7 @@ implementationStatus:
   epic1: "done"
   epic2: "not_started"
   epic3: "not_started"
-  epic4: "not_started"
+  epic4: "in_progress"
   epic5: "in_progress"
 ---
 
@@ -512,7 +512,7 @@ Para que o dashboard mostre informações do sistema e o analista possa acessar 
 ### Story 4.4: Endpoint Mock para Desenvolvimento Paralelo
 
 > 🚀 **PRIORIDADE MÁXIMA — Implementar antes das Stories 4.1–4.3** (habilita Epic 5 em paralelo)
-> **Status: 🔴 NÃO INICIADA** — ⚠️ **BLOQUEADOR do Epic 5.** `POST /predict/mock` não implementado. Isabela não pode iniciar o desenvolvimento do dashboard sem este endpoint.
+> **Status: ✅ CONCLUÍDA** (2026-07-25) — `POST /predict/mock` implementado em `ml-pipeline/src/api/routes/predict.py`, com `PredictionResponse` em `src/api/schemas/prediction.py`, ciclo determinístico `DDoS` → `Suspicious Traffic` → `Normal Traffic` e documentação automática em `/openapi.json`/`GET /docs`. Não depende de Epic 2/3 nem implementa o `/predict` real (permanece Story 4.2).
 
 Como desenvolvedora do dashboard (Isabela),
 Quero um endpoint mock que retorna predições fixas sem depender do modelo real,
