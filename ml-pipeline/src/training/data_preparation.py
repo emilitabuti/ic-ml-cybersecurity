@@ -1,6 +1,7 @@
 """Preparação dos dados model-ready para treino com k-fold."""
 from __future__ import annotations
 
+import gc
 from dataclasses import dataclass
 from typing import Sequence
 
@@ -41,6 +42,12 @@ def prepare_windowed_binary_dataset(
     X = features_df.to_numpy(dtype=np.float32)
     y = df["Binary_Label"].to_numpy(dtype=int)
     attack_types = _resolve_attack_types(df, y)
+    # Libera o DataFrame original e as colunas intermediarias assim que os arrays
+    # numpy ja foram extraidos — em datasets reais grandes (ex.: UNSW-NB15) essa
+    # copia extra chega a ~1GB e pode ser a diferenca entre caber ou nao na RAM
+    # de ambientes limitados (ex.: Colab free tier).
+    del df, features_df
+    gc.collect()
     return prepare_windowed_binary_arrays(
         X=X,
         y=y,

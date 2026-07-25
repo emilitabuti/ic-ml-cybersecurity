@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import gc
 import warnings
 
 import mlflow
@@ -128,22 +129,27 @@ def _run_tensorflow_lstm(
             start=1,
         ):
             print(f"[LSTM] Fold {fold_index}/{resolved_n_splits} iniciando...", flush=True)
+            # Libera o grafo/pesos do modelo do fold anterior antes de criar um novo —
+            # sem isso, o Keras acumula memoria a cada fold (5x nesse pipeline), o que
+            # pode ser a diferenca entre caber ou nao na RAM de ambientes limitados
+            # (ex.: Colab free tier).
+            tf.keras.backend.clear_session()
+            gc.collect()
             tf.random.set_seed(config.RANDOM_SEED)
+            X_val = prepared.X_sequential[val_index]
+            y_val = prepared.y[val_index]
             model = _build_keras_lstm(prepared.X_sequential.shape[1:])
             model.fit(
                 prepared.X_sequential[train_index],
                 prepared.y[train_index],
-                validation_data=(
-                    prepared.X_sequential[val_index],
-                    prepared.y[val_index],
-                ),
+                validation_data=(X_val, y_val),
                 epochs=config.LSTM_EPOCHS,
                 batch_size=config.LSTM_BATCH_SIZE,
                 verbose=2,
             )
-            y_score = model.predict(prepared.X_sequential[val_index], verbose=0).ravel()
+            y_score = model.predict(X_val, verbose=0).ravel()
             y_pred = (y_score >= 0.5).astype(int)
-            y_true = prepared.y[val_index]
+            y_true = y_val
             metrics = calculate_binary_metrics(y_true, y_pred, y_score)
             fold_metrics.append(metrics)
 
