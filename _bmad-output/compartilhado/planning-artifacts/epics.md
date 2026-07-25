@@ -9,7 +9,7 @@ inputDocuments:
   - "_bmad-output/planning-artifacts/ux-design-specification.md"
 implementationStatus:
   epic1: "done"
-  epic2: "not_started"
+  epic2: "done"
   epic3: "not_started"
   epic4: "in_progress"
   epic5: "in_progress"
@@ -287,7 +287,7 @@ Para que consiga reproduzir os experimentos principais em ≤ 30 minutos de setu
 Emili consegue preparar os dados do CICIDS2017 para treinamento — executando feature selection sobre o conjunto de treino e transformando as sequências em janelas deslizantes (sliding window), com garantia de ausência de data leakage entre treino e teste.
 
 ### Story 2.1: Feature Selection sobre o Conjunto de Treino
-> **Status: 🔴 NÃO INICIADA** — `src/features/` existe mas contém apenas `__init__.py`. `feature_selector.py` não implementado.
+> **Status: ✅ CONCLUÍDA** (2026-07-25) — `src/features/feature_selector.py` implementado com `RandomForestFeatureSelector`, cálculo de importâncias por Random Forest somente sobre treino, seleção top-N/threshold configurável, persistência JSON (`models/feature_selection.json`) e testes determinísticos em `tests/test_feature_selector.py`.
 
 Como pesquisadora de ML (Emili),
 Quero executar feature selection sobre o conjunto de treino para selecionar as top-N features mais relevantes,
@@ -307,7 +307,7 @@ Para que o modelo treine com as features de maior poder preditivo, reduzindo ru�
 **Então** o resultado é idêntico nas duas execuções
 
 ### Story 2.2: Transformação em Sliding Window
-> **Status: 🔴 NÃO INICIADA** — `feature_engineer.py` não implementado. `WINDOW_SIZE` está configurado em `config.py` mas a transformação ainda não existe.
+> **Status: ✅ CONCLUÍDA** (2026-07-25) — `src/features/feature_engineer.py` implementado com `create_sliding_windows()`, `create_train_test_windows()`, `SlidingWindowResult`, labels pelo último registro da janela, shapes para LSTM e RF/DT e preservação de `window_indices` para auditoria anti-leakage.
 
 Como pesquisadora de ML (Emili),
 Quero transformar sequências de registros de tráfego em janelas deslizantes de tamanho N configurável,
@@ -327,7 +327,7 @@ Para que os modelos sequenciais (LSTM) capturem dependências temporais que prec
 **Então** cada amostra tem shape `(10, num_features)` para modelos sequenciais (LSTM) e `(10 * num_features,)` para modelos tabulares (RF, DT)
 
 ### Story 2.3: Validação Anti-Leakage do Pipeline de Features
-> **Status: 🔴 NÃO INICIADA** — Depende de 2.1 e 2.2. `tests/test_feature_engineer.py` não existe.
+> **Status: ✅ CONCLUÍDA** (2026-07-25) — `tests/test_feature_engineer.py` implementado com validação integrada anti-leakage: split → feature selection → sliding window, prova de que índices de teste não aparecem em janelas de treino e confirmação de que feature selection registra apenas amostras de treino e não refita no teste.
 
 Como pesquisadora de IC,
 Quero validar que o pipeline de features não vaza dados do teste para o treino,
