@@ -38,7 +38,18 @@ DatasetName = Literal["cic", "unsw"]
 TaskName = Literal["binary", "attacktype"]
 
 # Colunas que não são features de entrada
-_NON_FEATURE_COLS = {"Binary_Label", "Attack_Type", "Attack_Type_ID", "label", "source_file"}
+# srcip/dstip são identificadores de rede (não features de tráfego) — mantê-los
+# causaria vazamento de dados, pois o modelo memorizaria IPs vistos no treino
+# em vez de aprender padrões de tráfego generalizáveis.
+_NON_FEATURE_COLS = {
+    "Binary_Label",
+    "Attack_Type",
+    "Attack_Type_ID",
+    "label",
+    "source_file",
+    "srcip",
+    "dstip",
+}
 
 
 def load_dataset(

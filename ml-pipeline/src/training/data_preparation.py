@@ -31,7 +31,11 @@ def prepare_windowed_binary_dataset(
     """Carrega o parquet binário e cria janelas para LSTM e RF/DT."""
     df = load_dataset(dataset=dataset, task="binary")
     feature_cols = [column for column in df.columns if column not in _NON_FEATURE_COLS]
-    X = df[feature_cols].to_numpy(dtype=np.float64)
+    # Alguns datasets (ex.: UNSW-NB15) guardam campos numéricos (portas, contadores)
+    # como string. Coerção explícita evita falha em .to_numpy(dtype=float64) sem
+    # descartar sinal — valores realmente não numéricos viram 0.
+    features_df = df[feature_cols].apply(pd.to_numeric, errors="coerce").fillna(0)
+    X = features_df.to_numpy(dtype=np.float64)
     y = df["Binary_Label"].to_numpy(dtype=int)
     attack_types = _resolve_attack_types(df, y)
     return prepare_windowed_binary_arrays(
