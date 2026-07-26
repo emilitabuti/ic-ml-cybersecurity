@@ -9,6 +9,7 @@
  * cor — sempre cor + ícone + label textual.
  */
 import { AlertOctagon, AlertTriangle, ShieldCheck, Info, type LucideIcon } from "lucide-react";
+import type { PredictionResponse } from "@/types/api";
 
 export type Severity = "critical" | "warning" | "safe" | "info";
 
@@ -30,5 +31,12 @@ export function severityFromConfidence(confidence: number): Severity {
   if (confidence >= 0.9) return "critical";
   if (confidence >= 0.7) return "warning";
   if (confidence >= 0.4) return "info";
+  return "safe";
+}
+
+export function severityFromPrediction(prediction: PredictionResponse): Severity {
+  if (prediction.prediction.toLowerCase().includes("normal")) return "safe";
+  if (prediction.confidence >= 0.9) return "critical";
+  if (prediction.confidence >= 0.7) return "warning";
   return "safe";
 }
