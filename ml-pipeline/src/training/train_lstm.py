@@ -100,28 +100,35 @@ def _run_tensorflow_lstm(
     def _make_indexed_dataset(
         indices: np.ndarray, *, shuffle: bool
     ) -> "tf.data.Dataset":
-        # Le uma janela por vez direto do array em memoria (view/copia minuscula,
-        # ~poucos KB) em vez de materializar a fatia inteira do fold (que em
-        # datasets grandes, ex.: UNSW-NB15, chega a >10GB e estoura a RAM mesmo
-        # em ambientes com bastante memoria).
+        # Monta cada lote com UM unico acesso vetorizado (fancy indexing de
+        # `batch_size` linhas, poucos MB) em vez de copiar a fatia inteira do
+        # fold de uma vez (que em datasets grandes, ex.: UNSW-NB15, chega a
+        # >10GB e estoura a RAM) OU de chamar o generator Python linha a linha
+        # (funciona, mas a sobrecarga de milhoes de chamadas Python deixa o
+        # treino muito lento). Lote inteiro por chamada = memoria minima e
+        # velocidade proxima da indexacao direta em numpy.
+        indices = np.asarray(indices)
+        batch_size = config.LSTM_BATCH_SIZE
+
         def _generator():
-            for sample_index in indices:
-                yield prepared.X_sequential[sample_index], prepared.y[sample_index]
+            order = indices
+            if shuffle:
+                rng = np.random.default_rng(config.RANDOM_SEED)
+                order = rng.permutation(indices)
+            for start in range(0, len(order), batch_size):
+                batch_indices = order[start : start + batch_size]
+                yield prepared.X_sequential[batch_indices], prepared.y[batch_indices]
 
         dataset = tf.data.Dataset.from_generator(
             _generator,
             output_signature=(
-                tf.TensorSpec(shape=prepared.X_sequential.shape[1:], dtype=tf.float32),
-                tf.TensorSpec(shape=(), dtype=tf.int64),
+                tf.TensorSpec(
+                    shape=(None,) + prepared.X_sequential.shape[1:], dtype=tf.float32
+                ),
+                tf.TensorSpec(shape=(None,), dtype=tf.int64),
             ),
         )
-        if shuffle:
-            dataset = dataset.shuffle(
-                buffer_size=min(len(indices), 10_000),
-                seed=config.RANDOM_SEED,
-                reshuffle_each_iteration=True,
-            )
-        return dataset.batch(config.LSTM_BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
+        return dataset.prefetch(tf.data.AUTOTUNE)
 
     tf.random.set_seed(config.RANDOM_SEED)
     folds = make_stratified_kfold(n_splits=n_splits, random_state=config.RANDOM_SEED)
