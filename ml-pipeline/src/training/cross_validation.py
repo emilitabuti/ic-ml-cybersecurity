@@ -89,24 +89,36 @@ def run_sklearn_cross_validation(
             start=1,
         ):
             print(
-                f"[{model_type}] Fold {fold_index}/{resolved_n_splits} iniciando...",
+                f"[{model_type}] Fold {fold_index}/{resolved_n_splits} iniciando "
+                "(o proximo log so aparece quando o fit() terminar ou, no RF, "
+                "quando o joblib reportar as primeiras arvores concluidas - isso "
+                "pode levar alguns minutos SEM nenhuma saida no terminal; "
+                "NAO interrompa)...",
                 flush=True,
             )
             estimator = estimator_factory()
-            # Copia a fatia de treino, treina e libera antes de copiar a fatia de
-            # validacao — evita manter as duas copias (~100% do array base) na
-            # memoria ao mesmo tempo, o que em datasets grandes (ex.: UNSW-NB15,
-            # ~13GB de array base) pode dobrar o pico de RAM sem necessidade.
-            X_train = prepared.X_tabular[train_index]
-            estimator.fit(X_train, prepared.y[train_index])
-            del X_train
+            # Em vez de copiar a fatia de treino/validacao (fancy-indexing sempre
+            # aloca um array novo — para o UNSW-NB15 isso significa ~10.4GB so
+            # para o treino, o mesmo tamanho que causou o OOM do LSTM antes do
+            # fix com tf.data), treina direto no array base completo usando
+            # sample_weight=0 para mascarar as linhas de validacao. Isso evita
+            # qualquer copia do array gigante (~13GB) — apenas um vetor de pesos
+            # (poucos MB) e alocado por fold.
+            sample_weight = np.zeros(prepared.y.shape[0], dtype=np.float64)
+            sample_weight[train_index] = 1.0
+            estimator.fit(prepared.X_tabular, prepared.y, sample_weight=sample_weight)
+            del sample_weight
             gc.collect()
 
-            X_val = prepared.X_tabular[val_index]
+            # Mesma logica para a predicao: prediz no array completo (ja
+            # residente em memoria, sem copia extra) e filtra o resultado (bem
+            # menor: 1 valor por linha) pelas linhas de validacao.
+            y_pred_all = estimator.predict(prepared.X_tabular)
+            y_score_all = _predict_scores(estimator, prepared.X_tabular)
             y_true = prepared.y[val_index]
-            y_pred = estimator.predict(X_val)
-            y_score = _predict_scores(estimator, X_val)
-            del X_val
+            y_pred = y_pred_all[val_index]
+            y_score = y_score_all[val_index]
+            del y_pred_all, y_score_all
             gc.collect()
             metrics = calculate_binary_metrics(y_true, y_pred, y_score)
             fold_metrics.append(metrics)
