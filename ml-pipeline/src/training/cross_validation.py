@@ -89,7 +89,11 @@ def run_sklearn_cross_validation(
             start=1,
         ):
             print(
-                f"[{model_type}] Fold {fold_index}/{resolved_n_splits} iniciando...",
+                f"[{model_type}] Fold {fold_index}/{resolved_n_splits} iniciando "
+                "(o proximo log so aparece quando o fit() terminar ou, no RF, "
+                "quando o joblib reportar as primeiras arvores concluidas - isso "
+                "pode levar alguns minutos SEM nenhuma saida no terminal; "
+                "NAO interrompa)...",
                 flush=True,
             )
             estimator = estimator_factory()
