@@ -19,6 +19,7 @@ def build_random_forest(**overrides: object) -> RandomForestClassifier:
         "max_depth": _optional_int(config.RF_MAX_DEPTH),
         "random_state": config.RANDOM_SEED,
         "n_jobs": -1,
+        "verbose": 1,
     }
     params.update({key: value for key, value in overrides.items() if value is not None})
     return RandomForestClassifier(**params)
