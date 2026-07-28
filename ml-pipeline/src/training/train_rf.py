@@ -54,7 +54,12 @@ def main() -> None:
     parser.add_argument("--output-dir", default=None)
     args = parser.parse_args()
 
+    print("[RF] Carregando e preparando dataset (pode levar alguns segundos)...", flush=True)
     prepared = prepare_windowed_binary_dataset(dataset=args.dataset)
+    print(
+        f"[RF] Dataset pronto: X_tabular={prepared.X_tabular.shape}, y={prepared.y.shape}",
+        flush=True,
+    )
     result = train_random_forest(
         prepared=prepared,
         use_mlflow=not args.no_mlflow,

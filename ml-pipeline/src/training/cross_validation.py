@@ -88,6 +88,10 @@ def run_sklearn_cross_validation(
             folds.split(prepared.X_tabular, prepared.y),
             start=1,
         ):
+            print(
+                f"[{model_type}] Fold {fold_index}/{resolved_n_splits} iniciando...",
+                flush=True,
+            )
             estimator = estimator_factory()
             # Copia a fatia de treino, treina e libera antes de copiar a fatia de
             # validacao — evita manter as duas copias (~100% do array base) na
@@ -106,6 +110,11 @@ def run_sklearn_cross_validation(
             gc.collect()
             metrics = calculate_binary_metrics(y_true, y_pred, y_score)
             fold_metrics.append(metrics)
+            print(
+                f"[{model_type}] Fold {fold_index}/{resolved_n_splits} concluido: "
+                f"f1={metrics['f1']:.4f} auc_roc={metrics['auc_roc']:.4f}",
+                flush=True,
+            )
 
             if use_mlflow:
                 for metric_name, metric_value in metrics.items():
