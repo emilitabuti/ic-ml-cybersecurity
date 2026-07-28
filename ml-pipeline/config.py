@@ -25,8 +25,13 @@ MLFLOW_TRACKING_URI: str = os.getenv("MLFLOW_TRACKING_URI", "mlruns")
 TRAINING_REPORTS_DIR: str = os.getenv("TRAINING_REPORTS_DIR", "reports")
 
 RF_N_ESTIMATORS: int = int(os.getenv("RF_N_ESTIMATORS", "100"))
-RF_MAX_DEPTH: str | None = os.getenv("RF_MAX_DEPTH") or None
-DT_MAX_DEPTH: str | None = os.getenv("DT_MAX_DEPTH") or None
+# max_depth limitado (em vez de None/ilimitado): com WINDOW_SIZE=10, o numero de
+# colunas efetivo (features x janela) fica alto o suficiente para deixar arvores
+# sem limite de profundidade impraticaveis em datasets grandes (ex.: UNSW-NB15,
+# 206 features x 10 = 2060 colunas, 1.58M linhas). 20 e um valor comum na
+# literatura para RF/DT em deteccao de intrusao e mantem o treino viavel.
+RF_MAX_DEPTH: str | None = os.getenv("RF_MAX_DEPTH", "20") or None
+DT_MAX_DEPTH: str | None = os.getenv("DT_MAX_DEPTH", "20") or None
 MLP_HIDDEN_LAYER_SIZES: str = os.getenv("MLP_HIDDEN_LAYER_SIZES", "64,32")
 MLP_MAX_ITER: int = int(os.getenv("MLP_MAX_ITER", "200"))
 LSTM_EPOCHS: int = int(os.getenv("LSTM_EPOCHS", "10"))
