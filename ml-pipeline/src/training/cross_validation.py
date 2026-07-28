@@ -101,7 +101,7 @@ def run_sklearn_cross_validation(
                 "NAO interrompa)...",
                 flush=True,
             )
-            _log_ram_usage(f"{model_type} fold {fold_index} antes do fit")
+            log_ram_usage(f"{model_type} fold {fold_index} antes do fit")
             estimator = estimator_factory()
             # Em vez de copiar a fatia de treino/validacao (fancy-indexing sempre
             # aloca um array novo — para o UNSW-NB15 isso significa ~10.4GB so
@@ -115,7 +115,7 @@ def run_sklearn_cross_validation(
             estimator.fit(prepared.X_tabular, prepared.y, sample_weight=sample_weight)
             del sample_weight
             gc.collect()
-            _log_ram_usage(f"{model_type} fold {fold_index} depois do fit")
+            log_ram_usage(f"{model_type} fold {fold_index} depois do fit")
 
             # Mesma logica para a predicao: prediz no array completo (ja
             # residente em memoria, sem copia extra) e filtra o resultado (bem
@@ -187,7 +187,7 @@ def run_sklearn_cross_validation(
     )
 
 
-def _log_ram_usage(label: str) -> None:
+def log_ram_usage(label: str) -> None:
     """Loga RAM disponivel/em uso (best-effort) para diagnosticar OOM em Colab."""
     if psutil is None:
         return
