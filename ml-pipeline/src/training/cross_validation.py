@@ -13,6 +13,11 @@ import pandas as pd
 from sklearn.base import ClassifierMixin
 from sklearn.model_selection import StratifiedKFold
 
+try:
+    import psutil
+except ModuleNotFoundError:
+    psutil = None
+
 import config
 from src.training.data_preparation import PreparedDataset
 from src.training.metrics import METRIC_NAMES, calculate_binary_metrics, summarize_fold_metrics
@@ -96,6 +101,7 @@ def run_sklearn_cross_validation(
                 "NAO interrompa)...",
                 flush=True,
             )
+            _log_ram_usage(f"{model_type} fold {fold_index} antes do fit")
             estimator = estimator_factory()
             # Em vez de copiar a fatia de treino/validacao (fancy-indexing sempre
             # aloca um array novo — para o UNSW-NB15 isso significa ~10.4GB so
@@ -109,6 +115,7 @@ def run_sklearn_cross_validation(
             estimator.fit(prepared.X_tabular, prepared.y, sample_weight=sample_weight)
             del sample_weight
             gc.collect()
+            _log_ram_usage(f"{model_type} fold {fold_index} depois do fit")
 
             # Mesma logica para a predicao: prediz no array completo (ja
             # residente em memoria, sem copia extra) e filtra o resultado (bem
@@ -177,6 +184,20 @@ def run_sklearn_cross_validation(
         result_path=result_path,
         predictions_path=predictions_path,
         fallback_used=fallback_used,
+    )
+
+
+def _log_ram_usage(label: str) -> None:
+    """Loga RAM disponivel/em uso (best-effort) para diagnosticar OOM em Colab."""
+    if psutil is None:
+        return
+    vm = psutil.virtual_memory()
+    process_rss_gb = psutil.Process().memory_info().rss / (1024 ** 3)
+    print(
+        f"[ram] {label}: processo={process_rss_gb:.2f}GB "
+        f"sistema_usado={vm.percent:.0f}% "
+        f"disponivel={vm.available / (1024 ** 3):.2f}GB",
+        flush=True,
     )
 
 
