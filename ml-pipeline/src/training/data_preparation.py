@@ -28,8 +28,18 @@ class PreparedDataset:
 def prepare_windowed_binary_dataset(
     dataset: str = "cic",
     window_size: int | None = None,
+    tabular_only: bool = False,
 ) -> PreparedDataset:
-    """Carrega o parquet binário e cria janelas para LSTM e RF/DT."""
+    """Carrega o parquet binário e cria janelas para LSTM e RF/DT.
+
+    Args:
+        tabular_only: quando True, nao constroi/mantem a representacao 3D
+            (usada apenas pelo LSTM) — evita manter duas copias completas dos
+            dados em memoria (~2x o tamanho do array de janelas), o que em
+            datasets grandes (ex.: UNSW-NB15, ~13GB por copia) pode causar
+            OOM em ambientes com RAM limitada mesmo quando so o RF/DT (que
+            usam apenas X_tabular) estao sendo treinados.
+    """
     df = load_dataset(dataset=dataset, task="binary")
     feature_cols = [column for column in df.columns if column not in _NON_FEATURE_COLS]
     # Alguns datasets (ex.: UNSW-NB15) guardam campos numéricos (portas, contadores)
@@ -54,6 +64,7 @@ def prepare_windowed_binary_dataset(
         attack_types=attack_types,
         feature_names=feature_cols,
         window_size=window_size,
+        tabular_only=tabular_only,
     )
 
 
@@ -63,12 +74,36 @@ def prepare_windowed_binary_arrays(
     attack_types: Sequence[str] | np.ndarray | None = None,
     feature_names: list[str] | None = None,
     window_size: int | None = None,
+    tabular_only: bool = False,
 ) -> PreparedDataset:
     """Cria representações 3D e achatada a partir de arrays em memória."""
     resolved_window_size = int(window_size or config.WINDOW_SIZE)
     X_array = np.asarray(X, dtype=np.float32)
     y_array = np.asarray(y, dtype=int)
     resolved_attack_types = _resolve_attack_array(attack_types, y_array)
+
+    names = feature_names or [f"feature_{index}" for index in range(X_array.shape[1])]
+    window_attack_types = resolved_attack_types[resolved_window_size - 1 :]
+
+    if tabular_only:
+        # create_sliding_windows(flatten=True) achata internamente e descarta a
+        # referencia ao array 3D intermediario ao retornar — o array 3D fica
+        # elegivel para coleta de lixo em vez de ficar retido para sempre no
+        # PreparedDataset (como aconteceria guardando X_sequential tambem).
+        tabular = create_sliding_windows(
+            X_array,
+            y_array,
+            window_size=resolved_window_size,
+            flatten=True,
+        )
+        return PreparedDataset(
+            X_sequential=np.empty((0,), dtype=np.float32),
+            X_tabular=tabular.X,
+            y=tabular.y,
+            attack_types=window_attack_types.astype(str),
+            feature_names=list(names),
+            window_size=resolved_window_size,
+        )
 
     sequential = create_sliding_windows(
         X_array,
@@ -77,9 +112,7 @@ def prepare_windowed_binary_arrays(
         flatten=False,
     )
     tabular = sequential.flatten()
-    window_attack_types = resolved_attack_types[resolved_window_size - 1 :]
 
-    names = feature_names or [f"feature_{index}" for index in range(X_array.shape[1])]
     return PreparedDataset(
         X_sequential=sequential.X,
         X_tabular=tabular.X,
