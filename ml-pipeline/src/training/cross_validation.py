@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import gc
 import json
 from pathlib import Path
 from typing import Callable
@@ -88,11 +89,21 @@ def run_sklearn_cross_validation(
             start=1,
         ):
             estimator = estimator_factory()
-            estimator.fit(prepared.X_tabular[train_index], prepared.y[train_index])
+            # Copia a fatia de treino, treina e libera antes de copiar a fatia de
+            # validacao — evita manter as duas copias (~100% do array base) na
+            # memoria ao mesmo tempo, o que em datasets grandes (ex.: UNSW-NB15,
+            # ~13GB de array base) pode dobrar o pico de RAM sem necessidade.
+            X_train = prepared.X_tabular[train_index]
+            estimator.fit(X_train, prepared.y[train_index])
+            del X_train
+            gc.collect()
 
+            X_val = prepared.X_tabular[val_index]
             y_true = prepared.y[val_index]
-            y_pred = estimator.predict(prepared.X_tabular[val_index])
-            y_score = _predict_scores(estimator, prepared.X_tabular[val_index])
+            y_pred = estimator.predict(X_val)
+            y_score = _predict_scores(estimator, X_val)
+            del X_val
+            gc.collect()
             metrics = calculate_binary_metrics(y_true, y_pred, y_score)
             fold_metrics.append(metrics)
 
