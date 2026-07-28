@@ -18,7 +18,7 @@ def build_random_forest(**overrides: object) -> RandomForestClassifier:
         "n_estimators": config.RF_N_ESTIMATORS,
         "max_depth": _optional_int(config.RF_MAX_DEPTH),
         "random_state": config.RANDOM_SEED,
-        "n_jobs": -1,
+        "n_jobs": config.RF_N_JOBS,
         "verbose": 1,
     }
     params.update({key: value for key, value in overrides.items() if value is not None})

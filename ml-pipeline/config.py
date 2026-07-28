@@ -32,6 +32,12 @@ RF_N_ESTIMATORS: int = int(os.getenv("RF_N_ESTIMATORS", "100"))
 # literatura para RF/DT em deteccao de intrusao e mantem o treino viavel.
 RF_MAX_DEPTH: str | None = os.getenv("RF_MAX_DEPTH", "20") or None
 DT_MAX_DEPTH: str | None = os.getenv("DT_MAX_DEPTH", "20") or None
+# n_jobs alto multiplica o overhead de memoria de construcao de arvore (buffers
+# internos de ordenacao por thread) pelo numero de threads concorrentes. Em
+# datasets largos (UNSW-NB15, 2060 colunas) isso pode dobrar/triplicar o pico de
+# RAM e causar OOM-kill silencioso. Valor baixo por padrao prioriza estabilidade
+# sobre velocidade; pode ser ajustado via env var quando a RAM disponivel permitir.
+RF_N_JOBS: int = int(os.getenv("RF_N_JOBS", "2"))
 MLP_HIDDEN_LAYER_SIZES: str = os.getenv("MLP_HIDDEN_LAYER_SIZES", "64,32")
 MLP_MAX_ITER: int = int(os.getenv("MLP_MAX_ITER", "200"))
 LSTM_EPOCHS: int = int(os.getenv("LSTM_EPOCHS", "10"))
