@@ -17,7 +17,10 @@ from urllib.request import Request, urlopen
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DEFAULT_EVENTS_FILE = SCRIPT_DIR / "results" / "dashboard_history_events.json"
+ML_PIPELINE_ROOT = SCRIPT_DIR.parents[2]
+DEFAULT_EVENTS_FILE = (
+    ML_PIPELINE_ROOT / "reports" / "isabela" / "syn_flood" / "dashboard_history_events.json"
+)
 DEFAULT_API_URL = "http://127.0.0.1:8000"
 
 # Assinatura compacta derivada de uma janela UNSW que o artefato RF atual

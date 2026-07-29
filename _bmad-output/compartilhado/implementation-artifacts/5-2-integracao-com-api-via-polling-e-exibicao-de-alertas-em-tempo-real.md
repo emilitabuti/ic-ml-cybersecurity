@@ -60,7 +60,7 @@ Para que possa monitorar a rede de forma passiva e ser notificada antes da concr
 
 ### Observação sobre backend/API real
 
-Story 4.3 implementou `GET /history` real, alimentado pelas respostas de `POST /predict`. O dashboard consome esse endpoint diretamente. Para demo do cenário SYN flood sem mock, use `docs/isabela/ataque-dataset/send_real_predictions_to_api.py`, que chama `POST /predict` e popula o histórico em memória.
+Story 4.3 implementou `GET /history` real, alimentado pelas respostas de `POST /predict`. O dashboard consome esse endpoint diretamente. Para demo do cenário SYN flood sem mock, use `python -m src.evaluation.scenarios.send_real_predictions_to_api` a partir de `ml-pipeline/`; o script chama `POST /predict` e popula o histórico em memória.
 
 ### Project Structure Notes
 
@@ -127,7 +127,7 @@ GPT-5 Codex
 - `dashboard/src/services/api.test.ts`
 - `dashboard/src/test/setup.ts`
 - `dashboard/src/types/api.ts`
-- `docs/isabela/ataque-dataset/send_real_predictions_to_api.py`
+- `ml-pipeline/src/evaluation/scenarios/send_real_predictions_to_api.py`
 
 ## Change Log
 

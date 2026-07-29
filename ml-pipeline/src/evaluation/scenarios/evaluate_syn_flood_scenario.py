@@ -13,8 +13,10 @@ from typing import Any
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DEFAULT_INPUT = SCRIPT_DIR / "sandbox_tabular_dataset" / "syn_flood_synthetic_samples.csv"
-DEFAULT_RESULTS_DIR = SCRIPT_DIR / "results"
+ML_PIPELINE_ROOT = SCRIPT_DIR.parents[2]
+DEFAULT_SCENARIO_DIR = ML_PIPELINE_ROOT / "reports" / "isabela" / "syn_flood"
+DEFAULT_INPUT = DEFAULT_SCENARIO_DIR / "sandbox_tabular_dataset" / "syn_flood_synthetic_samples.csv"
+DEFAULT_RESULTS_DIR = DEFAULT_SCENARIO_DIR
 MODEL_NAME = "isabela-syn-flood-heuristic-v1"
 
 
@@ -32,7 +34,7 @@ def parse_args() -> argparse.Namespace:
         "--results-dir",
         type=Path,
         default=DEFAULT_RESULTS_DIR,
-        help="Diretorio para CSV/JSON de resultados. Padrao: results.",
+        help="Diretorio para CSV/JSON de resultados. Padrao: reports/isabela/syn_flood.",
     )
     return parser.parse_args()
 

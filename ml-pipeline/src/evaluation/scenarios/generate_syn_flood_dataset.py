@@ -9,7 +9,9 @@ from pathlib import Path
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "sandbox_tabular_dataset"
+ML_PIPELINE_ROOT = SCRIPT_DIR.parents[2]
+DEFAULT_SCENARIO_DIR = ML_PIPELINE_ROOT / "reports" / "isabela" / "syn_flood"
+DEFAULT_OUTPUT_DIR = DEFAULT_SCENARIO_DIR / "sandbox_tabular_dataset"
 DEFAULT_OUTPUT_FILE = "syn_flood_synthetic_samples.csv"
 DEFAULT_SEED = 42
 
@@ -53,7 +55,7 @@ def parse_args() -> argparse.Namespace:
         "--output-dir",
         type=Path,
         default=DEFAULT_OUTPUT_DIR,
-        help="Diretorio de saida. Padrao: sandbox_tabular_dataset.",
+        help="Diretorio de saida. Padrao: reports/isabela/syn_flood/sandbox_tabular_dataset.",
     )
     parser.add_argument(
         "--filename",
@@ -218,7 +220,7 @@ def main() -> int:
 
     print(f"Dataset sintetico criado: {output_path}")
     print(f"Amostras geradas: {len(rows)}")
-    print("Proximo passo: py .\\evaluate_syn_flood_scenario.py")
+    print("Proximo passo: python -m src.evaluation.scenarios.evaluate_syn_flood_scenario")
     return 0
 
 
