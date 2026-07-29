@@ -95,8 +95,41 @@ function severityCounts(predictions: PredictionResponse[]): Record<Severity, num
   );
 }
 
+function threatTypeLabel(prediction: PredictionResponse): string {
+  return prediction.source_prediction ?? prediction.prediction;
+}
+
+function categoryLabel(prediction: PredictionResponse): string {
+  if (!prediction.source_prediction) return prediction.prediction;
+  if (prediction.source_prediction.toLowerCase().includes("syn flood")) return prediction.source_prediction;
+  return prediction.prediction;
+}
+
 function uniqueThreatTypes(predictions: PredictionResponse[]): string[] {
-  return Array.from(new Set(predictions.map((prediction) => prediction.prediction))).slice(0, 5);
+  return Array.from(new Set(predictions.map(threatTypeLabel))).slice(0, 5);
+}
+
+function severityRank(prediction: PredictionResponse): number {
+  const ranks: Record<Severity, number> = {
+    critical: 0,
+    warning: 1,
+    info: 2,
+    safe: 3,
+  };
+  return ranks[severityFromPrediction(prediction)];
+}
+
+function timestampValue(prediction: PredictionResponse): number {
+  const value = new Date(prediction.timestamp).getTime();
+  return Number.isNaN(value) ? 0 : value;
+}
+
+function sortBySeverityThenRecency(predictions: PredictionResponse[]): PredictionResponse[] {
+  return [...predictions].sort((current, next) => {
+    const severityDelta = severityRank(current) - severityRank(next);
+    if (severityDelta !== 0) return severityDelta;
+    return timestampValue(next) - timestampValue(current);
+  });
 }
 
 function loadStoredDecisions(): Record<string, DecisionStatus> {
@@ -176,7 +209,8 @@ function statusTone(status: DecisionStatus): string {
 }
 
 function App() {
-  const { data: predictions = [], error, isLoading, refetch } = usePredictions();
+  const { data, error, isLoading, refetch } = usePredictions();
+  const predictions: PredictionResponse[] = data ?? [];
   const [decisions, setDecisions] = useState<Record<string, DecisionStatus>>(loadStoredDecisions);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [threatFilter, setThreatFilter] = useState("all");
@@ -191,19 +225,21 @@ function App() {
   const activeAlerts = counts.critical + counts.warning + counts.info;
   const latest = predictions[0];
   const threatTypes = useMemo(() => uniqueThreatTypes(predictions), [predictions]);
-  const hasSynFlood = predictions.some((prediction) => prediction.prediction.toLowerCase().includes("syn flood"));
+  const hasSynFlood = predictions.some((prediction) => threatTypeLabel(prediction).toLowerCase().includes("syn flood"));
   const treatedCount = Object.values(decisions).filter((status) => status !== "pending").length;
 
   const filteredHistory = useMemo(
     () =>
-      predictions.filter((prediction) => {
+      sortBySeverityThenRecency(
+        predictions.filter((prediction) => {
         const alertId = getAlertId(prediction);
         const status = decisions[alertId] ?? "pending";
         const matchesStatus = statusFilter === "all" || status === statusFilter;
-        const matchesThreat = threatFilter === "all" || prediction.prediction === threatFilter;
+        const matchesThreat = threatFilter === "all" || threatTypeLabel(prediction) === threatFilter;
 
         return matchesStatus && matchesThreat;
-      }),
+        }),
+      ),
     [decisions, predictions, statusFilter, threatFilter],
   );
 
@@ -394,13 +430,20 @@ function App() {
                       </td>
                     </tr>
                   )}
-                  {predictions.map((prediction) => (
+                  {predictions.map((prediction, index) => (
                     <tr
-                      key={`${prediction.timestamp}-${prediction.prediction}-${prediction.model}`}
+                      key={`${getAlertId(prediction)}-${index}`}
                       className="border-b border-border last:border-0"
                     >
                       <td className="px-4 py-3 font-mono text-xs">{formatTimestamp(prediction.timestamp)}</td>
-                      <td className="px-4 py-3 font-medium">{prediction.prediction}</td>
+                      <td className="px-4 py-3">
+                        <div className="font-medium">{categoryLabel(prediction)}</div>
+                        {prediction.source_prediction && categoryLabel(prediction) !== prediction.source_prediction && (
+                          <div className="mt-1 text-xs text-muted-foreground">
+                            Cenario: {prediction.source_prediction}
+                          </div>
+                        )}
+                      </td>
                       <td className="px-4 py-3">
                         <SeverityText prediction={prediction} />
                       </td>
@@ -416,7 +459,7 @@ function App() {
           )}
         </section>
 
-        <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <section className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
           <div className="rounded-lg border border-border bg-card p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -489,16 +532,19 @@ function App() {
                       </td>
                     </tr>
                   )}
-                  {filteredHistory.map((prediction) => {
+                  {filteredHistory.map((prediction, index) => {
                     const alertId = getAlertId(prediction);
                     const decisionStatus = decisions[alertId] ?? "pending";
 
                     return (
-                      <tr key={alertId} className="border-b border-border last:border-0">
+                      <tr key={`${alertId}-${index}`} className="border-b border-border last:border-0">
                         <td className="px-3 py-3 font-mono text-xs">{formatTimestamp(prediction.timestamp)}</td>
                         <td className="px-3 py-3">
-                          <div className="font-medium">{prediction.prediction}</div>
+                          <div className="font-medium">{categoryLabel(prediction)}</div>
                           <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                            {prediction.source_prediction && categoryLabel(prediction) !== prediction.source_prediction && (
+                              <span>Cenario: {prediction.source_prediction}</span>
+                            )}
                             <SeverityText prediction={prediction} />
                             <span className="font-mono">{confidenceLabel(prediction.confidence)}</span>
                           </div>
@@ -546,7 +592,7 @@ function App() {
             </div>
           </div>
 
-          <aside className="rounded-lg border border-border bg-card p-4">
+          <aside className="self-start rounded-lg border border-border bg-card p-4 lg:aspect-square">
             <h2 className="flex items-center gap-2 text-xl font-semibold">
               <SlidersHorizontal className="size-5 text-status-info" aria-hidden="true" />
               Modo Demo

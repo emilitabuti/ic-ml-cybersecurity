@@ -14,7 +14,7 @@ export interface AlertWindow {
 }
 
 export function getAlertId(prediction: PredictionResponse): string {
-  return `${prediction.timestamp}-${prediction.prediction}-${prediction.model}`;
+  return `${prediction.timestamp}-${prediction.source_prediction ?? prediction.prediction}-${prediction.prediction}-${prediction.model}`;
 }
 
 export function getDecisionLabel(status: DecisionStatus): string {

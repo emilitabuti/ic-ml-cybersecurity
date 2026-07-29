@@ -56,6 +56,7 @@ def _next_mock_prediction() -> dict[str, str | float]:
 @router.post(
     "/predict/mock",
     response_model=PredictionResponse,
+    response_model_exclude_none=True,
     summary="Predição simulada para desenvolvimento paralelo do dashboard",
     description=(
         "Retorna uma predição simulada no mesmo formato do endpoint /predict real, "
@@ -69,6 +70,7 @@ def predict_mock() -> PredictionResponse:
 @router.post(
     "/predict",
     response_model=PredictionResponse,
+    response_model_exclude_none=True,
     summary="Predição real com o modelo carregado no startup",
 )
 def predict(payload: Any = Body(...)) -> PredictionResponse:
@@ -78,6 +80,7 @@ def predict(payload: Any = Body(...)) -> PredictionResponse:
 @router.post(
     "/history/demo",
     response_model=list[PredictionHistoryItem],
+    response_model_exclude_none=True,
     summary="Injeta uma predicao simulada no historico do dashboard",
     description=(
         "Recebe uma predicao simulada e a adiciona ao mesmo historico em memoria "
@@ -96,6 +99,7 @@ def push_demo_history_event(prediction: PredictionResponse) -> list[PredictionHi
 @router.delete(
     "/history/demo",
     response_model=list[PredictionHistoryItem],
+    response_model_exclude_none=True,
     summary="Limpa predicoes simuladas de demonstracao",
 )
 def clear_demo_history() -> list[PredictionHistoryItem]:
@@ -115,6 +119,7 @@ def model_info() -> ModelInfoResponse:
 @router.get(
     "/history",
     response_model=list[PredictionHistoryItem],
+    response_model_exclude_none=True,
     summary="Últimas predições em memória",
 )
 def history() -> list[PredictionHistoryItem]:

@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from src.api.routes.predict import router as predict_router
+from src.api.services.dashboard_history_loader import autoload_dashboard_history_if_enabled
 from src.api.services import prediction_service
 from src.api.services.prediction_service import (
     InvalidFeaturesError,
@@ -20,6 +21,10 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     load_model_once()
+    try:
+        autoload_dashboard_history_if_enabled()
+    except Exception:
+        logger.exception("Falha ao carregar eventos iniciais do dashboard.")
     yield
 
 

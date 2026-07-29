@@ -175,6 +175,7 @@ def main() -> int:
     sent = 0
     for event in events[: args.limit]:
         payload = {
+            "source_prediction": str(event.get("prediction", "")),
             "features": build_window(
                 feature_names,
                 window_size=window_size,

@@ -11,6 +11,10 @@ class PredictionResponse(BaseModel):
     )
     model: str = Field(..., description="Identificador do modelo que gerou a predição.")
     timestamp: str = Field(..., description="Timestamp da predição em ISO 8601 UTC.")
+    source_prediction: str | None = Field(
+        None,
+        description="Rotulo original do cenario/evento usado para filtros do dashboard.",
+    )
 
 
 class PredictionHistoryItem(PredictionResponse):

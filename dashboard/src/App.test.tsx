@@ -81,6 +81,79 @@ describe("App", () => {
     expect(screen.getByText("Confirmado")).toBeInTheDocument();
   });
 
+  it("filtra o historico pelo rotulo do cenario quando a predicao real retorna Attack", async () => {
+    vi.spyOn(apiClient, "getPredictionHistory").mockResolvedValue([
+      {
+        prediction: "Attack",
+        source_prediction: "SYN Flood - Low Intensity",
+        confidence: 0.68,
+        model: "random_forest",
+        timestamp: "2026-07-29T20:45:01Z",
+      },
+      {
+        prediction: "Attack",
+        source_prediction: "SYN Flood - High Intensity",
+        confidence: 0.68,
+        model: "random_forest",
+        timestamp: "2026-07-29T20:45:02Z",
+      },
+      {
+        prediction: "BENIGN",
+        source_prediction: "Normal Traffic",
+        confidence: 0.7,
+        model: "random_forest",
+        timestamp: "2026-07-29T20:45:03Z",
+      },
+    ]);
+
+    renderApp();
+
+    expect((await screen.findAllByText("SYN Flood - Low Intensity")).length).toBeGreaterThan(0);
+
+    const threatFilter = screen.getAllByRole("combobox")[1];
+    fireEvent.change(threatFilter, { target: { value: "SYN Flood - Low Intensity" } });
+
+    const historyTable = screen.getAllByRole("table")[1];
+    expect(within(historyTable).getByText("SYN Flood - Low Intensity")).toBeInTheDocument();
+    expect(within(historyTable).queryByText(/^Attack$/)).not.toBeInTheDocument();
+    expect(within(historyTable).queryByText("SYN Flood - High Intensity")).not.toBeInTheDocument();
+    expect(within(historyTable).queryByText("Normal Traffic")).not.toBeInTheDocument();
+  });
+
+  it("prioriza alertas suspeitos no topo do historico filtrado", async () => {
+    vi.spyOn(apiClient, "getPredictionHistory").mockResolvedValue([
+      {
+        prediction: "Attack",
+        source_prediction: "SYN Flood - Low Intensity",
+        confidence: 0.68,
+        model: "random_forest",
+        timestamp: "2026-07-29T20:45:01Z",
+      },
+      {
+        prediction: "Attack",
+        source_prediction: "SYN Flood - Low Intensity",
+        confidence: 0.77,
+        model: "random_forest",
+        timestamp: "2026-07-29T20:43:01Z",
+      },
+    ]);
+
+    renderApp();
+
+    expect((await screen.findAllByText("SYN Flood - Low Intensity")).length).toBeGreaterThan(0);
+
+    const threatFilter = screen.getAllByRole("combobox")[1];
+    fireEvent.change(threatFilter, { target: { value: "SYN Flood - Low Intensity" } });
+
+    const historyTable = screen.getAllByRole("table")[1];
+    const rows = within(historyTable).getAllByRole("row").slice(1);
+
+    expect(within(rows[0]).getByText("Suspeito")).toBeInTheDocument();
+    expect(within(rows[0]).getByText("77%")).toBeInTheDocument();
+    expect(within(rows[1]).getByText("Informativo")).toBeInTheDocument();
+    expect(within(rows[1]).getByText("68%")).toBeInTheDocument();
+  });
+
   it("renderiza historico e demo sem placeholders de construcao", async () => {
     vi.spyOn(apiClient, "getPredictionHistory").mockResolvedValue([]);
 

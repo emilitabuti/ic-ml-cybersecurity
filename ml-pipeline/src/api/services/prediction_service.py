@@ -83,6 +83,7 @@ def load_model_once(path: str | Path | None = None, *, force: bool = False) -> N
 def predict(payload: Any) -> dict[str, str | float]:
     artifact = _get_loaded_artifact()
     X = _payload_to_feature_array(payload, artifact)
+    source_prediction = _extract_source_prediction(payload)
 
     try:
         output = predict_from_artifact(artifact, X)
@@ -100,6 +101,8 @@ def predict(payload: Any) -> dict[str, str | float]:
         "model": str(artifact["model_type"]),
         "timestamp": _utc_timestamp(),
     }
+    if source_prediction:
+        response["source_prediction"] = source_prediction
     _append_history(response)
     return response
 
@@ -126,6 +129,9 @@ def append_prediction_history(item: dict[str, str | float]) -> None:
         "model": str(item["model"]),
         "timestamp": str(item["timestamp"]),
     }
+    source_prediction = item.get("source_prediction")
+    if source_prediction:
+        normalized["source_prediction"] = str(source_prediction)
     _append_history(normalized)
 
 
@@ -220,6 +226,18 @@ def _extract_rows(payload: Any) -> list[dict[str, Any]]:
     raise InvalidFeaturesError(
         "Payload inválido: envie {'features': [objetos_de_features]}."
     )
+
+
+def _extract_source_prediction(payload: Any) -> str | None:
+    if not isinstance(payload, dict):
+        return None
+
+    value = payload.get("source_prediction")
+    if value is None:
+        return None
+
+    normalized = str(value).strip()
+    return normalized or None
 
 
 def _coerce_numeric_feature(value: Any, *, name: str, row_index: int) -> float:

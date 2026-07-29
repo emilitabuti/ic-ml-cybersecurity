@@ -22,7 +22,8 @@ from src.api.services import prediction_service  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
-def clear_prediction_history():
+def clear_prediction_history(monkeypatch):
+    monkeypatch.setenv("ALERT_EMAIL_ENABLED", "false")
     prediction_service.clear_prediction_history()
     yield
     prediction_service.clear_prediction_history()

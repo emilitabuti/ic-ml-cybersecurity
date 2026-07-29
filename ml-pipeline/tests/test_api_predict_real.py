@@ -21,6 +21,7 @@ from src.models.model_serializer import serialize_model  # noqa: E402
 def client_with_model(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     artifact_path = _create_test_artifact(tmp_path)
     monkeypatch.setenv("MODEL_ARTIFACT_PATH", str(artifact_path))
+    monkeypatch.setenv("DASHBOARD_AUTOLOAD_REAL_EVENTS", "false")
     prediction_service.unload_model_for_tests()
     prediction_service.clear_prediction_history()
 
@@ -84,6 +85,18 @@ def test_history_returns_recent_predictions(client_with_model: TestClient) -> No
 
     assert response.status_code == 200
     assert response.json() == [first, second]
+
+
+def test_predict_preserves_source_prediction_for_dashboard_filters(client_with_model: TestClient) -> None:
+    payload = _valid_payload()
+    payload["source_prediction"] = "SYN Flood - Low Intensity"
+
+    predicted = client_with_model.post("/predict", json=payload).json()
+    history = client_with_model.get("/history").json()
+
+    assert predicted["prediction"] in {"BENIGN", "Attack"}
+    assert predicted["source_prediction"] == "SYN Flood - Low Intensity"
+    assert history == [predicted]
 
 
 def _create_test_artifact(tmp_path: Path) -> Path:
