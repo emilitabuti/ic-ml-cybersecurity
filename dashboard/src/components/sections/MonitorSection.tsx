@@ -1,15 +1,37 @@
+import { AlertCard } from "@/components/alerts/AlertCard";
+import { AlertDetailPanel } from "@/components/alerts/AlertDetailPanel";
+import { ErrorAlert } from "@/components/ui/ErrorAlert";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { type DecisionStatus, getAlertId } from "@/lib/alerts";
 import { SEVERITY_CONFIG, type Severity } from "@/lib/severity";
-import { RecentEventsTable } from "@/components/alerts/RecentEventsTable";
+import type { PredictionResponse } from "@/types/api";
 
 const SEVERITIES: Severity[] = ["critical", "warning", "info", "safe"];
 
-/**
- * Seção "Monitor" — visão principal do Command Center.
- * A legenda de severidade e a tabela de eventos recentes reaproveitam o
- * conceito de "cards de resumo + tabela de eventos" do protótipo da Isabela
- * (branch `Isa252-patch-1`); a integração com dados reais é da Story 5.2.
- */
-export function MonitorSection() {
+interface MonitorSectionProps {
+  predictions: PredictionResponse[];
+  isLoading: boolean;
+  error: Error | null;
+  selectedAlertId: string | null;
+  decisions: Record<string, DecisionStatus>;
+  onSelectAlert: (alertId: string) => void;
+  onDecideAlert: (alertId: string, status: Exclude<DecisionStatus, "pending">) => void;
+  onViewHistory: () => void;
+}
+
+export function MonitorSection({
+  predictions,
+  isLoading,
+  error,
+  selectedAlertId,
+  decisions,
+  onSelectAlert,
+  onDecideAlert,
+  onViewHistory,
+}: MonitorSectionProps) {
+  const isError = error !== null;
+  const selectedPrediction = predictions.find((prediction) => getAlertId(prediction) === selectedAlertId);
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
@@ -24,7 +46,40 @@ export function MonitorSection() {
           );
         })}
       </div>
-      <RecentEventsTable />
+
+      {isLoading && <LoadingSpinner />}
+      {isError && <ErrorAlert message={error.message} />}
+      {!isLoading && !isError && predictions.length === 0 && (
+        <div className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
+          Nenhum alerta recebido ainda.
+        </div>
+      )}
+      {!isLoading && !isError && predictions.length > 0 && (
+        <div className="grid gap-3 xl:grid-cols-2">
+          {predictions.map((prediction) => {
+            const alertId = getAlertId(prediction);
+
+            return (
+              <AlertCard
+                key={alertId}
+                prediction={prediction}
+                decisionStatus={decisions[alertId] ?? "pending"}
+                isSelected={selectedAlertId === alertId}
+                onSelect={() => onSelectAlert(alertId)}
+              />
+            );
+          })}
+        </div>
+      )}
+      {selectedPrediction && selectedAlertId && (
+        <AlertDetailPanel
+          prediction={selectedPrediction}
+          decisionStatus={decisions[selectedAlertId] ?? "pending"}
+          onConfirm={() => onDecideAlert(selectedAlertId, "confirmed")}
+          onFalsePositive={() => onDecideAlert(selectedAlertId, "false_positive")}
+          onViewHistory={onViewHistory}
+        />
+      )}
     </div>
   );
 }
