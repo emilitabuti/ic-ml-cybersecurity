@@ -44,6 +44,10 @@ ml-pipeline/data/
 ml-pipeline/models/
 !ml-pipeline/models/
 !ml-pipeline/models/.gitkeep
+!ml-pipeline/models/model_rf.pkl
+!ml-pipeline/models/model_lstm.pkl
+!ml-pipeline/data/processed/cic_ids2017_scaled.joblib
+!ml-pipeline/data/processed/unsw_nb15_scaled.joblib
 
 # Artefatos de experimentos MLflow (volumosos)
 mlruns/
