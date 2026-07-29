@@ -67,10 +67,10 @@ development_status:
   epic-3-retrospective: optional
 
   # ─── Epic 4: Exportação do Modelo e Serviço de Predição ───
-  epic-4: in-progress
-  4-1-serializacao-do-modelo-vencedor-com-pipeline-completo: backlog
-  4-2-endpoint-de-predicao-post-predict: backlog
-  4-3-endpoints-de-saude-metadados-e-historico: backlog
+  epic-4: done
+  4-1-serializacao-do-modelo-vencedor-com-pipeline-completo: done
+  4-2-endpoint-de-predicao-post-predict: done
+  4-3-endpoints-de-saude-metadados-e-historico: done
   4-4-endpoint-mock-para-desenvolvimento-paralelo: done
   epic-4-retrospective: optional
 

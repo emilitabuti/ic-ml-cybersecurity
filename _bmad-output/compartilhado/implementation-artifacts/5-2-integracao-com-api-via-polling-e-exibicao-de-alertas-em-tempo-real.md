@@ -10,7 +10,7 @@ Para que possa monitorar a rede de forma passiva e ser notificada antes da concr
 
 ## Acceptance Criteria
 
-**Dado** que a API FastAPI está rodando em `http://127.0.0.1:8000` (real ou mock)
+**Dado** que a API FastAPI está rodando em `http://127.0.0.1:8000`
 **Quando** abro o dashboard na seção Monitor
 **Então** o TanStack Query faz polling a cada 5 segundos (configurável via `POLLING_INTERVAL_MS` em `src/config.ts`) em `GET /history`
 **E** novos alertas aparecem automaticamente na lista sem refresh da página
@@ -55,12 +55,12 @@ Para que possa monitorar a rede de forma passiva e ser notificada antes da concr
 - Não criar router nem páginas novas; o dashboard continua single-page com estado local em `App.tsx`.
 - Não introduzir banco de dados, WebSocket, Kafka ou persistência nova; a arquitetura oficial usa polling REST e histórico em memória no backend.
 - O frontend deve aceitar o formato direto de `/history`: lista de objetos compatíveis com `PredictionResponse`.
-- Como o desenvolvimento está usando mock, os dados retornados devem permanecer sintéticos/públicos, sem dados pessoais ou sensíveis (NFR12).
+- Dados de demo devem permanecer sintéticos/públicos, sem dados pessoais ou sensíveis (NFR12).
 - A severidade deve reutilizar `dashboard/src/lib/severity.ts` e `SeverityBadge`, mantendo cor + ícone + label textual para WCAG AA.
 
-### Observação sobre backend/mock
+### Observação sobre backend/API real
 
-Story 4.4 implementou `POST /predict/mock` com respostas no mesmo formato de `POST /predict`. A Story 5.2 deve consumir o contrato-alvo `GET /history`; se o backend local ainda não tiver esse endpoint disponível, registrar o bloqueio ou implementar apenas o suporte mínimo necessário ao mock sem avançar escopo de histórico/feedback da Story 5.4.
+Story 4.3 implementou `GET /history` real, alimentado pelas respostas de `POST /predict`. O dashboard consome esse endpoint diretamente. Para demo do cenário SYN flood sem mock, use `python -m src.evaluation.scenarios.send_real_predictions_to_api` a partir de `ml-pipeline/`; o script chama `POST /predict` e popula o histórico em memória.
 
 ### Project Structure Notes
 
@@ -102,7 +102,7 @@ GPT-5 Codex
 - Implementado `AlertCard` com tipo de ameaça, confiança em %, timestamp, modelo e severidade por cor + ícone + label textual.
 - `MonitorSection` agora renderiza loading, erro, vazio e lista de AlertCards sem remover a legenda de severidade da Story 5.1.
 - `Header` recebe métricas em tempo real para alertas ativos e janelas analisadas; `App` atualiza `document.title` com a contagem de alertas ativos.
-- Adicionado suporte mínimo de mock `GET /history` no FastAPI para polling local enquanto o endpoint real da Story 4.3 não existe.
+- Integração ajustada para o `GET /history` real da Story 4.3; o cenário SYN flood alimenta o histórico via `POST /predict`.
 - Code review executado e ajuste aplicado: `MonitorSection` não abre mais um segundo observer da mesma query.
 
 ### File List
@@ -127,8 +127,7 @@ GPT-5 Codex
 - `dashboard/src/services/api.test.ts`
 - `dashboard/src/test/setup.ts`
 - `dashboard/src/types/api.ts`
-- `ml-pipeline/src/api/routes/predict.py`
-- `ml-pipeline/tests/test_api_predict_mock.py`
+- `ml-pipeline/src/evaluation/scenarios/send_real_predictions_to_api.py`
 
 ## Change Log
 
@@ -137,6 +136,7 @@ GPT-5 Codex
 | 2026-07-26 | Story criada via BMAD CS com contexto de `epics.md`, `architecture.md` e Story 5.1 |
 | 2026-07-26 | Story implementada via BMAD DS com polling TanStack Query, AlertCards, métricas no header, título da aba e histórico mock |
 | 2026-07-26 | CR aplicado: removido polling duplicado e Story marcada como done |
+| 2026-07-29 | Integração com Epic 4 real: removida dependência de histórico mock e adicionado alimentador via `POST /predict` |
 
 ## Senior Developer Review (AI)
 

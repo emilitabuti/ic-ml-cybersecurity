@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import gc
 import warnings
 
 import mlflow
@@ -96,6 +97,39 @@ def _run_tensorflow_lstm(
 
     from src.training.cross_validation import make_stratified_kfold
 
+    def _make_indexed_dataset(
+        indices: np.ndarray, *, shuffle: bool
+    ) -> "tf.data.Dataset":
+        # Monta cada lote com UM unico acesso vetorizado (fancy indexing de
+        # `batch_size` linhas, poucos MB) em vez de copiar a fatia inteira do
+        # fold de uma vez (que em datasets grandes, ex.: UNSW-NB15, chega a
+        # >10GB e estoura a RAM) OU de chamar o generator Python linha a linha
+        # (funciona, mas a sobrecarga de milhoes de chamadas Python deixa o
+        # treino muito lento). Lote inteiro por chamada = memoria minima e
+        # velocidade proxima da indexacao direta em numpy.
+        indices = np.asarray(indices)
+        batch_size = config.LSTM_BATCH_SIZE
+
+        def _generator():
+            order = indices
+            if shuffle:
+                rng = np.random.default_rng(config.RANDOM_SEED)
+                order = rng.permutation(indices)
+            for start in range(0, len(order), batch_size):
+                batch_indices = order[start : start + batch_size]
+                yield prepared.X_sequential[batch_indices], prepared.y[batch_indices]
+
+        dataset = tf.data.Dataset.from_generator(
+            _generator,
+            output_signature=(
+                tf.TensorSpec(
+                    shape=(None,) + prepared.X_sequential.shape[1:], dtype=tf.float32
+                ),
+                tf.TensorSpec(shape=(None,), dtype=tf.int64),
+            ),
+        )
+        return dataset.prefetch(tf.data.AUTOTUNE)
+
     tf.random.set_seed(config.RANDOM_SEED)
     folds = make_stratified_kfold(n_splits=n_splits, random_state=config.RANDOM_SEED)
     resolved_n_splits = int(n_splits or config.K_FOLDS)
@@ -128,22 +162,26 @@ def _run_tensorflow_lstm(
             start=1,
         ):
             print(f"[LSTM] Fold {fold_index}/{resolved_n_splits} iniciando...", flush=True)
+            # Libera o grafo/pesos do modelo do fold anterior antes de criar um novo —
+            # sem isso, o Keras acumula memoria a cada fold (5x nesse pipeline), o que
+            # pode ser a diferenca entre caber ou nao na RAM de ambientes limitados
+            # (ex.: Colab free tier).
+            tf.keras.backend.clear_session()
+            gc.collect()
             tf.random.set_seed(config.RANDOM_SEED)
+            y_val = prepared.y[val_index]
+            train_ds = _make_indexed_dataset(train_index, shuffle=True)
+            val_ds = _make_indexed_dataset(val_index, shuffle=False)
             model = _build_keras_lstm(prepared.X_sequential.shape[1:])
             model.fit(
-                prepared.X_sequential[train_index],
-                prepared.y[train_index],
-                validation_data=(
-                    prepared.X_sequential[val_index],
-                    prepared.y[val_index],
-                ),
+                train_ds,
+                validation_data=val_ds,
                 epochs=config.LSTM_EPOCHS,
-                batch_size=config.LSTM_BATCH_SIZE,
                 verbose=2,
             )
-            y_score = model.predict(prepared.X_sequential[val_index], verbose=0).ravel()
+            y_score = model.predict(val_ds, verbose=0).ravel()
             y_pred = (y_score >= 0.5).astype(int)
-            y_true = prepared.y[val_index]
+            y_true = y_val
             metrics = calculate_binary_metrics(y_true, y_pred, y_score)
             fold_metrics.append(metrics)
 

@@ -35,8 +35,7 @@ export function severityFromConfidence(confidence: number): Severity {
 }
 
 export function severityFromPrediction(prediction: PredictionResponse): Severity {
-  if (prediction.prediction.toLowerCase().includes("normal")) return "safe";
-  if (prediction.confidence >= 0.9) return "critical";
-  if (prediction.confidence >= 0.7) return "warning";
-  return "safe";
+  const label = prediction.prediction.toLowerCase();
+  if (label.includes("normal") || label.includes("benign")) return "safe";
+  return severityFromConfidence(prediction.confidence);
 }

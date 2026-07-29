@@ -44,15 +44,24 @@ ml-pipeline/data/
 ml-pipeline/models/
 !ml-pipeline/models/
 !ml-pipeline/models/.gitkeep
+!ml-pipeline/models/model_rf.pkl
+!ml-pipeline/models/model_lstm.pkl
+!ml-pipeline/data/processed/cic_ids2017_scaled.joblib
+!ml-pipeline/data/processed/unsw_nb15_scaled.joblib
 
 # Artefatos de experimentos MLflow (volumosos)
 mlruns/
 ml-pipeline/mlruns/
+ml-pipeline/reports_local/
+resultados_lstm/
+resultados_lstm(1)/
+resultados_unsw_rf_dt(1)/
 mlflow.db
 ml-pipeline/mlflow.db
 
 # Ambientes virtuais Python
 .venv/
+ml-pipeline/.venv-tf/
 venv/
 env/
 __pycache__/

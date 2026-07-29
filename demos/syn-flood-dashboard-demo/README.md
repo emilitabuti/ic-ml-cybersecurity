@@ -41,6 +41,5 @@ Para preservar alertas de uma execucao anterior:
 py .\demos\syn-flood-dashboard-demo\run_syn_flood_demo.py --no-clear
 ```
 
-Observacao: se a API estiver usando a variavel
-`ISABELA_SYN_FLOOD_HISTORY_FILE`, o endpoint `GET /history` continuara
-priorizando o arquivo configurado por essa variavel.
+Observacao: o endpoint `GET /history` continua lendo o historico real em memoria
+da API. O comando de limpeza remove apenas eventos do modo demo.

@@ -6,11 +6,11 @@ treinado existir.
 """
 
 from datetime import datetime
-import json
 import sys
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
 from fastapi.testclient import TestClient
 
 ROOT = Path(__file__).parent.parent
@@ -18,6 +18,14 @@ sys.path.insert(0, str(ROOT))
 
 from src.api.main import app  # noqa: E402
 from src.api.routes.predict import _reset_mock_prediction_cycle  # noqa: E402
+from src.api.services import prediction_service  # noqa: E402
+
+
+@pytest.fixture(autouse=True)
+def clear_prediction_history():
+    prediction_service.clear_prediction_history()
+    yield
+    prediction_service.clear_prediction_history()
 
 
 def _parse_iso8601(timestamp: str) -> datetime:
@@ -86,75 +94,23 @@ def test_predict_mock_route_does_not_depend_on_unimplemented_ml_pipeline() -> No
     assert "src.models" not in route_source
 
 
-def test_history_mock_returns_prediction_history_contract() -> None:
-    _reset_mock_prediction_cycle()
+def test_history_returns_prediction_service_data() -> None:
+    event = {
+        "prediction": "SYN Flood - High Intensity",
+        "confidence": 0.95,
+        "model": "random_forest",
+        "timestamp": "2026-07-27T12:00:00Z",
+    }
+    prediction_service.append_prediction_history(event)
     client = TestClient(app)
 
     response = client.get("/history")
 
     assert response.status_code == 200
-    data = response.json()
-    assert isinstance(data, list)
-    assert len(data) == 1
-    assert set(data[0]) == {"prediction", "confidence", "model", "timestamp"}
-    assert data[0]["prediction"] == "DDoS"
-
-
-def test_history_mock_accumulates_cyclic_predictions() -> None:
-    _reset_mock_prediction_cycle()
-    client = TestClient(app)
-
-    first = client.get("/history").json()
-    second = client.get("/history").json()
-    third = client.get("/history").json()
-
-    assert [item["prediction"] for item in first] == ["DDoS"]
-    assert [item["prediction"] for item in second] == ["Suspicious Traffic", "DDoS"]
-    assert [item["prediction"] for item in third] == [
-        "Normal Traffic",
-        "Suspicious Traffic",
-        "DDoS",
-    ]
-
-
-def test_history_mock_can_return_isabela_syn_flood_file(monkeypatch, tmp_path) -> None:
-    history_file = tmp_path / "dashboard_history_events.json"
-    history_file.write_text(
-        json.dumps(
-            [
-                {
-                    "prediction": "Normal Traffic",
-                    "confidence": 0.36,
-                    "model": "isabela-syn-flood-heuristic-v1",
-                    "timestamp": "2026-07-26T14:00:00Z",
-                },
-                {
-                    "prediction": "SYN Flood - High Intensity",
-                    "confidence": 0.95,
-                    "model": "isabela-syn-flood-heuristic-v1",
-                    "timestamp": "2026-07-26T14:00:05Z",
-                },
-            ]
-        ),
-        encoding="utf-8",
-    )
-    monkeypatch.setenv("ISABELA_SYN_FLOOD_HISTORY_FILE", str(history_file))
-    _reset_mock_prediction_cycle()
-    client = TestClient(app)
-
-    response = client.get("/history")
-
-    assert response.status_code == 200
-    data = response.json()
-    assert [item["prediction"] for item in data] == [
-        "SYN Flood - High Intensity",
-        "Normal Traffic",
-    ]
-    assert data[0]["confidence"] == 0.95
+    assert response.json() == [event]
 
 
 def test_history_demo_endpoint_pushes_events_to_dashboard_history(monkeypatch) -> None:
-    monkeypatch.delenv("ISABELA_SYN_FLOOD_HISTORY_FILE", raising=False)
     _reset_mock_prediction_cycle()
     client = TestClient(app)
 
@@ -175,7 +131,6 @@ def test_history_demo_endpoint_pushes_events_to_dashboard_history(monkeypatch) -
 
 
 def test_history_demo_sends_email_for_critical_alert(monkeypatch) -> None:
-    monkeypatch.delenv("ISABELA_SYN_FLOOD_HISTORY_FILE", raising=False)
     monkeypatch.setenv("ALERT_EMAIL_ENABLED", "true")
     monkeypatch.setenv("ALERT_EMAIL_TO", "analista@example.com")
     monkeypatch.setenv("ALERT_EMAIL_FROM", "dashboard@example.com")
@@ -208,7 +163,6 @@ def test_history_demo_sends_email_for_critical_alert(monkeypatch) -> None:
 
 
 def test_history_demo_does_not_send_email_for_non_critical_alert(monkeypatch) -> None:
-    monkeypatch.delenv("ISABELA_SYN_FLOOD_HISTORY_FILE", raising=False)
     monkeypatch.setenv("ALERT_EMAIL_ENABLED", "true")
     monkeypatch.setenv("ALERT_EMAIL_TO", "analista@example.com")
     monkeypatch.setenv("ALERT_EMAIL_FROM", "dashboard@example.com")
@@ -232,9 +186,15 @@ def test_history_demo_does_not_send_email_for_non_critical_alert(monkeypatch) ->
     smtp.assert_not_called()
 
 
-def test_history_demo_clear_keeps_dashboard_history_empty(monkeypatch) -> None:
-    monkeypatch.delenv("ISABELA_SYN_FLOOD_HISTORY_FILE", raising=False)
+def test_history_demo_clear_preserves_real_prediction_history() -> None:
     _reset_mock_prediction_cycle()
+    real_event = {
+        "prediction": "BENIGN",
+        "confidence": 0.91,
+        "model": "random_forest",
+        "timestamp": "2026-07-27T11:59:00Z",
+    }
+    prediction_service.append_prediction_history(real_event)
     client = TestClient(app)
 
     client.post(
@@ -251,6 +211,6 @@ def test_history_demo_clear_keeps_dashboard_history_empty(monkeypatch) -> None:
     history_response = client.get("/history")
 
     assert clear_response.status_code == 200
-    assert clear_response.json() == []
     assert history_response.status_code == 200
-    assert history_response.json() == []
+    assert clear_response.json() == [real_event]
+    assert history_response.json() == [real_event]

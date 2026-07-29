@@ -3,10 +3,11 @@ from __future__ import annotations
 
 import argparse
 
+import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 
 import config
-from src.training.cross_validation import ExperimentResult, run_sklearn_cross_validation
+from src.training.cross_validation import ExperimentResult, log_ram_usage, run_sklearn_cross_validation
 from src.training.data_preparation import PreparedDataset, prepare_windowed_binary_dataset
 from src.training.metrics import METRIC_NAMES, format_mean_std
 from src.utils.seed import set_global_seed
@@ -18,7 +19,8 @@ def build_random_forest(**overrides: object) -> RandomForestClassifier:
         "n_estimators": config.RF_N_ESTIMATORS,
         "max_depth": _optional_int(config.RF_MAX_DEPTH),
         "random_state": config.RANDOM_SEED,
-        "n_jobs": -1,
+        "n_jobs": config.RF_N_JOBS,
+        "verbose": 1,
     }
     params.update({key: value for key, value in overrides.items() if value is not None})
     return RandomForestClassifier(**params)
@@ -54,7 +56,19 @@ def main() -> None:
     parser.add_argument("--output-dir", default=None)
     args = parser.parse_args()
 
-    prepared = prepare_windowed_binary_dataset(dataset=args.dataset)
+    print("[RF] Carregando e preparando dataset (pode levar alguns segundos)...", flush=True)
+    prepared = prepare_windowed_binary_dataset(dataset=args.dataset, tabular_only=True)
+    print(
+        f"[RF] Dataset pronto: X_tabular={prepared.X_tabular.shape}, y={prepared.y.shape}",
+        flush=True,
+    )
+    print(
+        f"[RF] X_sequential nbytes={prepared.X_sequential.nbytes / (1024 ** 3):.2f}GB "
+        f"X_tabular nbytes={prepared.X_tabular.nbytes / (1024 ** 3):.2f}GB "
+        f"compartilham memoria={np.shares_memory(prepared.X_sequential, prepared.X_tabular)}",
+        flush=True,
+    )
+    log_ram_usage("RF apos preparar dataset")
     result = train_random_forest(
         prepared=prepared,
         use_mlflow=not args.no_mlflow,

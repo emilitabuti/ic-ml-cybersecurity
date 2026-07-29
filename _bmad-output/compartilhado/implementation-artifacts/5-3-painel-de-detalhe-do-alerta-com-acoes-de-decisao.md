@@ -56,7 +56,7 @@ Para que possa avaliar a ameaça e agir em ≤ 2 cliques sem sair do dashboard.
 
 - Decisões de alerta nesta story são estado local de UI; não gravar em backend e não implementar histórico filtrável/feedback persistente da Story 5.4.
 - `Ver Histórico` deve apenas mudar para a seção Histório/placeholder existente, mantendo o escopo de 5.4 intacto.
-- Como a API mock atual não fornece top features nem janela início–fim, usar helpers determinísticos de mock no frontend, derivados de `PredictionResponse`, e manter isso explicitamente isolado em `dashboard/src/lib/alerts.ts`.
+- Como a API atual não fornece top features nem janela início–fim no `PredictionResponse`, usar helpers determinísticos de demonstração no frontend, derivados de `PredictionResponse`, e manter isso explicitamente isolado em `dashboard/src/lib/alerts.ts`.
 - Não implementar SlidingWindowChart (Story 5.7).
 - Manter acessibilidade: cards clicáveis devem ser botões ou ter semântica equivalente; ações precisam de texto visível.
 

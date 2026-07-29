@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import gc
 import json
 from pathlib import Path
 from typing import Callable
@@ -11,6 +12,11 @@ import numpy as np
 import pandas as pd
 from sklearn.base import ClassifierMixin
 from sklearn.model_selection import StratifiedKFold
+
+try:
+    import psutil
+except ModuleNotFoundError:
+    psutil = None
 
 import config
 from src.training.data_preparation import PreparedDataset
@@ -87,14 +93,47 @@ def run_sklearn_cross_validation(
             folds.split(prepared.X_tabular, prepared.y),
             start=1,
         ):
+            print(
+                f"[{model_type}] Fold {fold_index}/{resolved_n_splits} iniciando "
+                "(o proximo log so aparece quando o fit() terminar ou, no RF, "
+                "quando o joblib reportar as primeiras arvores concluidas - isso "
+                "pode levar alguns minutos SEM nenhuma saida no terminal; "
+                "NAO interrompa)...",
+                flush=True,
+            )
+            log_ram_usage(f"{model_type} fold {fold_index} antes do fit")
             estimator = estimator_factory()
-            estimator.fit(prepared.X_tabular[train_index], prepared.y[train_index])
+            # Em vez de copiar a fatia de treino/validacao (fancy-indexing sempre
+            # aloca um array novo — para o UNSW-NB15 isso significa ~10.4GB so
+            # para o treino, o mesmo tamanho que causou o OOM do LSTM antes do
+            # fix com tf.data), treina direto no array base completo usando
+            # sample_weight=0 para mascarar as linhas de validacao. Isso evita
+            # qualquer copia do array gigante (~13GB) — apenas um vetor de pesos
+            # (poucos MB) e alocado por fold.
+            sample_weight = np.zeros(prepared.y.shape[0], dtype=np.float64)
+            sample_weight[train_index] = 1.0
+            estimator.fit(prepared.X_tabular, prepared.y, sample_weight=sample_weight)
+            del sample_weight
+            gc.collect()
+            log_ram_usage(f"{model_type} fold {fold_index} depois do fit")
 
+            # Mesma logica para a predicao: prediz no array completo (ja
+            # residente em memoria, sem copia extra) e filtra o resultado (bem
+            # menor: 1 valor por linha) pelas linhas de validacao.
+            y_pred_all = estimator.predict(prepared.X_tabular)
+            y_score_all = _predict_scores(estimator, prepared.X_tabular)
             y_true = prepared.y[val_index]
-            y_pred = estimator.predict(prepared.X_tabular[val_index])
-            y_score = _predict_scores(estimator, prepared.X_tabular[val_index])
+            y_pred = y_pred_all[val_index]
+            y_score = y_score_all[val_index]
+            del y_pred_all, y_score_all
+            gc.collect()
             metrics = calculate_binary_metrics(y_true, y_pred, y_score)
             fold_metrics.append(metrics)
+            print(
+                f"[{model_type}] Fold {fold_index}/{resolved_n_splits} concluido: "
+                f"f1={metrics['f1']:.4f} auc_roc={metrics['auc_roc']:.4f}",
+                flush=True,
+            )
 
             if use_mlflow:
                 for metric_name, metric_value in metrics.items():
@@ -145,6 +184,20 @@ def run_sklearn_cross_validation(
         result_path=result_path,
         predictions_path=predictions_path,
         fallback_used=fallback_used,
+    )
+
+
+def log_ram_usage(label: str) -> None:
+    """Loga RAM disponivel/em uso (best-effort) para diagnosticar OOM em Colab."""
+    if psutil is None:
+        return
+    vm = psutil.virtual_memory()
+    process_rss_gb = psutil.Process().memory_info().rss / (1024 ** 3)
+    print(
+        f"[ram] {label}: processo={process_rss_gb:.2f}GB "
+        f"sistema_usado={vm.percent:.0f}% "
+        f"disponivel={vm.available / (1024 ** 3):.2f}GB",
+        flush=True,
     )
 
 

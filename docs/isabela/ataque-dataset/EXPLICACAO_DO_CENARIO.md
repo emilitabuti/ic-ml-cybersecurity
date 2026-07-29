@@ -37,9 +37,10 @@ suficientes para comparar o comportamento esperado em diferentes intensidades.
 
 ## 4. Como o dataset sintetico e criado
 
-O script `generate_syn_flood_dataset.py` cria o arquivo:
+O script `ml-pipeline/src/evaluation/scenarios/generate_syn_flood_dataset.py`
+cria o arquivo:
 
-`sandbox_tabular_dataset/syn_flood_synthetic_samples.csv`
+`ml-pipeline/reports/isabela/syn_flood/sandbox_tabular_dataset/syn_flood_synthetic_samples.csv`
 
 Cada linha representa uma janela de trafego de rede. As principais colunas sao:
 
@@ -58,7 +59,8 @@ valores progressivamente mais suspeitos.
 
 ## 5. Como a heuristica temporaria funciona
 
-O script `evaluate_syn_flood_scenario.py` le o CSV e calcula sinais de anomalia.
+O script `ml-pipeline/src/evaluation/scenarios/evaluate_syn_flood_scenario.py`
+le o CSV e calcula sinais de anomalia.
 Ele verifica:
 
 1. Muitos SYN em relacao aos ACK.
@@ -89,7 +91,7 @@ O dashboard consome alertas pelo endpoint `GET /history`.
 
 O script de avaliacao gera:
 
-`results/dashboard_history_events.json`
+`ml-pipeline/reports/isabela/syn_flood/dashboard_history_events.json`
 
 Esse arquivo contem uma lista de eventos no mesmo contrato da API:
 
@@ -102,21 +104,32 @@ Esse arquivo contem uma lista de eventos no mesmo contrato da API:
 }
 ```
 
-Para exibir os eventos no dashboard, a API deve ser iniciada com:
+No fluxo integrado atual, esse arquivo nao substitui o endpoint da API. Ele serve
+como entrada do script
+`ml-pipeline/src/evaluation/scenarios/send_real_predictions_to_api.py`, que monta
+janelas no schema do modelo carregado e chama o endpoint real `POST /predict`.
+As respostas do modelo sao gravadas no historico em memoria da API e entao
+aparecem no dashboard por `GET /history`.
+
+Para exibir o cenario no dashboard, a API deve estar rodando normalmente:
 
 ```powershell
-$env:ISABELA_SYN_FLOOD_HISTORY_FILE="C:\Users\isagr\Documents\ic-ml-cybersecurity\docs\isabela\ataque-dataset\results\dashboard_history_events.json"
 cd C:\Users\isagr\Documents\ic-ml-cybersecurity\ml-pipeline
 uvicorn src.api.main:app --reload
 ```
 
-Quando essa variavel esta definida, o endpoint `GET /history` retorna os eventos
-do estudo de caso. Quando ela nao esta definida, a API continua usando o mock
-padrao do projeto.
+Em outro terminal:
+
+```powershell
+cd C:\Users\isagr\Documents\ic-ml-cybersecurity
+cd .\ml-pipeline
+py -m src.evaluation.scenarios.send_real_predictions_to_api --limit 20
+```
 
 ## 8. Quais resultados sao coletados
 
-O arquivo `results/evaluation_summary.json` registra:
+O arquivo `ml-pipeline/reports/isabela/syn_flood/evaluation_summary.json`
+registra:
 
 - total de amostras;
 - amostras corretamente identificadas;

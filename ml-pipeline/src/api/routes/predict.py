@@ -1,30 +1,28 @@
-import json
-import os
 from datetime import datetime, timezone
-from pathlib import Path
 from threading import Lock
+from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
 
-from src.api.schemas.prediction import PredictionResponse
+from src.api.schemas.prediction import (
+    ModelInfoResponse,
+    PredictionHistoryItem,
+    PredictionResponse,
+)
+from src.api.services import prediction_service
 from src.api.services.email_notifications import send_critical_alert_email
 
 router = APIRouter(tags=["prediction"])
 
 MOCK_MODEL_NAME = "mock-cyclic-v1"
-ISABELA_SYN_FLOOD_HISTORY_FILE_ENV = "ISABELA_SYN_FLOOD_HISTORY_FILE"
+DEMO_MODEL_NAME = "syn-flood-dashboard-demo-v1"
 _MOCK_RESPONSES = (
     {"prediction": "DDoS", "confidence": 0.97},
     {"prediction": "Suspicious Traffic", "confidence": 0.82},
     {"prediction": "Normal Traffic", "confidence": 0.42},
 )
-_MAX_MOCK_HISTORY = 100
-_MAX_DEMO_HISTORY = 100
 _mock_index = 0
 _mock_lock = Lock()
-_mock_history: list[PredictionResponse] = []
-_demo_history: list[PredictionResponse] = []
-_auto_mock_history_enabled = True
 
 
 def _utc_timestamp() -> str:
@@ -34,13 +32,10 @@ def _utc_timestamp() -> str:
 
 
 def _reset_mock_prediction_cycle() -> None:
-    global _auto_mock_history_enabled, _mock_index
+    global _mock_index
 
     with _mock_lock:
         _mock_index = 0
-        _mock_history.clear()
-        _demo_history.clear()
-        _auto_mock_history_enabled = True
 
 
 def _next_mock_prediction() -> dict[str, str | float]:
@@ -58,27 +53,6 @@ def _next_mock_prediction() -> dict[str, str | float]:
     }
 
 
-def _load_external_history_from_env() -> list[PredictionResponse] | None:
-    history_file = os.getenv(ISABELA_SYN_FLOOD_HISTORY_FILE_ENV)
-    if not history_file:
-        return None
-
-    path = Path(history_file)
-    if not path.exists():
-        raise FileNotFoundError(
-            f"Arquivo de historico simulado nao encontrado: {path}"
-        )
-
-    with path.open("r", encoding="utf-8") as file:
-        data = json.load(file)
-
-    if not isinstance(data, list):
-        raise ValueError("O historico simulado deve ser uma lista de predicoes.")
-
-    # O dashboard ja espera o contrato PredictionResponse usado por /history.
-    return [PredictionResponse(**item) for item in reversed(data)]
-
-
 @router.post(
     "/predict/mock",
     response_model=PredictionResponse,
@@ -93,63 +67,58 @@ def predict_mock() -> PredictionResponse:
 
 
 @router.post(
+    "/predict",
+    response_model=PredictionResponse,
+    summary="Predição real com o modelo carregado no startup",
+)
+def predict(payload: Any = Body(...)) -> PredictionResponse:
+    return PredictionResponse(**prediction_service.predict(payload))
+
+
+@router.post(
     "/history/demo",
-    response_model=list[PredictionResponse],
+    response_model=list[PredictionHistoryItem],
     summary="Injeta uma predicao simulada no historico do dashboard",
     description=(
-        "Recebe uma predicao ja simulada e a adiciona ao historico em memoria. "
-        "Este endpoint existe para demonstracoes controladas do dashboard sem "
-        "executar ataques reais e sem depender do modelo final."
+        "Recebe uma predicao simulada e a adiciona ao mesmo historico em memoria "
+        "usado pelas predicoes reais. Este endpoint existe para demonstracoes "
+        "controladas do dashboard sem substituir o contrato real de /history."
     ),
 )
-def push_demo_history_event(prediction: PredictionResponse) -> list[PredictionResponse]:
-    with _mock_lock:
-        _demo_history.insert(0, prediction)
-        del _demo_history[_MAX_DEMO_HISTORY:]
-        history = list(_demo_history)
+def push_demo_history_event(prediction: PredictionResponse) -> list[PredictionHistoryItem]:
+    item = prediction.model_copy(update={"model": DEMO_MODEL_NAME})
+    prediction_service.append_prediction_history(item.model_dump())
 
-    send_critical_alert_email(prediction)
-    return history
+    send_critical_alert_email(item)
+    return history()
 
 
 @router.delete(
     "/history/demo",
-    response_model=list[PredictionResponse],
+    response_model=list[PredictionHistoryItem],
     summary="Limpa predicoes simuladas de demonstracao",
 )
-def clear_demo_history() -> list[PredictionResponse]:
-    global _auto_mock_history_enabled
+def clear_demo_history() -> list[PredictionHistoryItem]:
+    prediction_service.remove_prediction_history_by_model(DEMO_MODEL_NAME)
+    return history()
 
-    with _mock_lock:
-        _demo_history.clear()
-        _mock_history.clear()
-        _auto_mock_history_enabled = False
-        return []
+
+@router.get(
+    "/model/info",
+    response_model=ModelInfoResponse,
+    summary="Metadados do modelo carregado",
+)
+def model_info() -> ModelInfoResponse:
+    return ModelInfoResponse(**prediction_service.model_info())
 
 
 @router.get(
     "/history",
-    response_model=list[PredictionResponse],
-    summary="Histórico mock de predições para polling do dashboard",
-    description=(
-        "Gera uma nova predição simulada e retorna o histórico em memória para "
-        "permitir desenvolvimento do dashboard via GET /history sem modelo real."
-    ),
+    response_model=list[PredictionHistoryItem],
+    summary="Últimas predições em memória",
 )
-def history_mock() -> list[PredictionResponse]:
-    external_history = _load_external_history_from_env()
-    if external_history is not None:
-        return external_history
-
-    with _mock_lock:
-        if _demo_history:
-            return list(_demo_history)
-        if not _auto_mock_history_enabled:
-            return []
-
-    prediction = PredictionResponse(**_next_mock_prediction())
-
-    with _mock_lock:
-        _mock_history.insert(0, prediction)
-        del _mock_history[_MAX_MOCK_HISTORY:]
-        return list(_mock_history)
+def history() -> list[PredictionHistoryItem]:
+    return [
+        PredictionHistoryItem(**item)
+        for item in prediction_service.prediction_history()
+    ]
