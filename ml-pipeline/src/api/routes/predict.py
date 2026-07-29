@@ -7,6 +7,7 @@ from threading import Lock
 from fastapi import APIRouter
 
 from src.api.schemas.prediction import PredictionResponse
+from src.api.services.email_notifications import send_critical_alert_email
 
 router = APIRouter(tags=["prediction"])
 
@@ -18,9 +19,12 @@ _MOCK_RESPONSES = (
     {"prediction": "Normal Traffic", "confidence": 0.42},
 )
 _MAX_MOCK_HISTORY = 100
+_MAX_DEMO_HISTORY = 100
 _mock_index = 0
 _mock_lock = Lock()
 _mock_history: list[PredictionResponse] = []
+_demo_history: list[PredictionResponse] = []
+_auto_mock_history_enabled = True
 
 
 def _utc_timestamp() -> str:
@@ -30,11 +34,13 @@ def _utc_timestamp() -> str:
 
 
 def _reset_mock_prediction_cycle() -> None:
-    global _mock_index
+    global _auto_mock_history_enabled, _mock_index
 
     with _mock_lock:
         _mock_index = 0
         _mock_history.clear()
+        _demo_history.clear()
+        _auto_mock_history_enabled = True
 
 
 def _next_mock_prediction() -> dict[str, str | float]:
@@ -86,6 +92,41 @@ def predict_mock() -> PredictionResponse:
     return PredictionResponse(**_next_mock_prediction())
 
 
+@router.post(
+    "/history/demo",
+    response_model=list[PredictionResponse],
+    summary="Injeta uma predicao simulada no historico do dashboard",
+    description=(
+        "Recebe uma predicao ja simulada e a adiciona ao historico em memoria. "
+        "Este endpoint existe para demonstracoes controladas do dashboard sem "
+        "executar ataques reais e sem depender do modelo final."
+    ),
+)
+def push_demo_history_event(prediction: PredictionResponse) -> list[PredictionResponse]:
+    with _mock_lock:
+        _demo_history.insert(0, prediction)
+        del _demo_history[_MAX_DEMO_HISTORY:]
+        history = list(_demo_history)
+
+    send_critical_alert_email(prediction)
+    return history
+
+
+@router.delete(
+    "/history/demo",
+    response_model=list[PredictionResponse],
+    summary="Limpa predicoes simuladas de demonstracao",
+)
+def clear_demo_history() -> list[PredictionResponse]:
+    global _auto_mock_history_enabled
+
+    with _mock_lock:
+        _demo_history.clear()
+        _mock_history.clear()
+        _auto_mock_history_enabled = False
+        return []
+
+
 @router.get(
     "/history",
     response_model=list[PredictionResponse],
@@ -99,6 +140,12 @@ def history_mock() -> list[PredictionResponse]:
     external_history = _load_external_history_from_env()
     if external_history is not None:
         return external_history
+
+    with _mock_lock:
+        if _demo_history:
+            return list(_demo_history)
+        if not _auto_mock_history_enabled:
+            return []
 
     prediction = PredictionResponse(**_next_mock_prediction())
 

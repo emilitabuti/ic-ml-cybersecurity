@@ -76,3 +76,9 @@ Thumbs.db
 .vscode/settings.json
 *.swp
 *.swo
+
+# Segredos locais
+.env
+*.env
+ml-pipeline/.env
+dashboard/.env

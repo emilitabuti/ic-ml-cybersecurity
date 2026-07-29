@@ -9,6 +9,7 @@ from datetime import datetime
 import json
 import sys
 from pathlib import Path
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
@@ -150,3 +151,106 @@ def test_history_mock_can_return_isabela_syn_flood_file(monkeypatch, tmp_path) -
         "Normal Traffic",
     ]
     assert data[0]["confidence"] == 0.95
+
+
+def test_history_demo_endpoint_pushes_events_to_dashboard_history(monkeypatch) -> None:
+    monkeypatch.delenv("ISABELA_SYN_FLOOD_HISTORY_FILE", raising=False)
+    _reset_mock_prediction_cycle()
+    client = TestClient(app)
+
+    event = {
+        "prediction": "SYN Flood - High Intensity",
+        "confidence": 0.95,
+        "model": "syn-flood-dashboard-demo-v1",
+        "timestamp": "2026-07-27T12:00:00Z",
+    }
+
+    push_response = client.post("/history/demo", json=event)
+    history_response = client.get("/history")
+
+    assert push_response.status_code == 200
+    assert history_response.status_code == 200
+    assert push_response.json() == [event]
+    assert history_response.json() == [event]
+
+
+def test_history_demo_sends_email_for_critical_alert(monkeypatch) -> None:
+    monkeypatch.delenv("ISABELA_SYN_FLOOD_HISTORY_FILE", raising=False)
+    monkeypatch.setenv("ALERT_EMAIL_ENABLED", "true")
+    monkeypatch.setenv("ALERT_EMAIL_TO", "analista@example.com")
+    monkeypatch.setenv("ALERT_EMAIL_FROM", "dashboard@example.com")
+    monkeypatch.setenv("SMTP_HOST", "smtp.example.com")
+    monkeypatch.setenv("SMTP_PORT", "587")
+    monkeypatch.setenv("SMTP_USERNAME", "dashboard@example.com")
+    monkeypatch.setenv("SMTP_PASSWORD", "secret")
+    _reset_mock_prediction_cycle()
+    client = TestClient(app)
+
+    event = {
+        "prediction": "SYN Flood - High Intensity",
+        "confidence": 0.95,
+        "model": "syn-flood-dashboard-demo-v1",
+        "timestamp": "2026-07-27T12:00:00Z",
+    }
+
+    with patch("src.api.services.email_notifications.smtplib.SMTP") as smtp:
+        response = client.post("/history/demo", json=event)
+
+    assert response.status_code == 200
+    smtp.assert_called_once_with("smtp.example.com", 587, timeout=10)
+    smtp.return_value.__enter__.return_value.starttls.assert_called_once()
+    smtp.return_value.__enter__.return_value.login.assert_called_once_with(
+        "dashboard@example.com", "secret"
+    )
+    sent_message = smtp.return_value.__enter__.return_value.send_message.call_args.args[0]
+    assert sent_message["To"] == "analista@example.com"
+    assert "SYN Flood - High Intensity" in sent_message.get_content()
+
+
+def test_history_demo_does_not_send_email_for_non_critical_alert(monkeypatch) -> None:
+    monkeypatch.delenv("ISABELA_SYN_FLOOD_HISTORY_FILE", raising=False)
+    monkeypatch.setenv("ALERT_EMAIL_ENABLED", "true")
+    monkeypatch.setenv("ALERT_EMAIL_TO", "analista@example.com")
+    monkeypatch.setenv("ALERT_EMAIL_FROM", "dashboard@example.com")
+    monkeypatch.setenv("SMTP_HOST", "smtp.example.com")
+    monkeypatch.setenv("SMTP_USERNAME", "dashboard@example.com")
+    monkeypatch.setenv("SMTP_PASSWORD", "secret")
+    _reset_mock_prediction_cycle()
+    client = TestClient(app)
+
+    event = {
+        "prediction": "SYN Flood - Low Intensity",
+        "confidence": 0.77,
+        "model": "syn-flood-dashboard-demo-v1",
+        "timestamp": "2026-07-27T12:00:00Z",
+    }
+
+    with patch("src.api.services.email_notifications.smtplib.SMTP") as smtp:
+        response = client.post("/history/demo", json=event)
+
+    assert response.status_code == 200
+    smtp.assert_not_called()
+
+
+def test_history_demo_clear_keeps_dashboard_history_empty(monkeypatch) -> None:
+    monkeypatch.delenv("ISABELA_SYN_FLOOD_HISTORY_FILE", raising=False)
+    _reset_mock_prediction_cycle()
+    client = TestClient(app)
+
+    client.post(
+        "/history/demo",
+        json={
+            "prediction": "SYN Flood - Low Intensity",
+            "confidence": 0.77,
+            "model": "syn-flood-dashboard-demo-v1",
+            "timestamp": "2026-07-27T12:00:00Z",
+        },
+    )
+
+    clear_response = client.delete("/history/demo")
+    history_response = client.get("/history")
+
+    assert clear_response.status_code == 200
+    assert clear_response.json() == []
+    assert history_response.status_code == 200
+    assert history_response.json() == []

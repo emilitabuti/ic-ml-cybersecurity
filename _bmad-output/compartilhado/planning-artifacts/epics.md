@@ -595,7 +595,7 @@ Para que possa avaliar a ameaça e agir em ≤ 2 cliques sem sair do dashboard.
 **E** o alerta tratado muda de cor/estado imediatamente sem recarregar a página
 
 ### Story 5.4: Histórico de Alertas com Filtros e Feedback do Analista
-> **Status: 🔴 NÃO INICIADA** — Depende de 5.3 e `GET /history` (Story 4.3).
+> **Status: ✅ CONCLUÍDA** (2026-07-29) — Seção "Histórico de Alertas" implementada no dashboard com filtros por status/tipo e feedback local Confirmar/Falso positivo/Resetar. Mantém `GET /history` como fonte única e persiste feedback no navegador, adequado ao escopo demonstrativo do relatório revisado.
 
 Como analista de segurança (Ana),
 Quero acessar o histórico completo de alertas tratados com status e poder registrar feedback,
@@ -627,7 +627,7 @@ Para que possa calibrar o sistema para minha rede e apresentar os resultados cie
 **E** um botão "Exportar métricas CSV" faz download da tabela comparativa para o artigo
 
 ### Story 5.6: Modo de Demonstração para o Seminário de IC
-> **Status: 🔴 NÃO INICIADA** — Depende de 5.2–5.5.
+> **Status: ✅ CONCLUÍDA** (2026-07-29) — Modo Demo implementado no dashboard com reprodução controlada (1x/2x/4x) dos cinco eventos SYN flood descritos no relatório revisado, usando `POST /history/demo` e `DELETE /history/demo` sem executar ataque real.
 
 Como pesquisadora (Isabela),
 Quero um modo de demonstração que reproduz sessões históricas de alertas em velocidade controlada,

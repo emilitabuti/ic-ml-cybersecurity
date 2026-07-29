@@ -28,6 +28,15 @@ export const apiClient = {
       body: JSON.stringify(body),
     }),
   getPredictionHistory: () => request<PredictionResponse[]>("/history"),
+  pushDemoHistoryEvent: (event: PredictionResponse) =>
+    request<PredictionResponse[]>("/history/demo", {
+      method: "POST",
+      body: JSON.stringify(event),
+    }),
+  clearDemoHistory: () =>
+    request<PredictionResponse[]>("/history/demo", {
+      method: "DELETE",
+    }),
 };
 
 export const api = apiClient;
