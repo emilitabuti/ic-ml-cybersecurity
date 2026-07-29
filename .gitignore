@@ -48,11 +48,16 @@ ml-pipeline/models/
 # Artefatos de experimentos MLflow (volumosos)
 mlruns/
 ml-pipeline/mlruns/
+ml-pipeline/reports_local/
+resultados_lstm/
+resultados_lstm(1)/
+resultados_unsw_rf_dt(1)/
 mlflow.db
 ml-pipeline/mlflow.db
 
 # Ambientes virtuais Python
 .venv/
+ml-pipeline/.venv-tf/
 venv/
 env/
 __pycache__/
