@@ -1,9 +1,15 @@
 from datetime import datetime, timezone
 from threading import Lock
+from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
 
-from src.api.schemas.prediction import PredictionResponse
+from src.api.schemas.prediction import (
+    ModelInfoResponse,
+    PredictionHistoryItem,
+    PredictionResponse,
+)
+from src.api.services import prediction_service
 
 router = APIRouter(tags=["prediction"])
 
@@ -56,3 +62,33 @@ def _next_mock_prediction() -> dict[str, str | float]:
 )
 def predict_mock() -> PredictionResponse:
     return PredictionResponse(**_next_mock_prediction())
+
+
+@router.post(
+    "/predict",
+    response_model=PredictionResponse,
+    summary="Predição real com o modelo carregado no startup",
+)
+def predict(payload: Any = Body(...)) -> PredictionResponse:
+    return PredictionResponse(**prediction_service.predict(payload))
+
+
+@router.get(
+    "/model/info",
+    response_model=ModelInfoResponse,
+    summary="Metadados do modelo carregado",
+)
+def model_info() -> ModelInfoResponse:
+    return ModelInfoResponse(**prediction_service.model_info())
+
+
+@router.get(
+    "/history",
+    response_model=list[PredictionHistoryItem],
+    summary="Últimas predições em memória",
+)
+def history() -> list[PredictionHistoryItem]:
+    return [
+        PredictionHistoryItem(**item)
+        for item in prediction_service.prediction_history()
+    ]

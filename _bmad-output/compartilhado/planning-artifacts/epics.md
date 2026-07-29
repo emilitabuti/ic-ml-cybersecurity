@@ -2,7 +2,7 @@
 stepsCompleted: ['step-01-validate-prerequisites', 'step-02-design-epics', 'step-03-create-stories', 'step-04-final-validation']
 workflowStatus: 'complete'
 completedAt: '2026-02-21'
-lastStatusUpdate: '2026-07-25'
+lastStatusUpdate: '2026-07-29'
 inputDocuments:
   - "_bmad-output/planning-artifacts/prd.md"
   - "_bmad-output/planning-artifacts/architecture.md"
@@ -10,8 +10,8 @@ inputDocuments:
 implementationStatus:
   epic1: "done"
   epic2: "done"
-  epic3: "not_started"
-  epic4: "in_progress"
+  epic3: "done"
+  epic4: "done"
   epic5: "in_progress"
 ---
 
@@ -267,7 +267,7 @@ Para que não haja data leakage e o contrato de dados esteja documentado formalm
 **Então** os conjuntos são idênticos nas duas execuções
 
 ### Story 1.5: README de Reprodutibilidade
-> **Status: ✅ CONCLUÍDA** (atualizado 2026-07-25) — `ml-pipeline/README.md` documenta instalação, execução da API, seção "Reprodutibilidade Científica" com passos numerados, acesso ao MLflow UI (`mlflow ui`) e placeholders explícitos `[a implementar]` para o pipeline de treino (Epic 2/3, ainda não implementado).
+> **Status: ✅ CONCLUÍDA** (atualizado 2026-07-29) — `ml-pipeline/README.md` documenta instalação, execução da API, seção "Reprodutibilidade Científica" com passos numerados, acesso ao MLflow UI (`mlflow ui`) e comandos do pipeline de treino/avaliação/exportação implementados nos Epics 2/3/4.
 
 Como pesquisador externo,
 Quero instruções claras de instalação e execução do projeto,
@@ -454,7 +454,7 @@ Emili consegue exportar o modelo vencedor com todo o pipeline de pré-processame
 > ⚠️ **ORDEM DE IMPLEMENTAÇÃO:** Story 4.4 (Endpoint Mock) deve ser implementada **ANTES** das Stories 4.1–4.3. Isso habilita o desenvolvimento paralelo do Dashboard (Epic 5) sem aguardar o modelo real. Isabela pode iniciar o Epic 5 assim que Story 4.4 estiver concluída.
 
 ### Story 4.1: Serialização do Modelo Vencedor com Pipeline Completo
-> **Status: 🔴 NÃO INICIADA** — `src/models/` existe com apenas `__init__.py`. `model_serializer.py` não implementado. Depende do Epic 3.
+> **Status: ✅ CONCLUÍDA** (2026-07-28) — `src/models/model_serializer.py` implementado com seleção do vencedor por `comparison_metrics.csv`, serialização portável do pipeline completo (`model`, `scaler`, sliding window, `feature_names`, `label_encoding` e metadados de preprocessing) e inferência via artefato. Artefatos reais gerados em `ml-pipeline/models/model_rf.pkl` (UNSW/RF, predição de teste bem-sucedida) e `ml-pipeline/models/model_lstm.pkl` (CIC/LSTM, predição de teste bem-sucedida em `.venv-tf` com Python 3.12 + TensorFlow 2.21.0). Scalers persistidos em `ml-pipeline/data/processed/unsw_nb15_scaled.joblib` e `ml-pipeline/data/processed/cic_ids2017_scaled.joblib`. Testes adicionados em `tests/test_model_serializer.py`; validação final executada com `pytest -q` (`159 passed, 4 warnings`).
 
 Como pesquisadora de ML (Emili),
 Quero serializar o modelo vencedor junto com todo o pipeline de pré-processamento (scaler + encoder + modelo),
@@ -473,7 +473,7 @@ Para que a inferência funcione em qualquer ambiente limpo sem acesso ao código
 **Então** a predição falha com erro descritivo indicando dependência faltante — não silencia o problema
 
 ### Story 4.2: Endpoint de Predição `POST /predict`
-> **Status: 🔴 NÃO INICIADA** — `src/api/routes/` e `src/api/schemas/` existem mas contêm apenas `__init__.py`. `predict.py` não implementado.
+> **Status: ✅ CONCLUÍDA** (2026-07-29) — `POST /predict` implementado em `src/api/routes/predict.py`, com inferência real via `src/api/services/prediction_service.py`, modelo serializado carregado uma vez no startup (`lifespan` em `src/api/main.py`), validação de features e erro padronizado `HTTP 422 {"detail": "...", "code": "INVALID_FEATURES"}`. Testes em `tests/test_api_predict_real.py`; validação executada com `pytest -q` (`159 passed, 4 warnings`).
 
 Como sistema de alertas da Isabela,
 Quero enviar uma janela de tráfego via HTTP e receber a predição do modelo,
@@ -492,7 +492,7 @@ Para que o dashboard exiba alertas em tempo real com tipo de ameaça e nível de
 **Então** retorna HTTP 422 com `{ "detail": "...", "code": "INVALID_FEATURES" }`
 
 ### Story 4.3: Endpoints de Saúde, Metadados e Histórico
-> **Status: 🟡 PARCIAL** — `GET /health` implementado e funcional em `src/api/main.py`. Faltam: `GET /model/info`, `GET /history`, e carregamento do modelo no startup.
+> **Status: ✅ CONCLUÍDA** (2026-07-29) — `GET /health` retorna status, versão e modelo carregado; `GET /model/info` retorna algoritmo, `window_size`, features e data do artefato; `GET /history` retorna as últimas predições via buffer em memória `deque(maxlen=100)`. O modelo é carregado no startup em menos de 5s (`model_rf.pkl`: ~1.9s local). Testes em `tests/test_api_predict_real.py`; validação executada com `pytest -q` (`159 passed, 4 warnings`).
 
 Como desenvolvedora do dashboard (Isabela),
 Quero endpoints para verificar o estado da API, metadados do modelo ativo e histórico de predições,
