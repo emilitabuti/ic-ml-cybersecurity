@@ -561,7 +561,7 @@ Para que todas as histórias seguintes tenham uma estrutura visual consistente p
 **E** nenhum dado pessoal ou sensível é processado — apenas dados simulados/públicos (NFR12)
 
 ### Story 5.2: Integração com API via Polling e Exibição de Alertas em Tempo Real
-> **Status: 🔴 NÃO INICIADA** — Depende de 5.1 e 4.4 (mock). `src/services/api.ts` existe como base, mas hooks e componentes não implementados.
+> **Status: ✅ CONCLUÍDA** (2026-07-29) — Dashboard consome `GET /history` real via TanStack Query com `POLLING_INTERVAL_MS = 5000`, renderiza `AlertCard` com tipo de ameaça, confiança, timestamp, modelo e `SeverityBadge` com cor + ícone + label textual (WCAG AA), atualiza métricas do header e título da aba com alertas ativos. O cenário SYN flood alimenta o histórico chamando `POST /predict`, sem substituir o endpoint real por mock.
 
 Como analista de segurança (Ana),
 Quero receber alertas de ameaças previstas automaticamente no dashboard sem refresh manual,
@@ -578,7 +578,7 @@ Para que possa monitorar a rede de forma passiva e ser notificada antes da concr
 **E** o badge de contagem de alertas ativos no título da aba do browser atualiza em tempo real
 
 ### Story 5.3: Painel de Detalhe do Alerta com Ações de Decisão
-> **Status: 🔴 NÃO INICIADA** — Depende de 5.2.
+> **Status: ✅ CONCLUÍDA** (2026-07-29) — AlertCards agora abrem painel de detalhe inline na seção Monitor, exibindo tipo de ataque, confiança, janela temporal derivada, modelo e top 3 features demonstrativas em monospace. Ações locais Confirmar/Falso Positivo alteram o estado visual imediatamente e exibem toast com Desfazer por 5s; Ver Histórico apenas troca para o placeholder da Story 5.4, sem implementar filtros/histórico persistente.
 
 Como analista de segurança (Ana),
 Quero clicar em um alerta e ver seus detalhes completos com opções de decisão inline,

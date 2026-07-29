@@ -452,6 +452,10 @@ ic-ml-cybersecurity/
 │   │   ├── 01_eda.ipynb
 │   │   └── 02_model_prototyping.ipynb
 │   │
+│   ├── reports/                       # Relatórios/resultados pequenos versionáveis
+│   │   └── isabela/
+│   │       └── syn_flood/             # Métricas e eventos do cenário SYN flood
+│   │
 │   ├── src/
 │   │   ├── data/
 │   │   │   ├── __init__.py
@@ -469,6 +473,12 @@ ic-ml-cybersecurity/
 │   │   │   ├── train_dt.py            # FR8–9: Treino Decision Tree + MLflow
 │   │   │   ├── train_lstm.py          # FR8–9: Treino LSTM + MLflow
 │   │   │   └── evaluator.py           # FR10–15: Métricas, k-fold, relatórios
+│   │   │
+│   │   ├── evaluation/
+│   │   │   └── scenarios/             # Cenários reprodutíveis e alimentadores de demo
+│   │   │       ├── generate_syn_flood_dataset.py
+│   │   │       ├── evaluate_syn_flood_scenario.py
+│   │   │       └── send_real_predictions_to_api.py
 │   │   │
 │   │   ├── models/
 │   │   │   ├── __init__.py
