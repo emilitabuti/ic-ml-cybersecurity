@@ -94,3 +94,7 @@ Thumbs.db
 *.env
 ml-pipeline/.env
 dashboard/.env
+
+# Documentos pessoais do relatório final; somente o plano histórico é versionado
+docs/emili/relatorio-final/*
+!docs/emili/relatorio-final/plano-previsao-antecipada.md
