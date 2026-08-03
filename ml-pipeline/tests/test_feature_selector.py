@@ -1,4 +1,4 @@
-"""Testes do seletor de features por Random Forest — Story 2.1."""
+"""Testes do seletor de atributos ajustado somente no treino."""
 import json
 from pathlib import Path
 
@@ -246,3 +246,31 @@ class TestRandomForestFeatureSelectorValidation:
 
         with pytest.raises(ValueError, match="feature_names"):
             selector.fit(X_train, y_train)
+
+    def test_temporal_fit_rejects_validation_and_refit(
+        self,
+        synthetic_feature_selection_data: tuple[np.ndarray, np.ndarray, list[str]],
+        tmp_path: Path,
+    ) -> None:
+        from src.features.feature_selector import RandomForestFeatureSelector
+
+        X, y, names = synthetic_feature_selection_data
+        ids = np.arange(len(y))
+        with pytest.raises(ValueError, match="partition='train'"):
+            RandomForestFeatureSelector(
+                feature_names=names,
+                top_n=2,
+                artifact_path=tmp_path / "invalid.json",
+            ).fit(X, y, partition="validation", record_ids=ids)
+
+        selector = RandomForestFeatureSelector(
+            feature_names=names,
+            top_n=2,
+            artifact_path=tmp_path / "valid.json",
+        ).fit(X, y, partition="train", record_ids=ids)
+        with pytest.raises(RuntimeError, match="refit"):
+            selector.fit(X, y, partition="train", record_ids=ids)
+
+        payload = selector.to_dict()
+        assert payload["fit_partition"] == "train"
+        assert payload["fit_record_ids_sha256"] is not None

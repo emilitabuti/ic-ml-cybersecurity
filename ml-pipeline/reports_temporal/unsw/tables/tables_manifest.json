@@ -1,0 +1,31 @@
+{
+  "artifacts": {
+    "attack_type_metrics.csv": {
+      "rows": 27,
+      "sha256": "19d8ec3decbd7ddd50bcd4dcec93dec0e571a8509fc817f58b7e8188c481d01f"
+    },
+    "confusion_matrices.csv": {
+      "rows": 3,
+      "sha256": "bd30cc1c50d45939ee93690a8bc6e9914bcd05d751fb34131188d8d8e249024e"
+    },
+    "development_vs_test.csv": {
+      "rows": 3,
+      "sha256": "70cae4b358b21492f0c5a34be495e8f94622aebdc3b34e270787ba1fe480abb1"
+    },
+    "final_model_metrics.csv": {
+      "rows": 3,
+      "sha256": "8a0ad779e9c56c5723025f237e6b78a38e9a06b7c1ff2e5fbe793ea5dacf00e1"
+    },
+    "final_model_metrics.md": {
+      "rows": 3,
+      "sha256": "263b283d3f2b7b70a3ce758f627edcf35a79211efc8721081227775553058434"
+    },
+    "selected_features_final.csv": {
+      "rows": 30,
+      "sha256": "88c42e4468f8d61e3f68aab43de96f520469d6041bab66e64490e3d1f92d0fe7"
+    }
+  },
+  "source_final_metrics_sha256": "8c3dc8d36aa617e074b0640208fdb4db139717e83adba093dd62bb015f566603",
+  "status": "final_tables_generated",
+  "test_reopened": false
+}

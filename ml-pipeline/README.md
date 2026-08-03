@@ -1,190 +1,86 @@
-# IC ML Cybersecurity — ML Pipeline
+# Pipeline temporal de detecção — UNSW-NB15
 
-Componente Python do projeto de Iniciação Científica: treino, avaliação e serving de modelos de ML para detecção de intrusões de rede (CICIDS2017).
+Este diretório contém o único fluxo científico e operacional do projeto. Ele
+avalia generalização temporal no UNSW-NB15, com seleção de atributos dentro dos
+folds, purga nas fronteiras e uma sessão futura mantida fechada até a avaliação
+final.
 
-## Pré-requisitos
+## Protocolo
 
-- Python 3.10+
-- `pip` atualizado
+- dataset: UNSW-NB15 não escalonado;
+- tarefa: detecção binária do estado do último registro da janela;
+- janela: 10 registros, isolada por partição, sessão e arquivo-fonte;
+- desenvolvimento: 3 folds cronológicos expansivos, sem embaralhamento;
+- pré-processamento e ranking: ajustados somente no treino de cada fold;
+- candidatos: todos os atributos, `top_10`, `top_20` e `top_30`;
+- configurações finais: Decision Tree `top_10`, LSTM `top_20` e Random Forest
+  `top_30`;
+- teste: sessão posterior, aberta uma única vez após o congelamento;
+- artefato servido: Random Forest `top_30`.
+
+O resultado final do Random Forest foi F1 `0,9261`, PR-AUC `0,9856`, precisão
+`0,9010`, revocação `0,9525` e FPR `0,0094` em 306.701 janelas futuras.
 
 ## Instalação
 
-```bash
-# Na raiz do ml-pipeline/
-python -m venv .venv
-source .venv/bin/activate   # Linux/macOS
-.venv\Scripts\activate      # Windows
-
-pip install -r requirements.txt
-cp .env.example .env
-```
-
-## Estrutura
-
-```
-ml-pipeline/
-├── config.py           # Configurações globais (RANDOM_SEED, WINDOW_SIZE, ...)
-├── requirements.txt    # Dependências com versões fixadas
-├── data/
-│   ├── raw/            # Dataset CICIDS2017 original (não versionado)
-│   ├── processed/      # Dados processados (gerados localmente pelo pipeline ou fornecidos pela equipe — não versionados)
-│   └── schema/         # features_schema.json — contrato de dados
-├── models/             # Modelos serializados (.pkl, .h5)
-├── notebooks/          # Exploração e prototipagem
-├── src/
-│   ├── data/           # Carregamento e validação do dataset
-│   ├── features/       # Feature engineering e sliding window
-│   ├── training/       # Scripts de treino por modelo
-│   ├── models/         # Serialização do modelo vencedor
-│   └── api/            # FastAPI (serving de predições)
-└── tests/              # Testes unitários e de integração
-```
-
-## Executar a API
+Use Python 3.12, a mesma versão do ambiente final:
 
 ```bash
+python3.12 -m venv .venv
 source .venv/bin/activate
-uvicorn src.api.main:app --reload
-# Acesse: http://127.0.0.1:8000/health
-# Docs:   http://127.0.0.1:8000/docs
-```
-
-## Reprodutibilidade Científica
-
-**Objetivo:** pesquisador externo consegue reproduzir os experimentos em ≤ 30 minutos de setup.
-
-Todas as execuções usam `RANDOM_SEED = 42` definido em `config.py`, garantindo resultados idênticos entre runs. A variação máxima aceita entre runs com mesmo seed, mesmo dataset e mesmos hiperparâmetros é **≤ 0,01%** em todas as métricas.
-
-### Pré-requisitos (≈ 2 min de verificação)
-
-- Python 3.10+
-- `pip` atualizado (`pip install --upgrade pip`)
-- `git`
-- ~500 MB de espaço em disco (ambiente + dependências, sem dataset)
-- ~3 GB adicionais para o dataset CICIDS2017
-
-### 1. Clonar e instalar (≈ 5 min)
-
-```bash
-git clone https://github.com/emilitabuti/ic-ml-cybersecurity.git
-cd ic-ml-cybersecurity/ml-pipeline
-
-python -m venv .venv
-source .venv/bin/activate   # Linux/macOS
-.venv\Scripts\activate      # Windows
-
 pip install -r requirements.txt
 cp .env.example .env
 ```
 
-### 2. Verificar integridade do ambiente (≈ 2 min)
+## Fluxo de execução
+
+Os datasets não são versionados. Coloque os Parquets brutos em
+`data/raw/unsw_nb15/` e execute, a partir de `ml-pipeline/`:
 
 ```bash
-# Dentro de ml-pipeline/ com o venv ativo
-python -m pytest tests/ -v
-# Esperado: 94+ testes passando — sem falhas
+python -m src.data.pipeline.collector
+python -m src.data.pipeline.cleaner \
+  --output-path data/processed/unsw_nb15_cleaned_temporal.parquet
+python -m src.data.detection_temporal_splitter
+python -m src.data.expanding_temporal_folds
+python -m src.training.temporal_development_experiments
 ```
 
-### 3. Preparar o dataset (≈ variável)
-
-O dataset CICIDS2017 **não está versionado no repositório** (~2,8 GB). Para obter:
-
-1. Acesse: [Canadian Institute for Cybersecurity — IDS 2017](https://www.unb.ca/cic/datasets/ids-2017.html)
-2. Faça o download dos arquivos CSV
-3. Coloque os arquivos em `ml-pipeline/data/raw/`
-
-```
-ml-pipeline/data/raw/
-├── Monday-WorkingHours.pcap_ISCX.csv
-├── Tuesday-WorkingHours.pcap_ISCX.csv
-├── Wednesday-workingHours.pcap_ISCX.csv
-├── Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv
-├── Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv
-├── Friday-WorkingHours-Morning.pcap_ISCX.csv
-├── Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv
-└── Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv
-```
-
-### 4. Executar o pipeline de dados (≈ 10 min)
-
-O pipeline de dados está implementado em `src/data/pipeline/`. Após preparar o dataset:
-
-```python
-# Salve como run_data_pipeline.py na pasta ml-pipeline/ e execute: python run_data_pipeline.py
-from src.data.data_loader import load_binary_dataset
-from src.data.data_splitter import split_train_test
-import config
-
-# Carregar e validar o dataset
-X, y = load_binary_dataset(dataset="cic")
-print(f"Dataset: {X.shape[0]} amostras, {X.shape[1]} features")
-print(f"Classes: {y.value_counts().to_dict()}")
-
-# Dividir em treino/teste (estratificado, sem data leakage)
-X_train, X_test, y_train, y_test = split_train_test(X, y)
-print(f"Treino: {X_train.shape[0]} | Teste: {X_test.shape[0]}")
-```
-
-O split é reprodutível: usa `RANDOM_SEED = 42` e é estratificado por label (proporção de classes preservada).
-
-### 5. Executar o pipeline de treino
+O protocolo congelado está em `reports_temporal/unsw/protocol.json`. A
+avaliação final já consumiu a única abertura autorizada do teste e não deve ser
+reexecutada. As rotinas abaixo existem para reprodução auditada em uma nova
+base ou em um novo protocolo, não para reajustar o resultado publicado:
 
 ```bash
-# Story 3.2 — Random Forest com k-fold k=5
-python src/training/train_rf.py
-
-# Story 3.3 — Decision Tree com o mesmo split/seed do RF
-python src/training/train_dt.py
-
-# Story 3.4 — LSTM; se TensorFlow não existir localmente, fallback MLP explícito
-python src/training/train_lstm.py
+python -m src.training.temporal_final_evaluation
+python -m src.training.temporal_final_reporting
+python -m src.models.temporal_artifact_builder
 ```
 
-Cada script usa `K_FOLDS=5`, `RANDOM_SEED=42`, `WINDOW_SIZE=10` por padrão e registra os runs em experimentos MLflow nomeados como `ic-ml-cybersecurity-{model_type}`. As métricas exportadas por fold e agregadas são F1, AUC-ROC, Precision, Recall e FPR.
+## API
 
-Os resultados tabulares ficam em:
-
-```
-reports/
-├── metrics/{model_type}_metrics.json
-└── predictions/{model_type}_fold_predictions.csv
-```
-
-**Decisão LSTM/MLP:** o LSTM completo deve ser executado preferencialmente no Google Colab com GPU T4, conforme planejado no PRD/epics. O ambiente local do repositório permanece leve e executável em CPU; quando TensorFlow não está instalado, `train_lstm.py` usa `MLPClassifier` como fallback explícito, marca `fallback_used=true` no resultado e imprime o motivo no terminal. Essa substituição não é silenciosa.
-
-### 6. Acessar métricas no MLflow UI (≈ 1 min)
+O único artefato aceito é `models/model_rf_temporal_v2.pkl`. A API recebe dez
+registros com os 43 campos brutos, aplica pré-processamento, seleção `top_30`,
+construção da janela e inferência.
 
 ```bash
-# Dentro de ml-pipeline/ com o venv ativo
-mlflow ui
-# Acesse: http://127.0.0.1:5000
-
-# Ou especificando o diretório de experimentos
-mlflow ui --backend-store-uri ./mlruns
+uvicorn src.api.main:app --reload
 ```
 
-O MLflow UI exibe: comparação de runs, métricas por experimento, hiperparâmetros usados e artefatos gerados.
+Endpoints principais:
 
-### 7. Exportar tabelas para o artigo
+- `POST /predict`;
+- `GET /health`;
+- `GET /model/info`;
+- `GET /history`.
+
+## Verificação
 
 ```bash
-python src/training/evaluator.py \
-  --comparison-csv reports/comparison_metrics.csv \
-  --attack-csv reports/attack_type_metrics.csv \
-  --attack-md reports/attack_type_metrics.md
+python -m pytest tests -q
+cd ..
+python scripts/audit_final_documents.py
 ```
 
-`comparison_metrics.csv` contém RF x DT x LSTM nas colunas F1, AUC-ROC, Precision, Recall e FPR como média +/- desvio padrão, com uma coluna `best_metrics` indicando o melhor modelo por métrica. `attack_type_metrics.csv` detalha F1, Precision, Recall e FPR por tipo de ataque e marca melhor/pior modelo por F1 para cada ataque.
-
-### O que NÃO está versionado
-
-```
-# Entradas relevantes do .gitignore
-ml-pipeline/data/    # Dataset e dados processados (~2,8 GB)
-ml-pipeline/models/  # Modelos serializados (.pkl, .joblib, .h5)
-ml-pipeline/mlruns/  # Experimentos MLflow — gerados localmente ao treinar
-mlruns/
-.env                 # Variáveis de ambiente locais
-.venv/               # Ambiente virtual Python
-__pycache__/
-```
+Os resultados publicados ficam em `reports_temporal/unsw/`, e a auditoria
+documental em `docs/emili/relatorio-final/auditoria-final.md`.

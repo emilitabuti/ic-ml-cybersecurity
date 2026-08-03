@@ -1,90 +1,85 @@
 {
-  "_comment": "Contrato formal de features — CIC-IDS2017 model-ready. Caroline ↔ Emili.",
-  "_version": "1.1.0",
-  "_dataset": "CIC-IDS2017",
-  "_generated_by": "Caroline Guimarães Campos — pipeline de pré-processamento",
-  "_consumed_by": "Emili Tabuti — ml-pipeline (data_loader.py, data_splitter.py)",
-
-  "required_columns": [
-    "Binary_Label"
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Contrato de entrada do pipeline temporal UNSW-NB15",
+  "version": "2.0.0",
+  "dataset": "UNSW-NB15",
+  "task": "detecção binária contextual no fim de janelas temporais",
+  "target": {
+    "column": "Binary_Label",
+    "values": {
+      "0": "BENIGN",
+      "1": "Attack"
+    }
+  },
+  "temporal_order": {
+    "start_column": "Stime",
+    "end_column": "Ltime",
+    "tie_breaker": "source_order",
+    "shuffle": false,
+    "window_size": 10
+  },
+  "raw_feature_names": [
+    "sport",
+    "dsport",
+    "dur",
+    "sbytes",
+    "dbytes",
+    "sttl",
+    "dttl",
+    "sloss",
+    "dloss",
+    "Sload",
+    "Dload",
+    "Spkts",
+    "Dpkts",
+    "swin",
+    "dwin",
+    "stcpb",
+    "dtcpb",
+    "smeansz",
+    "dmeansz",
+    "trans_depth",
+    "res_bdy_len",
+    "Sjit",
+    "Djit",
+    "Sintpkt",
+    "Dintpkt",
+    "tcprtt",
+    "synack",
+    "ackdat",
+    "is_sm_ips_ports",
+    "ct_state_ttl",
+    "ct_flw_http_mthd",
+    "is_ftp_login",
+    "ct_ftp_cmd",
+    "ct_srv_src",
+    "ct_srv_dst",
+    "ct_dst_ltm",
+    "ct_src_ltm",
+    "ct_src_dport_ltm",
+    "ct_dst_sport_ltm",
+    "ct_dst_src_ltm",
+    "proto",
+    "state",
+    "service"
   ],
-  "_todo_required_columns": "Expandir com as feature columns do CIC-IDS2017 após validação com Caroline — atualmente cobre apenas Binary_Label",
-
-  "target_columns": {
-    "binary_task": "Binary_Label",
-    "attacktype_task": "Attack_Type_ID"
+  "categorical_features": ["proto", "state", "service"],
+  "preprocessing_policy": {
+    "fit_scope": "treino de cada fold ou treino final",
+    "numeric": "mediana seguida de RobustScaler",
+    "categorical": "moda seguida de OneHotEncoder(handle_unknown='ignore')",
+    "refit_on_validation_or_test": false
   },
-
-  "label_values": {
-    "Binary_Label": {
-      "type": "int",
-      "values": [0, 1],
-      "description": "0 = Benigno, 1 = Ataque"
-    }
+  "feature_selection_policy": {
+    "method": "importância de Random Forest",
+    "fit_scope": "somente treino do fold",
+    "selected_count": 30,
+    "persisted_in_serving_artifact": true
   },
-
-  "preprocessing_applied": {
-    "duplicates_removed": true,
-    "infinite_values_handled": true,
-    "missing_values_handled": true,
-    "column_names_standardized": "snake_case",
-    "scaling": "log1p + RobustScaler (apenas colunas numéricas não-alvo)",
-    "encoding": {
-      "target_multiclass": "LabelEncoder → Attack_Type_ID",
-      "categorical_features": "One-Hot Encoding (apenas UNSW-NB15: proto, state, service)"
-    }
-  },
-
-  "known_attack_types_cic_ids2017": [
-    "Bot",
-    "DDoS",
-    "DoS GoldenEye",
-    "DoS Hulk",
-    "DoS Slowhttptest",
-    "DoS slowloris",
-    "FTP-Patator",
-    "Heartbleed",
-    "Infiltration",
-    "PortScan",
-    "SSH-Patator",
-    "Web Attack – Brute Force",
-    "Web Attack – SQL Injection",
-    "Web Attack – XSS"
-  ],
-
-  "_note_attack_type_dataset": "O dataset de tipo de ataque contém apenas Binary_Label=1. 'BENIGN' NÃO aparece como Attack_Type neste dataset.",
-
-  "structural_guarantees": {
-    "no_missing_values": true,
-    "no_infinite_values": true,
-    "outliers_preserved": true,
-    "note": "Outliers preservados — em detecção de intrusão valores extremos representam comportamento malicioso legítimo"
-  },
-
-  "data_sources": {
-    "primary": {
-      "name": "CIC-IDS2017",
-      "origin": "Canadian Institute for Cybersecurity",
-      "url": "https://www.unb.ca/cic/datasets/ids-2017.html",
-      "approximate_records_raw": 1200000,
-      "columns_raw": 80
-    },
-    "secondary": {
-      "name": "UNSW-NB15",
-      "origin": "University of New South Wales",
-      "url": "https://research.unsw.edu.au/projects/unsw-nb15-dataset",
-      "approximate_records_raw": 2280090,
-      "columns_raw": 50
-    }
-  },
-
-  "split_contract": {
-    "test_size": 0.2,
-    "train_size": 0.8,
-    "stratify_by": "Binary_Label",
-    "random_state_source": "config.RANDOM_SEED (default: 42)",
-    "leakage_prevention_policy": "split_first",
-    "split_applied_before": ["feature_selection", "sliding_window", "additional_scaling"],
-    "description": "O split train/test deve ser aplicado ANTES de qualquer transformação de features para prevenir data leakage. Ver src/data/data_splitter.py."
+  "split_policy": {
+    "method": "cronológico com folds expansivos",
+    "development_folds": 3,
+    "purge_records": 9,
+    "test_is_closed_until_final_evaluation": true
   }
 }

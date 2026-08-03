@@ -1,0 +1,6 @@
+*.docx binary
+*.joblib binary
+*.keras binary
+*.parquet binary
+*.pdf binary
+*.pkl binary

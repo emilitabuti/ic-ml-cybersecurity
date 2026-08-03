@@ -1,0 +1,185 @@
+{
+  "acceptance": {
+    "inputs_unchanged": true,
+    "record_ids_disjoint_between_train_validation": true,
+    "target_is_last_record": true,
+    "test_remained_closed": true,
+    "windows_created_separately_by_partition": true,
+    "windows_created_separately_by_session": true,
+    "windows_created_separately_by_source_file": true
+  },
+  "created_at": "2026-08-01T20:47:48.455731+00:00",
+  "cross_partition_integrity": {
+    "record_ids_disjoint": true,
+    "train_validation_shared_record_ids": 0
+  },
+  "feature_materialization": {
+    "feature_cubes_materialized_before_selection": false,
+    "index_manifests_materialized": true,
+    "iterator": "src.features.partition_window_builder.iter_partition_window_batches",
+    "reason": "A seleção de atributos precede a criação das features 3D; iter_partition_window_batches realiza as janelas selecionadas em lotes."
+  },
+  "inputs": {
+    "train": {
+      "path": "data/processed/unsw_nb15_temporal_preprocessed/train.parquet",
+      "sha256_after": "8d0b31c3a6a71e2d2fcfe58b7a00fd0547d4f8763f769d7f16c462d4a2fcc915",
+      "sha256_before": "8d0b31c3a6a71e2d2fcfe58b7a00fd0547d4f8763f769d7f16c462d4a2fcc915"
+    },
+    "validation": {
+      "path": "data/processed/unsw_nb15_temporal_preprocessed/validation.parquet",
+      "sha256_after": "8189e839b837b6dafb664347076e88a6b0390499acf20ab92f72484e43f8a05a",
+      "sha256_before": "8189e839b837b6dafb664347076e88a6b0390499acf20ab92f72484e43f8a05a"
+    }
+  },
+  "outputs": {
+    "train": {
+      "all_windows_within_one_session": true,
+      "all_windows_within_one_source_file": true,
+      "blocks": [
+        {
+          "rows": 1023187,
+          "source_file": "train-00000-of-00002.parquet",
+          "temporal_block": 0,
+          "temporal_session": 0,
+          "windows": 1023178
+        }
+      ],
+      "blocks_too_short_for_a_window": 0,
+      "both_target_classes_present": true,
+      "columns": 20,
+      "input_feature_count": 204,
+      "input_rows": 1023187,
+      "path": "data/processed/unsw_nb15_temporal_windows/train_window_index.parquet",
+      "rows_not_used_in_any_window": 0,
+      "sha256": "c886790d576b3c82394423a1964cd066ac38edc7e347bdabe55a73ef5b6f78c0",
+      "size_bytes": 53660819,
+      "target_is_last_record": true,
+      "unique_record_ids_sha256": "81b0f3937ee252355b98471aafbdc5f857938d766dfac7d5149c26342a4e2fc1",
+      "unique_record_ids_used": 1023187,
+      "window_record_id_columns": [
+        "record_id_t00",
+        "record_id_t01",
+        "record_id_t02",
+        "record_id_t03",
+        "record_id_t04",
+        "record_id_t05",
+        "record_id_t06",
+        "record_id_t07",
+        "record_id_t08",
+        "record_id_t09"
+      ],
+      "windows": 1023178
+    },
+    "validation": {
+      "all_windows_within_one_session": true,
+      "all_windows_within_one_source_file": true,
+      "blocks": [
+        {
+          "rows": 51264,
+          "source_file": "train-00000-of-00002.parquet",
+          "temporal_block": 0,
+          "temporal_session": 1,
+          "windows": 51255
+        },
+        {
+          "rows": 1,
+          "source_file": "train-00001-of-00002.parquet",
+          "temporal_block": 1,
+          "temporal_session": 1,
+          "windows": 0
+        },
+        {
+          "rows": 508,
+          "source_file": "train-00000-of-00002.parquet",
+          "temporal_block": 2,
+          "temporal_session": 1,
+          "windows": 499
+        },
+        {
+          "rows": 1,
+          "source_file": "train-00001-of-00002.parquet",
+          "temporal_block": 3,
+          "temporal_session": 1,
+          "windows": 0
+        },
+        {
+          "rows": 42,
+          "source_file": "train-00000-of-00002.parquet",
+          "temporal_block": 4,
+          "temporal_session": 1,
+          "windows": 33
+        },
+        {
+          "rows": 1,
+          "source_file": "train-00001-of-00002.parquet",
+          "temporal_block": 5,
+          "temporal_session": 1,
+          "windows": 0
+        },
+        {
+          "rows": 22,
+          "source_file": "train-00000-of-00002.parquet",
+          "temporal_block": 6,
+          "temporal_session": 1,
+          "windows": 13
+        },
+        {
+          "rows": 1,
+          "source_file": "train-00001-of-00002.parquet",
+          "temporal_block": 7,
+          "temporal_session": 1,
+          "windows": 0
+        },
+        {
+          "rows": 9,
+          "source_file": "train-00000-of-00002.parquet",
+          "temporal_block": 8,
+          "temporal_session": 1,
+          "windows": 0
+        },
+        {
+          "rows": 202477,
+          "source_file": "train-00001-of-00002.parquet",
+          "temporal_block": 9,
+          "temporal_session": 1,
+          "windows": 202468
+        }
+      ],
+      "blocks_too_short_for_a_window": 5,
+      "both_target_classes_present": true,
+      "columns": 20,
+      "input_feature_count": 204,
+      "input_rows": 254326,
+      "path": "data/processed/unsw_nb15_temporal_windows/validation_window_index.parquet",
+      "rows_not_used_in_any_window": 13,
+      "sha256": "5f61e505ad28496eca2db98fb79bd30112bd90a6abc32f55443a50557325fa39",
+      "size_bytes": 15833769,
+      "target_is_last_record": true,
+      "unique_record_ids_sha256": "36cc08775757d41cf25a0069158a97d1d89816f81f11227a81f9557d99bc5716",
+      "unique_record_ids_used": 254313,
+      "window_record_id_columns": [
+        "record_id_t00",
+        "record_id_t01",
+        "record_id_t02",
+        "record_id_t03",
+        "record_id_t04",
+        "record_id_t05",
+        "record_id_t06",
+        "record_id_t07",
+        "record_id_t08",
+        "record_id_t09"
+      ],
+      "windows": 254268
+    }
+  },
+  "protocol": "partition_session_and_source_isolated_sliding_windows",
+  "schema_version": "1.0",
+  "target_rule": "Binary_Label e attack_cat do último registro da janela.",
+  "test_policy": {
+    "status": "closed",
+    "test_input_was_not_loaded": true,
+    "test_window_output": "data/processed/unsw_nb15_temporal_windows/test_window_index.parquet",
+    "test_window_output_exists": false
+  },
+  "window_size": 10
+}

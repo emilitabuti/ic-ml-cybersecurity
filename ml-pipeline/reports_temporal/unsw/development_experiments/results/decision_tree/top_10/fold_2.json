@@ -1,0 +1,40 @@
+{
+  "algorithm": "decision_tree",
+  "artifact_size_bytes": 86041,
+  "feature_count": 10,
+  "feature_names": [
+    "ct_state_ttl",
+    "sttl",
+    "ackdat",
+    "tcprtt",
+    "Dload",
+    "dttl",
+    "dmeansz",
+    "synack",
+    "dsport",
+    "Dintpkt"
+  ],
+  "feature_names_sha256": "a0790020f4695e2b53e140b6f443af02f4066036119895361162f7f2f0ff936d",
+  "fit_seconds": 2.9758378450023883,
+  "fold": 2,
+  "inference_seconds": 0.06150811900079134,
+  "metrics": {
+    "auc_roc": 0.9572935142490813,
+    "f1": 0.9210558033023984,
+    "fpr": 0.007436120560082272,
+    "pr_auc": 0.8665282381532885,
+    "precision": 0.9312698025834755,
+    "recall": 0.9110634239389604
+  },
+  "model_input_shape": [
+    100
+  ],
+  "protocol": "temporal_purged_expanding_folds",
+  "shuffle": false,
+  "test_used": false,
+  "total_seconds": 3.2963584200006153,
+  "train_windows": 86072,
+  "validation_windows": 42117,
+  "variant": "top_10",
+  "window_size": 10
+}

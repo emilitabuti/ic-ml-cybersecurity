@@ -1,0 +1,4 @@
+model,fn,fp,tn,tp
+decision_tree,2501,3134,278310,22756
+lstm,1277,4982,276462,23980
+random_forest,1199,2642,278802,24058

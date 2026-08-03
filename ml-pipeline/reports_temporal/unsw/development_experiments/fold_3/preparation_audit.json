@@ -1,0 +1,60 @@
+{
+  "fit_partition": "train",
+  "fold": 3,
+  "input_feature_count": 203,
+  "outputs": {
+    "train": {
+      "columns": 213,
+      "path": "data/processed/unsw_nb15_temporal_experiment_folds/fold_3/train.parquet",
+      "record_ids_sha256": "9d46d822afb81180d61d30050c1472fdfa41e530c13ee551ffa59ed4536f6e27",
+      "rows": 128216,
+      "sha256": "c1c57e5e56f31d87ac56a8a580291c9f803bd31bc18adcb1e1489181f503e92a"
+    },
+    "validation": {
+      "columns": 213,
+      "path": "data/processed/unsw_nb15_temporal_experiment_folds/fold_3/validation.parquet",
+      "record_ids_sha256": "c822124755614ab37ca72c3b3c16ab7bbe702cb0c671fcdca257fa4d0529065b",
+      "rows": 1146790,
+      "sha256": "d255a6ec53f4758925b39eb2148c3125614729851ef9507630d139d26ea4a123"
+    }
+  },
+  "preprocessor_path": "reports_temporal/unsw/development_experiments/fold_3/preprocessor.joblib",
+  "preprocessor_sha256": "ba4b39f4a02e26d2c5d742f6c130e0bf1ad65906c53325d92b03f7724111af66",
+  "ranking_feature_count": 30,
+  "ranking_feature_names": [
+    "sttl",
+    "ct_state_ttl",
+    "dttl",
+    "synack",
+    "ackdat",
+    "Dload",
+    "tcprtt",
+    "dur",
+    "smeansz",
+    "Sload",
+    "sbytes",
+    "dmeansz",
+    "dsport",
+    "state_INT",
+    "Dintpkt",
+    "dbytes",
+    "ct_srv_dst",
+    "Dpkts",
+    "sport",
+    "ct_srv_src",
+    "ct_dst_sport_ltm",
+    "Sintpkt",
+    "ct_dst_ltm",
+    "Sjit",
+    "ct_src_ltm",
+    "Djit",
+    "service_-",
+    "Spkts",
+    "ct_src_dport_ltm",
+    "state_CON"
+  ],
+  "ranking_path": "reports_temporal/unsw/development_experiments/fold_3/feature_ranking.json",
+  "ranking_sha256": "921faf0814029ddc287541f465244ac873a0acccf46b670cf782360d19613c75",
+  "selector_state_unchanged_by_validation": true,
+  "test_used": false
+}

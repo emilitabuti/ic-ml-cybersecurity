@@ -1,0 +1,40 @@
+{
+  "algorithm": "random_forest",
+  "artifact_size_bytes": 15773161,
+  "feature_count": 10,
+  "feature_names": [
+    "sttl",
+    "ct_state_ttl",
+    "dttl",
+    "synack",
+    "ackdat",
+    "Dload",
+    "tcprtt",
+    "dur",
+    "smeansz",
+    "Sload"
+  ],
+  "feature_names_sha256": "c660889abca5cd5ed9ce394754e4533ef0600191ea1fe7e0324439c06640335c",
+  "fit_seconds": 38.29733167800077,
+  "fold": 3,
+  "inference_seconds": 7.893120106000424,
+  "metrics": {
+    "auc_roc": 0.9990201489662811,
+    "f1": 0.8846727613510309,
+    "fpr": 0.004637629011054782,
+    "pr_auc": 0.9495245127280152,
+    "precision": 0.8162343391565202,
+    "recall": 0.9656381779466411
+  },
+  "model_input_shape": [
+    100
+  ],
+  "protocol": "temporal_purged_expanding_folds",
+  "shuffle": false,
+  "test_used": false,
+  "total_seconds": 47.80460412100001,
+  "train_windows": 128189,
+  "validation_windows": 1146723,
+  "variant": "top_10",
+  "window_size": 10
+}

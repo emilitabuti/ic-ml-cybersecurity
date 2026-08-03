@@ -1,0 +1,162 @@
+{
+  "algorithm": "lstm",
+  "artifact_size_bytes": 315727,
+  "confusion_matrix": {
+    "fn": 1277,
+    "fp": 4982,
+    "tn": 276462,
+    "tp": 23980
+  },
+  "feature_count": 20,
+  "feature_names": [
+    "ct_state_ttl",
+    "sttl",
+    "dttl",
+    "Sload",
+    "tcprtt",
+    "synack",
+    "sbytes",
+    "ackdat",
+    "smeansz",
+    "dmeansz",
+    "Dload",
+    "Dpkts",
+    "Dintpkt",
+    "dsport",
+    "dur",
+    "dbytes",
+    "ct_srv_dst",
+    "sport",
+    "state_INT",
+    "ct_srv_src"
+  ],
+  "feature_names_sha256": "e505db92ffeea9fed5079585382104273b5d95b86bb108275db0c7f47168df9c",
+  "fit_seconds": 429.60743604800155,
+  "inference_seconds": 6.55291652500091,
+  "metrics": {
+    "auc_roc": 0.9954398321503715,
+    "f1": 0.8845607628322175,
+    "fpr": 0.017701567629794916,
+    "pr_auc": 0.9415338240320625,
+    "precision": 0.8279814929908156,
+    "recall": 0.9494397592746565
+  },
+  "metrics_by_attack_type": {
+    "Analysis": {
+      "metrics": {
+        "auc_roc": 0.9973563413398228,
+        "f1": 0.19228907888369093,
+        "fpr": 0.017701567629794916,
+        "pr_auc": 0.6799036461451198,
+        "precision": 0.10684833273574758,
+        "recall": 0.9597423510466989
+      },
+      "positive_examples": 621
+    },
+    "Backdoor": {
+      "metrics": {
+        "auc_roc": 0.9985013882658758,
+        "f1": 0.19629927594529364,
+        "fpr": 0.017701567629794916,
+        "pr_auc": 0.7783556450731354,
+        "precision": 0.10908440629470673,
+        "recall": 0.9791332263242376
+      },
+      "positive_examples": 623
+    },
+    "DoS": {
+      "metrics": {
+        "auc_roc": 0.9962753858417048,
+        "f1": 0.36016787485692486,
+        "fpr": 0.017701567629794916,
+        "pr_auc": 0.6845503728275875,
+        "precision": 0.22131916223819945,
+        "recall": 0.9665529010238908
+      },
+      "positive_examples": 1465
+    },
+    "Exploits": {
+      "metrics": {
+        "auc_roc": 0.9950782506197355,
+        "f1": 0.7088925259138025,
+        "fpr": 0.017701567629794916,
+        "pr_auc": 0.822952874276245,
+        "precision": 0.5659900688213259,
+        "recall": 0.9483287111370603
+      },
+      "positive_examples": 6851
+    },
+    "Fuzzer": {
+      "metrics": {
+        "auc_roc": 0.9926670696282983,
+        "f1": 0.6190244917782557,
+        "fpr": 0.017701567629794916,
+        "pr_auc": 0.6515999568128665,
+        "precision": 0.4724134279360373,
+        "recall": 0.8975855130784708
+      },
+      "positive_examples": 4970
+    },
+    "Generic": {
+      "metrics": {
+        "auc_roc": 0.9974208783986477,
+        "f1": 0.7254775702940545,
+        "fpr": 0.017701567629794916,
+        "pr_auc": 0.8883812490476924,
+        "precision": 0.57571112246636,
+        "recall": 0.9805628082390484
+      },
+      "positive_examples": 6894
+    },
+    "Reconnaissance": {
+      "metrics": {
+        "auc_roc": 0.995063912146141,
+        "f1": 0.5573489010989011,
+        "fpr": 0.017701567629794916,
+        "pr_auc": 0.7095364618518071,
+        "precision": 0.3945065629557608,
+        "recall": 0.9491228070175438
+      },
+      "positive_examples": 3420
+    },
+    "Shellcode": {
+      "metrics": {
+        "auc_roc": 0.9943687695925951,
+        "f1": 0.1240581741720694,
+        "fpr": 0.017701567629794916,
+        "pr_auc": 0.23518879700741124,
+        "precision": 0.06634182908545727,
+        "recall": 0.954177897574124
+      },
+      "positive_examples": 371
+    },
+    "Worms": {
+      "metrics": {
+        "auc_roc": 0.9945330408282186,
+        "f1": 0.01579778830963665,
+        "fpr": 0.017701567629794916,
+        "pr_auc": 0.07404954706591345,
+        "precision": 0.00796495420151334,
+        "recall": 0.9523809523809523
+      },
+      "positive_examples": 42
+    }
+  },
+  "metrics_by_session": {
+    "2": {
+      "auc_roc": 0.9954398321503715,
+      "f1": 0.8845607628322175,
+      "fpr": 0.017701567629794916,
+      "pr_auc": 0.9415338240320625,
+      "precision": 0.8279814929908156,
+      "recall": 0.9494397592746565
+    }
+  },
+  "predictions_path": "reports_temporal/unsw/final_evaluation/predictions/lstm.parquet",
+  "predictions_sha256": "0b8d7adc0a0ab6564509a94f343f31d92c67f5b8d958f8f80d2485a193603e7b",
+  "protocol_sha256": "ff08c3fc499f5679ea3d399021da9c476909eaecb73312fe85cb990fab37cc6f",
+  "selection_or_tuning_on_test": false,
+  "test_evaluation_run": 1,
+  "test_windows": 306701,
+  "variant": "top_20"
+}

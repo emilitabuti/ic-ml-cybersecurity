@@ -1,0 +1,16 @@
+{
+  "artifact_path": "models/model_rf_temporal_v2.pkl",
+  "artifact_sha256": "ef622fa6dc6f995ca83dafe555e4fafdaf425a0bff1ea751851a2ff71ae7c713",
+  "artifact_size_bytes": 38217426,
+  "artifact_version": "2.0",
+  "final_metrics_sha256": "8c3dc8d36aa617e074b0640208fdb4db139717e83adba093dd62bb015f566603",
+  "model_input_count": 300,
+  "model_type": "random_forest",
+  "pipeline_kind": "temporal_raw_v2",
+  "protocol_sha256": "ff08c3fc499f5679ea3d399021da9c476909eaecb73312fe85cb990fab37cc6f",
+  "raw_feature_count": 43,
+  "selected_feature_count": 30,
+  "status": "temporal_winner_artifact_built",
+  "test_reopened": false,
+  "window_size": 10
+}

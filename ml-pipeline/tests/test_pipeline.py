@@ -1,8 +1,4 @@
-"""
-Testes dos scripts de pipeline de dados — Story 1.3 (code review fix).
-
-Cobre as funções puras de cleaner.py que transformam DataFrames.
-"""
+"""Testes da limpeza UNSW-NB15 usada pelo pipeline temporal."""
 import numpy as np
 import pandas as pd
 import pytest
@@ -112,3 +108,68 @@ class TestTreatInfiniteAndMissing:
         original_val = df["a"].iloc[1]
         treat_infinite_and_missing(df)
         assert df["a"].iloc[1] == original_val
+
+
+class TestCleanDatasetPaths:
+    """Valida geração em caminho novo sem sobrescrita acidental."""
+
+    def test_clean_unsw_writes_custom_output_without_mutating_input(
+        self,
+        tmp_path,
+    ) -> None:
+        from src.data.pipeline.cleaner import clean_unsw_nb15
+
+        source = tmp_path / "unsw_raw.parquet"
+        destination = tmp_path / "unsw_cleaned_temporal.parquet"
+        original = pd.DataFrame(
+            {
+                "attack_cat": [None, "Fuzzers", "Fuzzers"],
+                "label": [0, 1, 1],
+                "is_ftp_login": [np.nan, 1.0, 1.0],
+                "ct_flw_http_mthd": [np.nan, 2.0, 2.0],
+                "source_file": ["part-0", "part-0", "part-0"],
+                "stcpb": [10, 20, 20],
+            }
+        )
+        original.to_parquet(source, index=False)
+
+        result_path = clean_unsw_nb15(
+            input_path=source,
+            output_path=destination,
+            overwrite=False,
+        )
+
+        result = pd.read_parquet(result_path)
+        source_after = pd.read_parquet(source)
+        assert result_path == destination
+        assert len(result) == 2
+        assert result["attack_cat"].tolist() == ["BENIGN", "Fuzzer"]
+        assert result["Binary_Label"].tolist() == [0, 1]
+        assert result["is_ftp_login"].tolist() == [0.0, 1.0]
+        pd.testing.assert_frame_equal(source_after, original)
+
+    def test_clean_unsw_refuses_existing_output_without_overwrite(
+        self,
+        tmp_path,
+    ) -> None:
+        from src.data.pipeline.cleaner import clean_unsw_nb15
+
+        source = tmp_path / "unsw_raw.parquet"
+        destination = tmp_path / "already_exists.parquet"
+        pd.DataFrame(
+            {
+                "attack_cat": [None],
+                "label": [0],
+                "source_file": ["part-0"],
+            }
+        ).to_parquet(source, index=False)
+        destination.write_bytes(b"do-not-overwrite")
+
+        with pytest.raises(FileExistsError, match="já existe"):
+            clean_unsw_nb15(
+                input_path=source,
+                output_path=destination,
+                overwrite=False,
+            )
+
+        assert destination.read_bytes() == b"do-not-overwrite"

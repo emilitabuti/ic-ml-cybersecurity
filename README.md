@@ -1,7 +1,7 @@
 # ic-ml-cybersecurity
 
 > **Iniciação Científica — FCET**
-> Previsão antecipada de ataques cibernéticos com Machine Learning
+> Detecção temporal de ataques cibernéticos com Machine Learning
 > Orientação: Prof. Dr. Daniel Couto Gatti
 
 ---
@@ -23,16 +23,14 @@
 
 ## 1. O que é este projeto
 
-Este repositório é o espaço de trabalho da nossa IC. O objetivo do projeto é construir um sistema que **prevê ataques cibernéticos antes que eles aconteçam**, usando modelos de Machine Learning treinados sobre sequências de tráfego de rede.
-
-A diferença para ferramentas comuns (Snort, Suricata) é que elas *detectam* ataques em andamento. A nossa abordagem *prevê* — o modelo aprende os padrões de tráfego que *antecedem* um ataque.
+Este repositório é o espaço de trabalho da nossa IC. O componente operacional usa aprendizado de máquina para **detectar tráfego malicioso em uma janela recente**. A previsão antecipada foi investigada separadamente, mas os dados disponíveis não contêm eventos independentes suficientes para sustentá-la como tarefa final.
 
 **Os três componentes do sistema:**
 
 | Componente | Responsável | O que faz |
 |---|---|---|
-| **Pipeline de dados** | Caroline | Coleta, limpa e entrega o dataset CICIDS2017 normalizado em CSV |
-| **Pipeline de ML** | Emili | Feature engineering, treino dos modelos (RF, DT, LSTM), experimentos, exportação |
+| **Pipeline de dados** | Caroline | Coleta e preserva o UNSW-NB15 não escalonado com metadados temporais |
+| **Pipeline de ML** | Emili | Validação temporal, seleção de atributos, RF/DT/LSTM e exportação |
 | **Dashboard** | Isabela | Interface React de monitoramento, alertas em tempo real, demonstração no seminário |
 
 **Entregáveis da IC:** artigo científico com comparação empírica dos algoritmos, relatório final e demonstração funcional no seminário.
@@ -44,18 +42,18 @@ A diferença para ferramentas comuns (Snort, Suricata) é que elas *detectam* at
 ### Caroline — Dados
 Responsável pelo Epic 1 (parcial) e pela entrega do dataset processado.
 
-- Coleta e pré-processamento do CICIDS2017 (~2,8M registros)
-- Normalização das features e validação do schema CSV
-- Entrega um arquivo CSV formal que o pipeline da Emili consome sem modificação de código
+- Coleta e limpeza do UNSW-NB15, preservando `Stime`, `Ltime` e arquivo-fonte
+- Preservação do Parquet não escalonado para ajuste sem vazamento em cada fold
+- Validação do contrato de 43 atributos brutos e dos metadados temporais
 - O contrato de interface (colunas, tipos, ausência de nulos) é documentado na arquitetura
 
 ### Emili — ML Pipeline
 Responsável pelos Epics 1, 2, 3 e 4.
 
 - Inicialização do monorepo e ambiente reprodutível
-- Feature selection, sliding window, divisão train/test sem data leakage
-- Treino e avaliação de Random Forest, Decision Tree e LSTM/MLP com k-fold
-- Rastreamento de experimentos com MLflow
+- Feature selection dentro de folds e janelas isoladas por sessão
+- Treino e avaliação de Random Forest, Decision Tree e LSTM em folds temporais expansivos
+- Holdout cronológico fechado, purga e auditoria por hashes
 - Exportação do modelo vencedor e API FastAPI (`POST /predict`)
 
 ### Isabela — Dashboard
@@ -65,7 +63,7 @@ Responsável pelo Epic 5.
 - Exibição de alertas em tempo real (polling a cada 5s)
 - Histórico de alertas, threshold de confiança, feedback do analista
 - Modo de demonstração para o seminário
-- Pode desenvolver em paralelo usando o endpoint mock que a Emili disponibiliza (`GET /mock`)
+- Pode desenvolver em paralelo usando o endpoint mock que a Emili disponibiliza (`POST /predict/mock`)
 
 ---
 
@@ -301,13 +299,12 @@ Sua pasta é sua. Commit e push à vontade — não conflita com as outras.
 
 ### Dataset e arquivos grandes
 
-Os dados **não são versionados no git** — o CICIDS2017 tem ~2,8 GB e excede o limite do GitHub. Cada pesquisadora mantém os arquivos de dados localmente.
+Os dados brutos e processados **não são versionados no git**. Cada pesquisadora mantém os Parquets do UNSW-NB15 localmente.
 
 | O que não está no git | Onde obter |
 |---|---|
-| Dataset CICIDS2017 | [Canadian Institute for Cybersecurity](https://www.unb.ca/cic/datasets/ids-2017.html) — download direto |
-| Modelos treinados (`.pkl`, `.joblib`, `.h5`) | Compartilhar via Google Drive ou GitHub Releases quando necessário |
-| Experimentos MLflow (`mlruns/`) | Local de cada pesquisadora |
+| Dataset UNSW-NB15 | Fonte pública do UNSW Canberra |
+| Artefatos intermediários (`.joblib`, `.keras`, `.parquet`) | Gerados localmente pelo protocolo |
 
 ---
 
@@ -315,14 +312,14 @@ Os dados **não são versionados no git** — o CICIDS2017 tem ~2,8 GB e excede 
 
 Para reproduzir os experimentos científicos descritos no artigo:
 
-**Setup estimado: ≤ 30 minutos** — pré-requisitos: Python 3.10+, pip, git e o dataset CICIDS2017.
+**Pré-requisitos:** Python 3.12, pip, git e os Parquets do UNSW-NB15.
 
-O sistema aplica Random Forest, Decision Tree e LSTM sobre **janelas temporais deslizantes** (*sliding window*) do dataset CICIDS2017 para **previsão antecipada** de ataques cibernéticos. Todos os experimentos são rastreados com MLflow e são determinísticos via `RANDOM_SEED = 42`.
+O sistema compara Random Forest, Decision Tree e LSTM sobre janelas de dez registros do UNSW-NB15. Pré-processamento e seleção são ajustados somente no treino de cada fold, e o teste é uma sessão futura fechada. A tarefa é detecção do estado corrente, não previsão antecipada.
 
 **Para reproduzir:**
-1. Siga as instruções passo a passo em [`ml-pipeline/README.md#reprodutibilidade-científica`](ml-pipeline/README.md#reprodutibilidade-científica)
+1. Siga as instruções em [`ml-pipeline/README.md`](ml-pipeline/README.md)
 2. Use `RANDOM_SEED = 42` (padrão em `config.py`) para resultados exatos
-3. Após treinar, visualize métricas em `http://127.0.0.1:5000` com `mlflow ui`
+3. Confira protocolo, métricas e hashes em `ml-pipeline/reports_temporal/unsw/`
 
 **Componente Dashboard** *(Epic 5 — a implementar)*
 
@@ -337,7 +334,7 @@ npm run dev
 
 > ⚠️ O dashboard está em desenvolvimento (Epic 5). A integração com a API de predição ocorrerá nas Stories 5.2–5.3.
 
-**Dataset:** [CICIDS2017](https://www.unb.ca/cic/datasets/ids-2017.html) — Canadian Institute for Cybersecurity (~2,8 GB, não versionado no repositório).
+**Dataset principal:** UNSW-NB15, não versionado no repositório.
 
 ---
 

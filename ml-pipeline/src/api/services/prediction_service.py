@@ -4,15 +4,13 @@ from __future__ import annotations
 from collections import deque
 from datetime import datetime, timezone
 import logging
-import math
-from numbers import Real
 import os
 from pathlib import Path
 from threading import Lock
 from time import perf_counter
 from typing import Any
 
-import numpy as np
+import pandas as pd
 
 import config
 from src.models.model_serializer import (
@@ -82,7 +80,7 @@ def load_model_once(path: str | Path | None = None, *, force: bool = False) -> N
 
 def predict(payload: Any) -> dict[str, str | float]:
     artifact = _get_loaded_artifact()
-    X = _payload_to_feature_array(payload, artifact)
+    X = _payload_to_features(payload, artifact)
     source_prediction = _extract_source_prediction(payload)
 
     try:
@@ -112,8 +110,11 @@ def model_info() -> dict[str, Any]:
     return {
         "model_type": str(artifact["model_type"]),
         "window_size": int(artifact["window_size"]),
-        "features": list(artifact["feature_names"]),
+        "features": list(artifact["raw_feature_names"]),
         "trained_at": artifact.get("trained_at") or artifact.get("created_at"),
+        "artifact_version": artifact["artifact_version"],
+        "input_schema": "raw",
+        "selected_features": list(artifact["selected_feature_names"]),
     }
 
 
@@ -166,37 +167,38 @@ def _get_loaded_artifact() -> dict[str, Any]:
     return _artifact
 
 
-def _payload_to_feature_array(payload: Any, artifact: dict[str, Any]) -> np.ndarray:
+def _payload_to_features(
+    payload: Any, artifact: dict[str, Any]
+) -> pd.DataFrame:
     rows = _extract_rows(payload)
-    feature_names = list(artifact["feature_names"])
+    raw_names = list(artifact["raw_feature_names"])
     window_size = int(artifact["window_size"])
-
     if len(rows) < window_size:
         raise InvalidFeaturesError(
             "Janela insuficiente para predição: "
             f"{len(rows)} registros recebidos, window_size={window_size}."
         )
-
-    values: list[list[float]] = []
+    normalized: list[dict[str, Any]] = []
     for row_index, row in enumerate(rows):
         if not isinstance(row, dict):
             raise InvalidFeaturesError(
-                "Cada registro de features deve ser um objeto JSON; "
-                f"índice inválido: {row_index}."
+                f"Cada registro deve ser um objeto JSON; índice inválido: {row_index}."
             )
-
-        missing = [name for name in feature_names if name not in row]
+        missing = [name for name in raw_names if name not in row]
         if missing:
             raise InvalidFeaturesError(
-                "Features obrigatórias ausentes: " + ", ".join(missing[:10])
+                "Features brutas obrigatórias ausentes: " + ", ".join(missing[:10])
             )
-
-        values.append([
-            _coerce_numeric_feature(row[name], name=name, row_index=row_index)
-            for name in feature_names
-        ])
-
-    return np.asarray(values, dtype=np.float32)
+        clean: dict[str, Any] = {}
+        for name in raw_names:
+            value = row[name]
+            if isinstance(value, bool) or isinstance(value, (dict, list)) or value is None:
+                raise InvalidFeaturesError(
+                    f"Feature bruta '{name}' no registro {row_index} possui tipo inválido."
+                )
+            clean[name] = value
+        normalized.append(clean)
+    return pd.DataFrame(normalized, columns=raw_names)
 
 
 def _extract_rows(payload: Any) -> list[dict[str, Any]]:
@@ -240,44 +242,16 @@ def _extract_source_prediction(payload: Any) -> str | None:
     return normalized or None
 
 
-def _coerce_numeric_feature(value: Any, *, name: str, row_index: int) -> float:
-    if isinstance(value, bool) or not isinstance(value, Real):
-        raise InvalidFeaturesError(
-            f"Feature '{name}' no registro {row_index} deve ser numérica."
-        )
-    numeric = float(value)
-    if not math.isfinite(numeric):
-        raise InvalidFeaturesError(
-            f"Feature '{name}' no registro {row_index} deve ser finita."
-        )
-    return numeric
-
-
 def _append_history(item: dict[str, str | float]) -> None:
     with _history_lock:
         _history.append(item)
 
 
 def _resolve_model_path(path: str | Path | None = None) -> Path:
-    explicit = path or os.getenv("MODEL_ARTIFACT_PATH")
+    explicit = path or os.getenv("MODEL_ARTIFACT_PATH") or config.MODEL_ARTIFACT_PATH
     if explicit:
         return _resolve_project_relative_path(Path(explicit))
-
-    default_path = _resolve_project_relative_path(
-        Path(config.MODEL_PATH) / "model_rf.pkl"
-    )
-    if default_path.exists():
-        return default_path
-
-    candidates = sorted(
-        _resolve_project_relative_path(Path(config.MODEL_PATH)).glob("model_*.pkl")
-    )
-    if candidates:
-        return candidates[0]
-
-    raise FileNotFoundError(
-        f"Artefato de modelo serializado não encontrado: {default_path}."
-    )
+    raise FileNotFoundError("MODEL_ARTIFACT_PATH não foi configurado.")
 
 
 def _resolve_project_relative_path(path: Path) -> Path:

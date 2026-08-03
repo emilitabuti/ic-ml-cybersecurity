@@ -1,12 +1,8 @@
-"""Coleta e consolidação dos datasets brutos em um único arquivo parquet.
-
-Suporta CIC-IDS2017 e UNSW-NB15. Execute este script uma vez após o download
-dos dados brutos para `data/raw/<dataset>/`.
+"""Coleta e consolida os arquivos brutos do UNSW-NB15.
 
 Uso:
     cd ml-pipeline/
-    python -m src.data.pipeline.collector --dataset cic
-    python -m src.data.pipeline.collector --dataset unsw
+    python -m src.data.pipeline.collector
 """
 import logging
 import os
@@ -14,13 +10,6 @@ import os
 import pandas as pd
 
 logger = logging.getLogger(__name__)
-
-# ── CIC-IDS2017 ──────────────────────────────────────────────────────────────
-
-CIC_RAW_PATH = "data/raw/cic_ids2017"
-CIC_OUTPUT_PATH = "data/processed/cic_ids2017_raw_merged.parquet"
-
-# ── UNSW-NB15 ─────────────────────────────────────────────────────────────────
 
 UNSW_RAW_PATH = "data/raw/unsw_nb15"
 UNSW_OUTPUT_PATH = "data/processed/unsw_nb15_raw_merged.parquet"
@@ -51,18 +40,6 @@ def load_parquet_files(path: str) -> pd.DataFrame:
     return pd.concat(dataframes, ignore_index=True)
 
 
-def collect_cic_ids2017() -> None:
-    """Consolida os arquivos brutos do CIC-IDS2017."""
-    logger.info("Iniciando coleta dos arquivos CIC-IDS2017...")
-    df_merged = load_parquet_files(CIC_RAW_PATH)
-
-    logger.info("Total de registros: %d | Colunas: %d", len(df_merged), df_merged.shape[1])
-
-    os.makedirs("data/processed", exist_ok=True)
-    df_merged.to_parquet(CIC_OUTPUT_PATH, index=False)
-    logger.info("Dataset consolidado salvo em: %s", CIC_OUTPUT_PATH)
-
-
 def collect_unsw_nb15() -> None:
     """Consolida os arquivos brutos do UNSW-NB15."""
     logger.info("Iniciando coleta dos arquivos UNSW-NB15...")
@@ -76,14 +53,5 @@ def collect_unsw_nb15() -> None:
 
 
 if __name__ == "__main__":
-    import argparse
-
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s — %(message)s")
-    parser = argparse.ArgumentParser(description="Coleta e consolida datasets brutos.")
-    parser.add_argument("--dataset", choices=["cic", "unsw", "all"], default="all")
-    args = parser.parse_args()
-
-    if args.dataset in ("cic", "all"):
-        collect_cic_ids2017()
-    if args.dataset in ("unsw", "all"):
-        collect_unsw_nb15()
+    collect_unsw_nb15()

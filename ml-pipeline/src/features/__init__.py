@@ -1,15 +1,6 @@
-"""Feature engineering utilities for the ML pipeline."""
+"""Componentes do pipeline temporal de atributos."""
 
-from src.features.feature_engineer import (
-    SlidingWindowResult,
-    create_sliding_windows,
-    create_train_test_windows,
-)
 from src.features.feature_selector import RandomForestFeatureSelector
+from src.features.fold_preprocessor import FoldPreprocessor
 
-__all__ = [
-    "RandomForestFeatureSelector",
-    "SlidingWindowResult",
-    "create_sliding_windows",
-    "create_train_test_windows",
-]
+__all__ = ["FoldPreprocessor", "RandomForestFeatureSelector"]

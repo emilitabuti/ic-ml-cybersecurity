@@ -1,0 +1,276 @@
+{
+  "acceptance": {
+    "all_attack_types_in_every_partition": true,
+    "both_classes_in_every_partition": true,
+    "chronological_order": true,
+    "record_ids_disjoint": true,
+    "record_ids_unique": true,
+    "source_unchanged": true,
+    "windows_cross_sessions": false
+  },
+  "created_at": "2026-08-01T20:24:20.998598+00:00",
+  "input": {
+    "columns": 51,
+    "path": "data/processed/unsw_nb15_cleaned_temporal.parquet",
+    "rows": 1584259,
+    "sha256_after": "6aaf8e06904b3e206782e08ef315ffa4d380655702da9c6bc63854a8f6c510fa",
+    "sha256_before": "6aaf8e06904b3e206782e08ef315ffa4d380655702da9c6bc63854a8f6c510fa",
+    "size_bytes": 135942715
+  },
+  "partitions": {
+    "test": {
+      "all_columns_and_row_groups_readable": true,
+      "attack_types": [
+        "Analysis",
+        "Backdoor",
+        "DoS",
+        "Exploits",
+        "Fuzzer",
+        "Generic",
+        "Reconnaissance",
+        "Shellcode",
+        "Worms"
+      ],
+      "attacks": 25257,
+      "benign": 281453,
+      "columns": 54,
+      "end_ltime": 1424262069,
+      "path": "data/processed/unsw_nb15_temporal/test.parquet",
+      "record_ids_sha256": "637b11e68a73003070b9b4fc8b7d8a747ca6d93e3360649f9c687e861067253e",
+      "rows": 306710,
+      "sha256": "9dcffe1027337232910f5b982387cf60686e47a14fb1005162d92abd2846277b",
+      "size_bytes": 28588473,
+      "start_stime": 1424249994,
+      "temporal_sessions": [
+        2
+      ]
+    },
+    "train": {
+      "all_columns_and_row_groups_readable": true,
+      "attack_types": [
+        "Analysis",
+        "Backdoor",
+        "DoS",
+        "Exploits",
+        "Fuzzer",
+        "Generic",
+        "Reconnaissance",
+        "Shellcode",
+        "Worms"
+      ],
+      "attacks": 14278,
+      "benign": 1008909,
+      "columns": 54,
+      "end_ltime": 1421972724,
+      "path": "data/processed/unsw_nb15_temporal/train.parquet",
+      "record_ids_sha256": "81b0f3937ee252355b98471aafbdc5f857938d766dfac7d5149c26342a4e2fc1",
+      "rows": 1023187,
+      "sha256": "3ded3fc61dc783bfbf6b16469ed6c4a8fe83ef0f6c809b9d40be7fd5734fdd83",
+      "size_bytes": 90270645,
+      "start_stime": 1421927377,
+      "temporal_sessions": [
+        0
+      ]
+    },
+    "validation": {
+      "all_columns_and_row_groups_readable": true,
+      "attack_types": [
+        "Analysis",
+        "Backdoor",
+        "DoS",
+        "Exploits",
+        "Fuzzer",
+        "Generic",
+        "Reconnaissance",
+        "Shellcode",
+        "Worms"
+      ],
+      "attacks": 20819,
+      "benign": 233507,
+      "columns": 54,
+      "end_ltime": 1424231128,
+      "path": "data/processed/unsw_nb15_temporal/validation.parquet",
+      "record_ids_sha256": "3e77573faf4dba62a16c4e1294208928e1fd9eb1fa6c82d28b335307d878f41f",
+      "rows": 254326,
+      "sha256": "00fcc34091ec5941373572310b222509a66592249da50ed2477d95f89ff9ed47",
+      "size_bytes": 24218080,
+      "start_stime": 1424219010,
+      "temporal_sessions": [
+        1
+      ]
+    }
+  },
+  "protocol": "natural_session_chronological_holdout",
+  "purge": {
+    "events": [
+      {
+        "left_session": 0,
+        "left_split": "train",
+        "natural_gap_seconds": 2246284,
+        "purged_left_record_ids_sha256": "d23916cf096271ef25a4d0d108797e1545f160e464497dc710f7060b25fe139e",
+        "purged_left_rows": 9,
+        "purged_right_record_ids_sha256": "89560ed5e5d91cfda22e1301b44dab9a5cdbf91f4725af46f4603471eb7d9faf",
+        "purged_right_rows": 9,
+        "right_session": 1,
+        "right_split": "validation"
+      },
+      {
+        "left_session": 1,
+        "left_split": "validation",
+        "natural_gap_seconds": 18855,
+        "purged_left_record_ids_sha256": "f76a27ec5ff1c0a7f20833dd2e431d257e358825c02e52990309a1716aa813ea",
+        "purged_left_rows": 9,
+        "purged_right_record_ids_sha256": "3a0c5d990d5f230efb70b9f7022ac9b2e6b4c40e34f83344dea932ba5174cab5",
+        "purged_right_rows": 9,
+        "right_session": 2,
+        "right_split": "test"
+      }
+    ],
+    "purge_per_boundary_side_rows": 9,
+    "purged_record_ids_sha256": "6c90b927081891a0ef05988172f56bd84d27ceadc5c79b5764111f82ecbb819e",
+    "purged_rows_total": 36,
+    "window_size": 10
+  },
+  "record_id": {
+    "assignment": "Posição zero-based no Parquet limpo antes da ordenação.",
+    "dtype": "int64",
+    "maximum": 1584258,
+    "minimum": 0,
+    "unique": true
+  },
+  "schema_version": "1.0",
+  "sessions": {
+    "count": 3,
+    "cut_stimes": [
+      1424219008,
+      1424249984
+    ],
+    "gap_threshold_seconds": 3600,
+    "items": [
+      {
+        "assigned_split": "train",
+        "attack_types_before_purge": [
+          "Analysis",
+          "Backdoor",
+          "DoS",
+          "Exploits",
+          "Fuzzer",
+          "Generic",
+          "Reconnaissance",
+          "Shellcode",
+          "Worms"
+        ],
+        "attacks_before_purge": 14278,
+        "benign_before_purge": 1008918,
+        "end_ltime": 1421972724,
+        "rows_before_purge": 1023196,
+        "start_stime": 1421927377,
+        "temporal_session": 0
+      },
+      {
+        "assigned_split": "validation",
+        "attack_types_before_purge": [
+          "Analysis",
+          "Backdoor",
+          "DoS",
+          "Exploits",
+          "Fuzzer",
+          "Generic",
+          "Reconnaissance",
+          "Shellcode",
+          "Worms"
+        ],
+        "attacks_before_purge": 20820,
+        "benign_before_purge": 233524,
+        "end_ltime": 1424231129,
+        "rows_before_purge": 254344,
+        "start_stime": 1424219008,
+        "temporal_session": 1
+      },
+      {
+        "assigned_split": "test",
+        "attack_types_before_purge": [
+          "Analysis",
+          "Backdoor",
+          "DoS",
+          "Exploits",
+          "Fuzzer",
+          "Generic",
+          "Reconnaissance",
+          "Shellcode",
+          "Worms"
+        ],
+        "attacks_before_purge": 25257,
+        "benign_before_purge": 281462,
+        "end_ltime": 1424262069,
+        "rows_before_purge": 306719,
+        "start_stime": 1424249984,
+        "temporal_session": 2
+      }
+    ]
+  },
+  "shuffle": false,
+  "sorting": {
+    "keys": [
+      "Stime",
+      "Ltime",
+      "source_file",
+      "record_id"
+    ],
+    "kind": "stable",
+    "stime_regressions_after": 0,
+    "stime_regressions_before": 250850
+  },
+  "test_policy": {
+    "allowed_use": "Uma única avaliação após congelar pré-processamento, seleção e hiperparâmetros na validação.",
+    "status": "closed_after_materialization"
+  },
+  "window_integrity": {
+    "all_partition_record_ids_disjoint": true,
+    "partitions": {
+      "test": {
+        "record_ids_sha256": "637b11e68a73003070b9b4fc8b7d8a747ca6d93e3360649f9c687e861067253e",
+        "rows": 306710,
+        "sessions": [
+          {
+            "rows": 306710,
+            "temporal_session": 2,
+            "windows": 306701
+          }
+        ],
+        "windows_created_separately_by_session": 306701
+      },
+      "train": {
+        "record_ids_sha256": "81b0f3937ee252355b98471aafbdc5f857938d766dfac7d5149c26342a4e2fc1",
+        "rows": 1023187,
+        "sessions": [
+          {
+            "rows": 1023187,
+            "temporal_session": 0,
+            "windows": 1023178
+          }
+        ],
+        "windows_created_separately_by_session": 1023178
+      },
+      "validation": {
+        "record_ids_sha256": "3e77573faf4dba62a16c4e1294208928e1fd9eb1fa6c82d28b335307d878f41f",
+        "rows": 254326,
+        "sessions": [
+          {
+            "rows": 254326,
+            "temporal_session": 1,
+            "windows": 254317
+          }
+        ],
+        "windows_created_separately_by_session": 254317
+      }
+    },
+    "record_id_overlaps": {
+      "train_test": 0,
+      "train_validation": 0,
+      "validation_test": 0
+    },
+    "window_rule": "Criar janelas separadamente dentro de cada temporal_session.",
+    "windows_can_cross_session": false
+  }
+}

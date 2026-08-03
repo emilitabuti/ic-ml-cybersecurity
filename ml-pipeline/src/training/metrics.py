@@ -5,6 +5,7 @@ from typing import Iterable
 
 import numpy as np
 from sklearn.metrics import (
+    average_precision_score,
     confusion_matrix,
     f1_score,
     precision_score,
@@ -12,7 +13,7 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 
-METRIC_NAMES = ("f1", "auc_roc", "precision", "recall", "fpr")
+METRIC_NAMES = ("f1", "pr_auc", "auc_roc", "precision", "recall", "fpr")
 
 
 def calculate_binary_metrics(
@@ -32,9 +33,14 @@ def calculate_binary_metrics(
         auc_roc = float(roc_auc_score(true, score))
     except ValueError:
         auc_roc = float("nan")
+    try:
+        pr_auc = float(average_precision_score(true, score))
+    except ValueError:
+        pr_auc = float("nan")
 
     return {
         "f1": float(f1_score(true, pred, zero_division=0)),
+        "pr_auc": pr_auc,
         "auc_roc": auc_roc,
         "precision": float(precision_score(true, pred, zero_division=0)),
         "recall": float(recall_score(true, pred, zero_division=0)),

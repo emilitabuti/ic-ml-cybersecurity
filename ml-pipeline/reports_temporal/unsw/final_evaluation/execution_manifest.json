@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "captured_at": "2026-08-01T22:47:48-03:00",
+  "status": "completed_with_disclosed_environment_deviation",
+  "protocol_path": "reports_temporal/unsw/protocol.json",
+  "protocol_sha256": "ff08c3fc499f5679ea3d399021da9c476909eaecb73312fe85cb990fab37cc6f",
+  "final_summary_path": "reports_temporal/unsw/final_test_metrics.json",
+  "final_summary_sha256": "8c3dc8d36aa617e074b0640208fdb4db139717e83adba093dd62bb015f566603",
+  "execution_code": {
+    "path": "src/training/temporal_final_evaluation.py",
+    "sha256": "64a6392e51ac2cd300ec96140b178a5494bc1357afac762b476e0a71255d5612",
+    "included_in_frozen_protocol_source_hashes": false
+  },
+  "protocol_dependency_versions": {
+    "numpy": "2.4.2",
+    "pandas": "2.3.3",
+    "pyarrow": "23.0.1",
+    "scikit_learn": "1.8.0",
+    "joblib": "1.5.3",
+    "tensorflow": "2.21.0"
+  },
+  "actual_execution_dependency_versions": {
+    "numpy": "2.5.1",
+    "pandas": "3.0.5",
+    "pyarrow": "25.0.0",
+    "scikit_learn": "1.9.0",
+    "joblib": "1.5.3",
+    "tensorflow": "2.21.0"
+  },
+  "deviations": [
+    {
+      "type": "dependency_version_mismatch",
+      "affected": ["numpy", "pandas", "pyarrow", "scikit_learn"],
+      "reason": "A execução conjunta precisava do ambiente local .venv-tf para o LSTM real; suas versões diferiam do ambiente padrão consultado no congelamento.",
+      "discovered": "post_execution_integrity_audit",
+      "model_or_selection_decisions_changed": false,
+      "test_based_tuning_performed": false
+    },
+    {
+      "type": "final_runner_not_prehashed",
+      "affected": ["src/training/temporal_final_evaluation.py"],
+      "reason": "O executor do passo 11 foi implementado depois do congelamento do passo 10.",
+      "final_code_hash_recorded_here": true,
+      "model_or_selection_decisions_changed": false,
+      "test_based_tuning_performed": false
+    }
+  ],
+  "artifacts": {
+    "preparation_audit": {
+      "path": "reports_temporal/unsw/final_evaluation/preparation_audit.json",
+      "sha256": "08b82ab5b264d3d3033b72a70b46d522100c610ed992a55b499ad9a398e688a0"
+    },
+    "run_state": {
+      "path": "reports_temporal/unsw/final_evaluation/run_state.json",
+      "sha256": "c122faa47902b508a7bf20e1da4fe488f03d84a27269c093cfe2438bf241e894"
+    },
+    "models": {
+      "decision_tree": "416a4cd0b51c4a7e75b61a9477a5fa50d01b7353107faa98779692ec47322ba6",
+      "random_forest": "1fc5aac0e950698c7baf1b6b9b735c57a8d06444372a59b92077ce99d3561050",
+      "lstm": "0b6761001e858e928bcda7e44c6233c85d55f30ab70ae11673cf757f911aac08"
+    },
+    "predictions": {
+      "decision_tree": "33394b18f8caa6ccfcc330a181faa7f794f9b59aa1a843e964e673887bd52ce8",
+      "random_forest": "2e6d2a379f7c9435e7fa33dc47de0e1c4b6ff5bcbd18824984a12b45b199ec3c",
+      "lstm": "0b8d7adc0a0ab6564509a94f343f31d92c67f5b8d958f8f80d2485a193603e7b"
+    }
+  },
+  "test_policy": {
+    "raw_test_reads": 1,
+    "test_evaluation_runs": 1,
+    "selection_or_tuning_on_test": false,
+    "rerun_authorized": false
+  },
+  "scientific_interpretation": "Resultados temporais finais preservados com desvio de ambiente explicitamente declarado; nenhuma repetição do teste é permitida para corrigir o desvio."
+}

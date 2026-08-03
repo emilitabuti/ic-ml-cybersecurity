@@ -1,11 +1,4 @@
-"""
-Testes de reprodutibilidade científica — Story 1.2.
-
-Valida que:
-- config.py define RANDOM_SEED=42 e as variáveis configuráveis esperadas
-- set_global_seed() aplica o seed em random, numpy e (opcionalmente) tensorflow
-- Dois experimentos com o mesmo seed produzem resultados idênticos
-"""
+"""Testes dos controles de reprodutibilidade do pipeline temporal."""
 
 import random
 
@@ -38,13 +31,11 @@ class TestConfigReproducibility:
         assert isinstance(config.CONFIDENCE_THRESHOLD, float)
         assert 0.0 <= config.CONFIDENCE_THRESHOLD <= 1.0
 
-    def test_config_model_path_exists_and_is_str(self) -> None:
-        """MODEL_PATH deve existir e ser string não-vazia."""
+    def test_config_model_artifact_path_exists_and_is_str(self) -> None:
+        """MODEL_ARTIFACT_PATH deve existir e apontar para o artefato canônico."""
         import config
 
-        assert hasattr(config, "MODEL_PATH")
-        assert isinstance(config.MODEL_PATH, str)
-        assert len(config.MODEL_PATH) > 0
+        assert config.MODEL_ARTIFACT_PATH == "models/model_rf_temporal_v2.pkl"
 
 
 class TestSetGlobalSeed:
@@ -152,16 +143,10 @@ class TestSklearnReproducibility:
 
         assert list(shuffled1) == list(shuffled2)
 
-    def test_sklearn_train_test_split_reproducibility(self) -> None:
-        """train_test_split deve produzir split idêntico com o mesmo seed."""
-        from sklearn.model_selection import train_test_split
+    def test_canonical_model_hyperparameters_are_fixed(self) -> None:
+        """Os hiperparâmetros vencedores devem permanecer explícitos."""
+        import config
 
-        from config import RANDOM_SEED
-
-        X = list(range(500))
-
-        X_train1, X_test1 = train_test_split(X, test_size=0.2, random_state=RANDOM_SEED)
-        X_train2, X_test2 = train_test_split(X, test_size=0.2, random_state=RANDOM_SEED)
-
-        assert X_train1 == X_train2
-        assert X_test1 == X_test2
+        assert config.RF_N_ESTIMATORS == 100
+        assert config.RF_MAX_DEPTH == "20"
+        assert config.FEATURE_SELECTION_TOP_N == 30

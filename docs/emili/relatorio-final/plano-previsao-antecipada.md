@@ -556,7 +556,6 @@ Se algum critério falhar, o resultado deverá ser descrito como exploratório.
 ## 13. Informações que exigem decisão humana
 
 - **TODO:** validar esta interpretação com o orientador.
-- **TODO:** decidir se o CICIDS2017 original será recuperado.
 - **TODO:** definir o cenário principal da nova coleta.
 - **TODO:** definir a unidade operacional de campanha.
 - **TODO:** definir a quantidade mínima de execuções.

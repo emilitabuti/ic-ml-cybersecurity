@@ -1,0 +1,546 @@
+{
+  "acceptance": {
+    "both_classes_in_every_train_and_validation": true,
+    "inputs_unchanged": true,
+    "minimum_purge_is_window_size_minus_one": true,
+    "no_train_validation_record_overlap": true,
+    "shuffle_disabled": true,
+    "test_remained_closed": true,
+    "three_or_more_folds": true,
+    "train_grows_monotonically": true,
+    "windows_respect_development_blocks": true
+  },
+  "created_at": "2026-08-02T00:18:55.104732+00:00",
+  "definition": {
+    "active_attack_stop_train_position_exclusive": 173433,
+    "blocks": [
+      {
+        "attack_types_after_purge": [
+          "Backdoor",
+          "DoS",
+          "Exploits",
+          "Fuzzer",
+          "Generic",
+          "Reconnaissance",
+          "Shellcode",
+          "Worms"
+        ],
+        "attacks_after_purge": 3007,
+        "benign_after_purge": 40363,
+        "both_classes_after_purge": true,
+        "development_block": 0,
+        "end_ltime_after_purge": 1421929177,
+        "origin_splits": [
+          "train"
+        ],
+        "rows_after_purge": 43370,
+        "rows_before_purge": 43379,
+        "start_stime_after_purge": 1421927377,
+        "temporal_sessions": [
+          0
+        ]
+      },
+      {
+        "attack_types_after_purge": [
+          "Analysis",
+          "Backdoor",
+          "DoS",
+          "Exploits",
+          "Fuzzer",
+          "Generic",
+          "Reconnaissance",
+          "Shellcode",
+          "Worms"
+        ],
+        "attacks_after_purge": 3755,
+        "benign_after_purge": 38965,
+        "both_classes_after_purge": true,
+        "development_block": 1,
+        "end_ltime_after_purge": 1421930944,
+        "origin_splits": [
+          "train"
+        ],
+        "rows_after_purge": 42720,
+        "rows_before_purge": 43348,
+        "start_stime_after_purge": 1421929178,
+        "temporal_sessions": [
+          0
+        ]
+      },
+      {
+        "attack_types_after_purge": [
+          "Analysis",
+          "Backdoor",
+          "DoS",
+          "Exploits",
+          "Fuzzer",
+          "Generic",
+          "Reconnaissance",
+          "Shellcode",
+          "Worms"
+        ],
+        "attacks_after_purge": 4194,
+        "benign_after_purge": 37932,
+        "both_classes_after_purge": true,
+        "development_block": 2,
+        "end_ltime_after_purge": 1421932663,
+        "origin_splits": [
+          "train"
+        ],
+        "rows_after_purge": 42126,
+        "rows_before_purge": 43371,
+        "start_stime_after_purge": 1421930945,
+        "temporal_sessions": [
+          0
+        ]
+      },
+      {
+        "attack_types_after_purge": [
+          "Analysis",
+          "Backdoor",
+          "DoS",
+          "Exploits",
+          "Fuzzer",
+          "Generic",
+          "Reconnaissance",
+          "Shellcode",
+          "Worms"
+        ],
+        "attacks_after_purge": 23956,
+        "benign_after_purge": 1122834,
+        "both_classes_after_purge": true,
+        "development_block": 3,
+        "end_ltime_after_purge": 1424231128,
+        "origin_splits": [
+          "train",
+          "validation"
+        ],
+        "rows_after_purge": 1146790,
+        "rows_before_purge": 1147415,
+        "start_stime_after_purge": 1421932664,
+        "temporal_sessions": [
+          0,
+          1
+        ]
+      }
+    ],
+    "boundary_positions_in_development_before_purge": [
+      43379,
+      86727,
+      130098
+    ],
+    "boundary_stimes": [
+      1421929150,
+      1421930895,
+      1421932637
+    ],
+    "last_attack_stime_in_original_train": 1421934448,
+    "n_blocks": 4,
+    "n_folds": 3,
+    "purge_events": [
+      {
+        "additional_right_rows_for_temporal_embargo": 610,
+        "boundary": 1,
+        "left_block": 0,
+        "left_last_stime_before_purge": 1421929149,
+        "left_max_ltime_after_left_purge": 1421929177,
+        "minimum_purge_each_side_rows": 9,
+        "purged_left_record_ids_sha256": "28ee2edf784deb42cc431d75748ba5e0a217c19c15e7f1856cdb79e93d545669",
+        "purged_left_rows": 9,
+        "purged_right_record_ids_sha256": "44e696ca557b8dabdf10dfaf7774c391aafadce45b7d6733538f86564c16666f",
+        "purged_right_rows": 619,
+        "right_block": 1,
+        "right_first_stime_after_embargo": 1421929178,
+        "right_first_stime_before_purge": 1421929150
+      },
+      {
+        "additional_right_rows_for_temporal_embargo": 1227,
+        "boundary": 2,
+        "left_block": 1,
+        "left_last_stime_before_purge": 1421930894,
+        "left_max_ltime_after_left_purge": 1421930944,
+        "minimum_purge_each_side_rows": 9,
+        "purged_left_record_ids_sha256": "02ab68b7ce890b205836a46e13a7d5115224d92e58912b2fc73e0177a2a3b55a",
+        "purged_left_rows": 9,
+        "purged_right_record_ids_sha256": "905abb0684758a5dcb7e247c48add088eb661551b10776e5b32bf844b45d55cc",
+        "purged_right_rows": 1236,
+        "right_block": 2,
+        "right_first_stime_after_embargo": 1421930945,
+        "right_first_stime_before_purge": 1421930895
+      },
+      {
+        "additional_right_rows_for_temporal_embargo": 616,
+        "boundary": 3,
+        "left_block": 2,
+        "left_last_stime_before_purge": 1421932636,
+        "left_max_ltime_after_left_purge": 1421932663,
+        "minimum_purge_each_side_rows": 9,
+        "purged_left_record_ids_sha256": "4bc2b92c73dbeaf83c5e15fa80624779a02f6724f2af215ff6096640d8b7f57b",
+        "purged_left_rows": 9,
+        "purged_right_record_ids_sha256": "e51593d844a8b4bac8ee2c7bb5a0836512194394eaa74b9a14fa4eb5737b439a",
+        "purged_right_rows": 625,
+        "right_block": 3,
+        "right_first_stime_after_embargo": 1421932664,
+        "right_first_stime_before_purge": 1421932637
+      }
+    ],
+    "purge_per_boundary_side_rows": 9,
+    "purged_record_ids_sha256": "8d6def0765ae2d0fd67a77e90aa6fabbc7cc336e9cca9768918f6f6b1122311a",
+    "purged_rows_total": 2507,
+    "strategy": "attack_active_prefix_boundaries_then_all_future"
+  },
+  "folds": [
+    {
+      "fold": 1,
+      "roles": {
+        "train": {
+          "attack_types": [
+            "Backdoor",
+            "DoS",
+            "Exploits",
+            "Fuzzer",
+            "Generic",
+            "Reconnaissance",
+            "Shellcode",
+            "Worms"
+          ],
+          "attacks": 3007,
+          "benign": 40363,
+          "development_blocks": [
+            0
+          ],
+          "record_ids_sha256": "4130507f1448dfd56745fa1c44ff2688f2f82ac4abbdfd41696c0516f2c21595",
+          "rows": 43370,
+          "rows_path": "data/processed/unsw_nb15_temporal_folds/fold_1/train_rows.parquet",
+          "rows_sha256": "029e1fcc1324447a2062569071fbb01558812c96feb436a90579541175d63fb2",
+          "window_blocks": [
+            {
+              "rows": 43370,
+              "source_file": "train-00000-of-00002.parquet",
+              "temporal_block": 0,
+              "temporal_session": 0,
+              "windows": 43361
+            }
+          ],
+          "window_index_path": "data/processed/unsw_nb15_temporal_folds/fold_1/train_window_index.parquet",
+          "window_index_sha256": "392643a35fae3e989b87986f8f5f199d8f239b0fb00736d45b89fd946fa90b10",
+          "windows": 43361
+        },
+        "validation": {
+          "attack_types": [
+            "Analysis",
+            "Backdoor",
+            "DoS",
+            "Exploits",
+            "Fuzzer",
+            "Generic",
+            "Reconnaissance",
+            "Shellcode",
+            "Worms"
+          ],
+          "attacks": 3755,
+          "benign": 38965,
+          "development_blocks": [
+            1
+          ],
+          "record_ids_sha256": "6ff4b64e66aab8bb7cb996ae7ed0ccd994bf3359a38cf3394e9b2793dfe69195",
+          "rows": 42720,
+          "rows_path": "data/processed/unsw_nb15_temporal_folds/fold_1/validation_rows.parquet",
+          "rows_sha256": "1e5e1119e0cb63128b240761885ca56f32552539291757e135d721a3f7caf302",
+          "window_blocks": [
+            {
+              "rows": 42720,
+              "source_file": "train-00000-of-00002.parquet",
+              "temporal_block": 0,
+              "temporal_session": 0,
+              "windows": 42711
+            }
+          ],
+          "window_index_path": "data/processed/unsw_nb15_temporal_folds/fold_1/validation_window_index.parquet",
+          "window_index_sha256": "ebf42a9dc7c0a5fd811d34235d2faa0d43ff5af5a339665d3b116b12e5acd636",
+          "windows": 42711
+        }
+      },
+      "train_blocks": [
+        0
+      ],
+      "train_validation_shared_record_ids": 0,
+      "validation_block": 1
+    },
+    {
+      "fold": 2,
+      "roles": {
+        "train": {
+          "attack_types": [
+            "Analysis",
+            "Backdoor",
+            "DoS",
+            "Exploits",
+            "Fuzzer",
+            "Generic",
+            "Reconnaissance",
+            "Shellcode",
+            "Worms"
+          ],
+          "attacks": 6762,
+          "benign": 79328,
+          "development_blocks": [
+            0,
+            1
+          ],
+          "record_ids_sha256": "3e61f314b8b11b3237024736b7926f2a37bdc3509863ac75ad318030f12fc3c1",
+          "rows": 86090,
+          "rows_path": "data/processed/unsw_nb15_temporal_folds/fold_2/train_rows.parquet",
+          "rows_sha256": "39e6a96b6f50df07c05bd1814ec84a667adb9428a20b37d5e416df3db18a8d8e",
+          "window_blocks": [
+            {
+              "rows": 43370,
+              "source_file": "train-00000-of-00002.parquet",
+              "temporal_block": 0,
+              "temporal_session": 0,
+              "windows": 43361
+            },
+            {
+              "rows": 42720,
+              "source_file": "train-00000-of-00002.parquet",
+              "temporal_block": 1,
+              "temporal_session": 0,
+              "windows": 42711
+            }
+          ],
+          "window_index_path": "data/processed/unsw_nb15_temporal_folds/fold_2/train_window_index.parquet",
+          "window_index_sha256": "824ea590ad6dcc75d0f40e9eb5b95214b10dd7849c46af666e1296e3c6a0329f",
+          "windows": 86072
+        },
+        "validation": {
+          "attack_types": [
+            "Analysis",
+            "Backdoor",
+            "DoS",
+            "Exploits",
+            "Fuzzer",
+            "Generic",
+            "Reconnaissance",
+            "Shellcode",
+            "Worms"
+          ],
+          "attacks": 4194,
+          "benign": 37932,
+          "development_blocks": [
+            2
+          ],
+          "record_ids_sha256": "c8c0d70c0830b39e588ed299973ed4d8cf9bbdc8ed5fd6a4d0b5cfc11be12422",
+          "rows": 42126,
+          "rows_path": "data/processed/unsw_nb15_temporal_folds/fold_2/validation_rows.parquet",
+          "rows_sha256": "c6575d6b1bc2ec740ac512a456c71c4d93feab6e70e3f61c097cdb247cfb28b1",
+          "window_blocks": [
+            {
+              "rows": 42126,
+              "source_file": "train-00000-of-00002.parquet",
+              "temporal_block": 0,
+              "temporal_session": 0,
+              "windows": 42117
+            }
+          ],
+          "window_index_path": "data/processed/unsw_nb15_temporal_folds/fold_2/validation_window_index.parquet",
+          "window_index_sha256": "38f6b866237461ffeb08f507962f8a6e8fbd08fa4c13112e218f4890aac4a9b5",
+          "windows": 42117
+        }
+      },
+      "train_blocks": [
+        0,
+        1
+      ],
+      "train_validation_shared_record_ids": 0,
+      "validation_block": 2
+    },
+    {
+      "fold": 3,
+      "roles": {
+        "train": {
+          "attack_types": [
+            "Analysis",
+            "Backdoor",
+            "DoS",
+            "Exploits",
+            "Fuzzer",
+            "Generic",
+            "Reconnaissance",
+            "Shellcode",
+            "Worms"
+          ],
+          "attacks": 10956,
+          "benign": 117260,
+          "development_blocks": [
+            0,
+            1,
+            2
+          ],
+          "record_ids_sha256": "5b30c778d4e8f34f72316c99d1be5ce49c0ca01e2a626f429114e1b056a1945f",
+          "rows": 128216,
+          "rows_path": "data/processed/unsw_nb15_temporal_folds/fold_3/train_rows.parquet",
+          "rows_sha256": "cf7743d61aa6b1ca7cef4a1ddebb9cb6b3aabf81cd80f92451b2e3392d1d3a84",
+          "window_blocks": [
+            {
+              "rows": 43370,
+              "source_file": "train-00000-of-00002.parquet",
+              "temporal_block": 0,
+              "temporal_session": 0,
+              "windows": 43361
+            },
+            {
+              "rows": 42720,
+              "source_file": "train-00000-of-00002.parquet",
+              "temporal_block": 1,
+              "temporal_session": 0,
+              "windows": 42711
+            },
+            {
+              "rows": 42126,
+              "source_file": "train-00000-of-00002.parquet",
+              "temporal_block": 2,
+              "temporal_session": 0,
+              "windows": 42117
+            }
+          ],
+          "window_index_path": "data/processed/unsw_nb15_temporal_folds/fold_3/train_window_index.parquet",
+          "window_index_sha256": "caf859d6c593c349c114cf857145f57329079e47282e555e8b2b9da2e46f9b67",
+          "windows": 128189
+        },
+        "validation": {
+          "attack_types": [
+            "Analysis",
+            "Backdoor",
+            "DoS",
+            "Exploits",
+            "Fuzzer",
+            "Generic",
+            "Reconnaissance",
+            "Shellcode",
+            "Worms"
+          ],
+          "attacks": 23956,
+          "benign": 1122834,
+          "development_blocks": [
+            3
+          ],
+          "record_ids_sha256": "912c2789379031d4c1ec7b45b2f85bf1fbca3b4f8af560d3a95dcd1a744adf40",
+          "rows": 1146790,
+          "rows_path": "data/processed/unsw_nb15_temporal_folds/fold_3/validation_rows.parquet",
+          "rows_sha256": "1b7079c815dd7472d8ba91d4498ec0135ebb8ac5b3ba1e88cbac740c24632b1c",
+          "window_blocks": [
+            {
+              "rows": 892464,
+              "source_file": "train-00000-of-00002.parquet",
+              "temporal_block": 0,
+              "temporal_session": 0,
+              "windows": 892455
+            },
+            {
+              "rows": 51264,
+              "source_file": "train-00000-of-00002.parquet",
+              "temporal_block": 1,
+              "temporal_session": 1,
+              "windows": 51255
+            },
+            {
+              "rows": 1,
+              "source_file": "train-00001-of-00002.parquet",
+              "temporal_block": 2,
+              "temporal_session": 1,
+              "windows": 0
+            },
+            {
+              "rows": 508,
+              "source_file": "train-00000-of-00002.parquet",
+              "temporal_block": 3,
+              "temporal_session": 1,
+              "windows": 499
+            },
+            {
+              "rows": 1,
+              "source_file": "train-00001-of-00002.parquet",
+              "temporal_block": 4,
+              "temporal_session": 1,
+              "windows": 0
+            },
+            {
+              "rows": 42,
+              "source_file": "train-00000-of-00002.parquet",
+              "temporal_block": 5,
+              "temporal_session": 1,
+              "windows": 33
+            },
+            {
+              "rows": 1,
+              "source_file": "train-00001-of-00002.parquet",
+              "temporal_block": 6,
+              "temporal_session": 1,
+              "windows": 0
+            },
+            {
+              "rows": 22,
+              "source_file": "train-00000-of-00002.parquet",
+              "temporal_block": 7,
+              "temporal_session": 1,
+              "windows": 13
+            },
+            {
+              "rows": 1,
+              "source_file": "train-00001-of-00002.parquet",
+              "temporal_block": 8,
+              "temporal_session": 1,
+              "windows": 0
+            },
+            {
+              "rows": 9,
+              "source_file": "train-00000-of-00002.parquet",
+              "temporal_block": 9,
+              "temporal_session": 1,
+              "windows": 0
+            },
+            {
+              "rows": 202477,
+              "source_file": "train-00001-of-00002.parquet",
+              "temporal_block": 10,
+              "temporal_session": 1,
+              "windows": 202468
+            }
+          ],
+          "window_index_path": "data/processed/unsw_nb15_temporal_folds/fold_3/validation_window_index.parquet",
+          "window_index_sha256": "405bafa8e2123a7924c1cd7d480721650314cf224fb0414b7ecd358821ff8fcb",
+          "windows": 1146723
+        }
+      },
+      "train_blocks": [
+        0,
+        1,
+        2
+      ],
+      "train_validation_shared_record_ids": 0,
+      "validation_block": 3
+    }
+  ],
+  "inputs": {
+    "train": {
+      "path": "data/processed/unsw_nb15_temporal/train.parquet",
+      "sha256_after": "3ded3fc61dc783bfbf6b16469ed6c4a8fe83ef0f6c809b9d40be7fd5734fdd83",
+      "sha256_before": "3ded3fc61dc783bfbf6b16469ed6c4a8fe83ef0f6c809b9d40be7fd5734fdd83"
+    },
+    "validation": {
+      "path": "data/processed/unsw_nb15_temporal/validation.parquet",
+      "sha256_after": "00fcc34091ec5941373572310b222509a66592249da50ed2477d95f89ff9ed47",
+      "sha256_before": "00fcc34091ec5941373572310b222509a66592249da50ed2477d95f89ff9ed47"
+    }
+  },
+  "protocol": "expanding_temporal_folds_with_record_purge",
+  "schema_version": "1.0",
+  "shuffle": false,
+  "test_policy": {
+    "status": "closed",
+    "test_input_was_not_loaded": true,
+    "test_output": "data/processed/unsw_nb15_temporal_folds/test.parquet",
+    "test_output_exists": false
+  },
+  "window_size": 10
+}

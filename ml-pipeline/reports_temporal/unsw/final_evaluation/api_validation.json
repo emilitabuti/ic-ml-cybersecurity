@@ -1,0 +1,33 @@
+{
+  "status": "passed_exact_training_environment",
+  "validated_with_test_data": false,
+  "validation_input": "Primeiros 10 registros da partição de treino",
+  "artifact_path": "models/model_rf_temporal_v2.pkl",
+  "artifact_sha256": "ef622fa6dc6f995ca83dafe555e4fafdaf425a0bff1ea751851a2ff71ae7c713",
+  "environment": {
+    "python": "3.12",
+    "scikit_learn": "1.9.0",
+    "pandas": "3.0.5",
+    "numpy": "2.5.1",
+    "fastapi": "0.135.1"
+  },
+  "checks": {
+    "health_status": 200,
+    "model_info_status": 200,
+    "model_type": "random_forest",
+    "artifact_version": "2.0",
+    "input_schema": "raw",
+    "raw_feature_count": 43,
+    "selected_feature_count": 30,
+    "window_size": 10,
+    "predict_status": 200,
+    "prediction": "BENIGN",
+    "confidence": 0.9999224672910774,
+    "prediction_matches_direct_artifact_inference": true,
+    "missing_feature_status": 422,
+    "missing_feature_code": "INVALID_FEATURES",
+    "model_load_seconds": 0.1550780389989086,
+    "inconsistent_version_warnings": 0
+  },
+  "test_reopened": false
+}

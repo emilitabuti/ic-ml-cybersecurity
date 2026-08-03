@@ -1,12 +1,4 @@
-"""
-Testes de scaffolding — Story 1.1.
-
-Valida que a estrutura do ml-pipeline foi criada corretamente:
-- Pastas obrigatórias existem
-- Arquivos de configuração estão presentes
-- config.py define as constantes corretas
-- API FastAPI inicia sem erros e responde no /health
-"""
+"""Testes da estrutura canônica do pipeline temporal."""
 
 import importlib
 import os
@@ -103,20 +95,22 @@ class TestConfigPy:
             config.CONFIDENCE_THRESHOLD, float
         ), "CONFIDENCE_THRESHOLD deve ser float"
 
-    def test_model_path_is_string(self) -> None:
+    def test_model_artifact_path_is_string(self) -> None:
         import sys
 
         sys.path.insert(0, str(ROOT))
         import config  # noqa: PLC0415
 
         importlib.reload(config)
-        assert isinstance(config.MODEL_PATH, str), "MODEL_PATH deve ser str"
+        assert isinstance(
+            config.MODEL_ARTIFACT_PATH, str
+        ), "MODEL_ARTIFACT_PATH deve ser str"
 
 
 class TestDotEnvExample:
     """Valida que .env.example documenta as variáveis necessárias."""
 
-    REQUIRED_VARS = ["WINDOW_SIZE", "CONFIDENCE_THRESHOLD", "MODEL_PATH"]
+    REQUIRED_VARS = ["MODEL_ARTIFACT_PATH", "CONFIDENCE_THRESHOLD"]
 
     def test_env_example_contains_required_vars(self) -> None:
         env_example = (ROOT / ".env.example").read_text()
@@ -130,14 +124,13 @@ class TestRequirementsTxt:
     REQUIRED_PACKAGES = [
         "fastapi",
         "uvicorn",
-        "mlflow",
         "scikit-learn",
         "pandas",
         "numpy",
         "pydantic",
-        "pandera",
         "joblib",
         "python-dotenv",
+        "tensorflow",
     ]
 
     def test_requirements_has_essential_packages(self) -> None:

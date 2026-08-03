@@ -1,0 +1,229 @@
+{
+  "schema_version": "2.0",
+  "status": "frozen_before_closed_test",
+  "frozen_at": "2026-08-01T22:02:45-03:00",
+  "dataset": "UNSW-NB15",
+  "task": {
+    "name": "binary_current_state_detection",
+    "target": "Binary_Label do último registro da janela",
+    "positive_class": "attack",
+    "classification_threshold": 0.5
+  },
+  "selection_rule": {
+    "primary_metric": "f1_mean da classe ataque nos três folds de desenvolvimento",
+    "direction": "maximize",
+    "tie_breakers_in_order": [
+      "lower_fpr_mean",
+      "lower_feature_count"
+    ],
+    "tie_tolerance_pre_registered": false,
+    "random_forest_top_30_minus_top_20_f1": 0.00002993462182376816,
+    "interpretation": "A diferença não é tratada como empate porque nenhuma tolerância foi fixada antes dos experimentos."
+  },
+  "selected_configuration_by_algorithm": {
+    "decision_tree": {
+      "variant": "top_10",
+      "top_n": 10,
+      "development_metrics": {
+        "f1_mean": 0.8923106286607788,
+        "f1_std": 0.023475894418929177,
+        "pr_auc_mean": 0.8037030268068653,
+        "auc_roc_mean": 0.9507465418753052,
+        "precision_mean": 0.8842338925394486,
+        "recall_mean": 0.9021040892750776,
+        "fpr_mean": 0.00701951089973624
+      },
+      "hyperparameters": {
+        "max_depth": 20,
+        "random_state": 42
+      }
+    },
+    "random_forest": {
+      "variant": "top_30",
+      "top_n": 30,
+      "development_metrics": {
+        "f1_mean": 0.9235818129799171,
+        "f1_std": 0.021094020160528963,
+        "pr_auc_mean": 0.9728219107301005,
+        "auc_roc_mean": 0.9984600174349261,
+        "precision_mean": 0.8818351125307119,
+        "recall_mean": 0.9703819755791705,
+        "fpr_mean": 0.008393363554574661
+      },
+      "hyperparameters": {
+        "n_estimators": 100,
+        "max_depth": 20,
+        "n_jobs": 2,
+        "random_state": 42
+      }
+    },
+    "lstm": {
+      "variant": "top_20",
+      "top_n": 20,
+      "development_metrics": {
+        "f1_mean": 0.8811669467083122,
+        "f1_std": 0.015613202672034343,
+        "pr_auc_mean": 0.9138251476854938,
+        "auc_roc_mean": 0.9953536895249405,
+        "precision_mean": 0.8299997460627688,
+        "recall_mean": 0.9423020139113004,
+        "fpr_mean": 0.012886591721477186
+      },
+      "hyperparameters": {
+        "layers": [
+          "LSTM(64)",
+          "Dense(32, relu)",
+          "Dense(1, sigmoid)"
+        ],
+        "optimizer": "adam",
+        "loss": "binary_crossentropy",
+        "epochs": 10,
+        "batch_size": 4096,
+        "shuffle": false,
+        "random_state": 42,
+        "fallback_allowed": false
+      }
+    }
+  },
+  "overall_selected_configuration": {
+    "algorithm": "random_forest",
+    "variant": "top_30",
+    "top_n": 30,
+    "reason": "Maior F1 médio entre todas as configurações de desenvolvimento."
+  },
+  "final_fit": {
+    "fit_partitions": [
+      "train",
+      "validation"
+    ],
+    "fit_rows_before_windowing": 1277513,
+    "preprocessor_fit_scope": "train+validation only",
+    "selector_fit_scope": "train+validation only",
+    "selector": {
+      "algorithm": "RandomForestClassifier feature importance",
+      "n_estimators": 100,
+      "n_jobs": 2,
+      "random_state": 42,
+      "fit_once_to_top_n": 30,
+      "reuse_same_ranking_for_all_models": true
+    },
+    "selected_feature_names_fixed_before_final_fit": false,
+    "selected_feature_names_rule": "Os nomes serão os primeiros top_n do ranking reajustado somente em treino+validação; apenas top_n foi congelado.",
+    "window_size": 10,
+    "window_target_position": "last",
+    "window_boundaries": [
+      "split",
+      "temporal_session",
+      "source_file"
+    ],
+    "window_materialization_batch_size_tree_models": 25000,
+    "test_transform_without_refit": true
+  },
+  "temporal_protocol": {
+    "strategy": "natural_session_chronological_holdout",
+    "sorting_keys": [
+      "Stime",
+      "Ltime",
+      "source_file",
+      "record_id"
+    ],
+    "sorting_kind": "stable",
+    "shuffle": false,
+    "purge_each_boundary_side_rows": 9,
+    "development_folds": 3,
+    "development_fold_strategy": "temporal_purged_expanding_folds",
+    "development_embargo_rule": "max(Ltime_train) < min(Stime_validation)",
+    "partitions": {
+      "train": {
+        "temporal_session": 0,
+        "rows": 1023187,
+        "start_stime": 1421927377,
+        "end_ltime": 1421972724,
+        "sha256": "3ded3fc61dc783bfbf6b16469ed6c4a8fe83ef0f6c809b9d40be7fd5734fdd83",
+        "record_ids_sha256": "81b0f3937ee252355b98471aafbdc5f857938d766dfac7d5149c26342a4e2fc1"
+      },
+      "validation": {
+        "temporal_session": 1,
+        "rows": 254326,
+        "start_stime": 1424219010,
+        "end_ltime": 1424231128,
+        "sha256": "00fcc34091ec5941373572310b222509a66592249da50ed2477d95f89ff9ed47",
+        "record_ids_sha256": "3e77573faf4dba62a16c4e1294208928e1fd9eb1fa6c82d28b335307d878f41f"
+      },
+      "test": {
+        "temporal_session": 2,
+        "rows": 306710,
+        "start_stime": 1424249994,
+        "end_ltime": 1424262069,
+        "sha256": "9dcffe1027337232910f5b982387cf60686e47a14fb1005162d92abd2846277b",
+        "record_ids_sha256": "637b11e68a73003070b9b4fc8b7d8a747ca6d93e3360649f9c687e861067253e",
+        "status_at_freeze": "closed"
+      }
+    }
+  },
+  "metrics_to_report": [
+    "f1",
+    "pr_auc",
+    "auc_roc",
+    "precision",
+    "recall",
+    "fpr",
+    "confusion_matrix",
+    "fit_seconds",
+    "inference_seconds",
+    "artifact_size_bytes"
+  ],
+  "test_policy": {
+    "test_access_at_freeze": false,
+    "test_metrics_consulted_at_freeze": false,
+    "maximum_evaluation_runs": 1,
+    "evaluate_all_frozen_models_in_same_run": true,
+    "threshold_tuning_on_test": false,
+    "feature_selection_on_test": false,
+    "hyperparameter_tuning_on_test": false,
+    "changes_after_test_require_exploratory_label": true
+  },
+  "evidence": {
+    "input_dataset": {
+      "path": "data/processed/unsw_nb15_cleaned_temporal.parquet",
+      "sha256": "6aaf8e06904b3e206782e08ef315ffa4d380655702da9c6bc63854a8f6c510fa"
+    },
+    "split_audit": {
+      "path": "reports_temporal/unsw/split_audit.json",
+      "sha256": "0f9de85a9faf6726a8aa96359e184674ff82f4bfd6620212f7c6b9693b9186eb"
+    },
+    "fold_audit": {
+      "path": "reports_temporal/unsw/folds/expanding_folds_audit.json",
+      "sha256": "c8c621b6e96b144150ae33ef51d4cd293dee86178c344a972c7f9ba9fe190245"
+    },
+    "development_summary": {
+      "path": "reports_temporal/unsw/development_experiments/development_summary.json",
+      "sha256": "22c03d0ebad631776f5e24cd3eff6ee17ad1411f5cb0f10bc7f6a86021c47f9a"
+    },
+    "experiment_manifest": {
+      "path": "reports_temporal/unsw/development_experiments/experiment_manifest.json",
+      "sha256": "9908d9c122e32174d7cad95a30565e5830464e0dc4d243120b4d96ccf241257e"
+    }
+  },
+  "source_code": {
+    "git_commit": "cd79cc520119bd33da20910decd325041c1772c9",
+    "working_tree_was_dirty": true,
+    "file_sha256": {
+      "src/data/detection_temporal_splitter.py": "2ac88e5a14ea83c90da6e4ab540799bf668ddecd0e62142095fea8115e29af3d",
+      "src/data/expanding_temporal_folds.py": "619b812be91d9bce2152716b7780ffb8ea1ea54a287526af93cdb1c358fff357",
+      "src/features/fold_preprocessor.py": "5bf3c804aa055b6ed8752936273e8c2adef05fb63940af7a6ee4e674e0b051ee",
+      "src/features/feature_selector.py": "09dede33a3630e21bc57d006706cf77c91b0d57dfa0fb4e8aa31c5c6e8fedee1",
+      "src/features/partition_window_builder.py": "40f8e9ca7ebfefd81b506138d0bb40d95744f21a61ef48bc56776329b64de5e0",
+      "src/training/metrics.py": "e7fa3c53a52f7a272e6fa6fe1e7038c7475831f18fef6b7d89259983919c9fed",
+      "src/training/temporal_development_experiments.py": "b3e25060bcee7e2ccb731a31df34447c25c94899241db0f84c5ee7dec5e0dca5"
+    }
+  },
+  "dependencies": {
+    "numpy": "2.4.2",
+    "pandas": "2.3.3",
+    "pyarrow": "23.0.1",
+    "scikit_learn": "1.8.0",
+    "joblib": "1.5.3",
+    "tensorflow": "2.21.0"
+  }
+}

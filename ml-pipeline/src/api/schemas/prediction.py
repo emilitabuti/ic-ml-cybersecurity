@@ -29,3 +29,15 @@ class ModelInfoResponse(BaseModel):
         None,
         description="Data de treino/criação do artefato.",
     )
+    artifact_version: str = Field(
+        ...,
+        description="Versão do artefato carregado.",
+    )
+    input_schema: str = Field(
+        ...,
+        description="Indica se a API espera features brutas ou já transformadas.",
+    )
+    selected_features: list[str] = Field(
+        ...,
+        description="Features efetivamente usadas pelo modelo após seleção.",
+    )

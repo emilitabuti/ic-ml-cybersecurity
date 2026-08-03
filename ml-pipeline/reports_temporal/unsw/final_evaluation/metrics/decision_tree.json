@@ -1,0 +1,152 @@
+{
+  "algorithm": "decision_tree",
+  "artifact_size_bytes": 368441,
+  "confusion_matrix": {
+    "fn": 2501,
+    "fp": 3134,
+    "tn": 278310,
+    "tp": 22756
+  },
+  "feature_count": 10,
+  "feature_names": [
+    "ct_state_ttl",
+    "sttl",
+    "dttl",
+    "Sload",
+    "tcprtt",
+    "synack",
+    "sbytes",
+    "ackdat",
+    "smeansz",
+    "dmeansz"
+  ],
+  "feature_names_sha256": "35bd125889a7563a342aa541c064c646549c21d25ee991421655befb90e481d5",
+  "fit_seconds": 35.22164091000013,
+  "inference_seconds": 0.39952556699790875,
+  "metrics": {
+    "auc_roc": 0.9568823542996627,
+    "f1": 0.889827360353491,
+    "fpr": 0.011135430138855332,
+    "pr_auc": 0.8230764059538264,
+    "precision": 0.8789494013132484,
+    "recall": 0.9009779467078434
+  },
+  "metrics_by_attack_type": {
+    "Analysis": {
+      "metrics": {
+        "auc_roc": 0.9609896080899195,
+        "f1": 0.25915623551228556,
+        "fpr": 0.011135430138855332,
+        "pr_auc": 0.1616638226916926,
+        "precision": 0.15136745193609533,
+        "recall": 0.9001610305958132
+      },
+      "positive_examples": 621
+    },
+    "Backdoor": {
+      "metrics": {
+        "auc_roc": 0.9844328217174337,
+        "f1": 0.27779051111620445,
+        "fpr": 0.011135430138855332,
+        "pr_auc": 0.17135024115650113,
+        "precision": 0.1620320855614973,
+        "recall": 0.9727126805778491
+      },
+      "positive_examples": 623
+    },
+    "DoS": {
+      "metrics": {
+        "auc_roc": 0.9611606402049537,
+        "f1": 0.4502106149957877,
+        "fpr": 0.011135430138855332,
+        "pr_auc": 0.28059004736564297,
+        "precision": 0.29888143176733784,
+        "recall": 0.9119453924914676
+      },
+      "positive_examples": 1465
+    },
+    "Exploits": {
+      "metrics": {
+        "auc_roc": 0.9658327832460647,
+        "f1": 0.7725121396520991,
+        "fpr": 0.011135430138855332,
+        "pr_auc": 0.6376540894619903,
+        "precision": 0.6672329581652156,
+        "recall": 0.9172383593635965
+      },
+      "positive_examples": 6851
+    },
+    "Fuzzer": {
+      "metrics": {
+        "auc_roc": 0.877977992527013,
+        "f1": 0.6036012750926165,
+        "fpr": 0.011135430138855332,
+        "pr_auc": 0.4015234885917709,
+        "precision": 0.5277987042338406,
+        "recall": 0.7048289738430583
+      },
+      "positive_examples": 4970
+    },
+    "Generic": {
+      "metrics": {
+        "auc_roc": 0.9886821596297732,
+        "f1": 0.8069006543723973,
+        "fpr": 0.011135430138855332,
+        "pr_auc": 0.727857726508579,
+        "precision": 0.6839451391690198,
+        "recall": 0.9837539889759211
+      },
+      "positive_examples": 6894
+    },
+    "Reconnaissance": {
+      "metrics": {
+        "auc_roc": 0.9852075773635565,
+        "f1": 0.6748887990295188,
+        "fpr": 0.011135430138855332,
+        "pr_auc": 0.4631607482077533,
+        "precision": 0.5157601977750309,
+        "recall": 0.9760233918128655
+      },
+      "positive_examples": 3420
+    },
+    "Shellcode": {
+      "metrics": {
+        "auc_roc": 0.9264891320391553,
+        "f1": 0.1629979035639413,
+        "fpr": 0.011135430138855332,
+        "pr_auc": 0.059366323354441794,
+        "precision": 0.09027576197387518,
+        "recall": 0.8382749326145552
+      },
+      "positive_examples": 371
+    },
+    "Worms": {
+      "metrics": {
+        "auc_roc": 0.9575685275460365,
+        "f1": 0.023031434796140678,
+        "fpr": 0.011135430138855332,
+        "pr_auc": 0.009348724979562871,
+        "precision": 0.011668243456322927,
+        "recall": 0.8809523809523809
+      },
+      "positive_examples": 42
+    }
+  },
+  "metrics_by_session": {
+    "2": {
+      "auc_roc": 0.9568823542996627,
+      "f1": 0.889827360353491,
+      "fpr": 0.011135430138855332,
+      "pr_auc": 0.8230764059538264,
+      "precision": 0.8789494013132484,
+      "recall": 0.9009779467078434
+    }
+  },
+  "predictions_path": "reports_temporal/unsw/final_evaluation/predictions/decision_tree.parquet",
+  "predictions_sha256": "33394b18f8caa6ccfcc330a181faa7f794f9b59aa1a843e964e673887bd52ce8",
+  "protocol_sha256": "ff08c3fc499f5679ea3d399021da9c476909eaecb73312fe85cb990fab37cc6f",
+  "selection_or_tuning_on_test": false,
+  "test_evaluation_run": 1,
+  "test_windows": 306701,
+  "variant": "top_10"
+}

@@ -1,26 +1,19 @@
-"""Limpeza e tratamento dos datasets consolidados.
+"""Limpeza e tratamento do UNSW-NB15 consolidado.
 
 Aplica deduplicação, padronização de nomes, correção de encoding de labels,
 tratamento de valores ausentes e infinitos.
 
 Uso:
     cd ml-pipeline/
-    python -m src.data.pipeline.cleaner --dataset cic
-    python -m src.data.pipeline.cleaner --dataset unsw
+    python -m src.data.pipeline.cleaner
 """
 import logging
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 logger = logging.getLogger(__name__)
-
-# ── CIC-IDS2017 ──────────────────────────────────────────────────────────────
-
-CIC_INPUT_PATH = "data/processed/cic_ids2017_raw_merged.parquet"
-CIC_OUTPUT_PATH = "data/processed/cic_ids2017_cleaned.parquet"
-
-# ── UNSW-NB15 ─────────────────────────────────────────────────────────────────
 
 UNSW_INPUT_PATH = "data/processed/unsw_nb15_raw_merged.parquet"
 UNSW_OUTPUT_PATH = "data/processed/unsw_nb15_cleaned.parquet"
@@ -71,34 +64,16 @@ def treat_infinite_and_missing(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def clean_cic_ids2017() -> None:
-    """Limpa o dataset CIC-IDS2017 consolidado."""
-    logger.info("Carregando CIC-IDS2017 consolidado: %s", CIC_INPUT_PATH)
-    df = pd.read_parquet(CIC_INPUT_PATH)
-
-    df = remove_duplicate_columns(df)
-    df = clean_column_names(df)
-
-    # Corrige caracteres corrompidos no campo Label (U+FFFD = replacement character)
-    df["Label"] = df["Label"].str.replace("\ufffd", "", regex=False).str.strip()
-
-    # Cria coluna binária
-    df["Binary_Label"] = df["Label"].apply(lambda x: 0 if x == "BENIGN" else 1)
-    logger.info("Binary_Label criado — Benignos: %d | Ataques: %d",
-                (df["Binary_Label"] == 0).sum(), (df["Binary_Label"] == 1).sum())
-
-    df = remove_duplicate_rows(df)
-    df = treat_infinite_and_missing(df)
-
-    logger.info("CIC-IDS2017 limpo — linhas: %d | colunas: %d", df.shape[0], df.shape[1])
-    df.to_parquet(CIC_OUTPUT_PATH, index=False)
-    logger.info("Dataset limpo salvo em: %s", CIC_OUTPUT_PATH)
-
-
-def clean_unsw_nb15() -> None:
+def clean_unsw_nb15(
+    input_path: str | Path = UNSW_INPUT_PATH,
+    output_path: str | Path = UNSW_OUTPUT_PATH,
+    *,
+    overwrite: bool = True,
+) -> Path:
     """Limpa o dataset UNSW-NB15 consolidado."""
-    logger.info("Carregando UNSW-NB15 consolidado: %s", UNSW_INPUT_PATH)
-    df = pd.read_parquet(UNSW_INPUT_PATH)
+    source, destination = _resolve_io_paths(input_path, output_path, overwrite=overwrite)
+    logger.info("Carregando UNSW-NB15 consolidado: %s", source)
+    df = pd.read_parquet(source)
 
     # Padroniza attack_cat
     df["attack_cat"] = df["attack_cat"].astype(str).str.strip()
@@ -116,19 +91,48 @@ def clean_unsw_nb15() -> None:
             df[col] = df[col].fillna(0)
 
     logger.info("UNSW-NB15 limpo — linhas: %d | colunas: %d", df.shape[0], df.shape[1])
-    df.to_parquet(UNSW_OUTPUT_PATH, index=False)
-    logger.info("Dataset limpo salvo em: %s", UNSW_OUTPUT_PATH)
+    df.to_parquet(destination, index=False)
+    logger.info("Dataset limpo salvo em: %s", destination)
+    return destination
+
+
+def _resolve_io_paths(
+    input_path: str | Path,
+    output_path: str | Path,
+    *,
+    overwrite: bool,
+) -> tuple[Path, Path]:
+    """Valida entrada e saída antes de materializar um dataset limpo."""
+    source = Path(input_path)
+    destination = Path(output_path)
+    if not source.exists():
+        raise FileNotFoundError(f"Dataset de entrada não encontrado: {source}")
+    if source.resolve() == destination.resolve():
+        raise ValueError("O caminho de saída deve ser diferente do arquivo de entrada.")
+    if destination.exists() and not overwrite:
+        raise FileExistsError(
+            f"O arquivo de saída já existe: {destination}. "
+            "Use overwrite=True somente após validar o destino."
+        )
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    return source, destination
 
 
 if __name__ == "__main__":
-    import argparse
-
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s — %(message)s")
-    parser = argparse.ArgumentParser(description="Limpeza e tratamento dos datasets.")
-    parser.add_argument("--dataset", choices=["cic", "unsw", "all"], default="all")
+    import argparse
+    parser = argparse.ArgumentParser(description="Limpeza do UNSW-NB15.")
+    parser.add_argument("--input-path", default=None)
+    parser.add_argument("--output-path", default=None)
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Permite substituir explicitamente um arquivo de saída existente.",
+    )
     args = parser.parse_args()
 
-    if args.dataset in ("cic", "all"):
-        clean_cic_ids2017()
-    if args.dataset in ("unsw", "all"):
-        clean_unsw_nb15()
+    clean_unsw_nb15(
+        input_path=args.input_path or UNSW_INPUT_PATH,
+        output_path=args.output_path or UNSW_OUTPUT_PATH,
+        overwrite=args.overwrite,
+    )

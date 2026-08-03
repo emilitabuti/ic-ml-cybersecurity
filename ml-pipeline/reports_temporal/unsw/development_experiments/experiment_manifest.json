@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0",
+  "protocol": "temporal_purged_expanding_folds",
+  "dataset": "UNSW-NB15",
+  "task": "binary_current_state_detection",
+  "source_commit": "cd79cc520119bd33da20910decd325041c1772c9",
+  "working_tree_dirty_during_execution": true,
+  "input_dataset": {
+    "path": "data/processed/unsw_nb15_cleaned_temporal.parquet",
+    "sha256": "6aaf8e06904b3e206782e08ef315ffa4d380655702da9c6bc63854a8f6c510fa"
+  },
+  "fold_definition": {
+    "path": "reports_temporal/unsw/folds/expanding_folds_audit.json",
+    "sha256": "c8c621b6e96b144150ae33ef51d4cd293dee86178c344a972c7f9ba9fe190245",
+    "folds": [1, 2, 3],
+    "shuffle": false,
+    "purged": true,
+    "window_size": 10
+  },
+  "feature_variants": ["all", "top_10", "top_20", "top_30"],
+  "algorithms": ["decision_tree", "random_forest", "lstm"],
+  "common_parameters": {
+    "random_seed": 42,
+    "classification_threshold": 0.5,
+    "selector": {
+      "algorithm": "RandomForestClassifier",
+      "n_estimators": 100,
+      "n_jobs": 2,
+      "fit_partition": "train de cada fold"
+    }
+  },
+  "model_parameters": {
+    "decision_tree": {
+      "max_depth": 20,
+      "batch_size_for_window_materialization": 25000
+    },
+    "random_forest": {
+      "n_estimators": 100,
+      "max_depth": 20,
+      "n_jobs": 2,
+      "batch_size_for_window_materialization": 25000
+    },
+    "lstm": {
+      "layers": ["LSTM(64)", "Dense(32, relu)", "Dense(1, sigmoid)"],
+      "optimizer": "adam",
+      "loss": "binary_crossentropy",
+      "epochs": 10,
+      "batch_size": 4096,
+      "shuffle": false,
+      "fallback_used": false,
+      "device": "CPU"
+    }
+  },
+  "metrics": ["f1", "pr_auc", "auc_roc", "precision", "recall", "fpr"],
+  "primary_metric": "f1 da classe ataque",
+  "dependencies": {
+    "numpy": "2.4.2",
+    "pandas": "2.3.3",
+    "pyarrow": "23.0.1",
+    "scikit_learn": "1.8.0",
+    "joblib": "1.5.3",
+    "tensorflow": "2.21.0"
+  },
+  "completed_fold_executions": 36,
+  "complete_aggregated_configurations": 12,
+  "test_used": false
+}
