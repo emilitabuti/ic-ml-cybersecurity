@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Visão Geral de Anomalias</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Visão Geral de Anomalias</h1>
+
+    <div class="grid">
+
+        <div class="card">
+            <h2>Nº de Eventos</h2>
+            <p class="big-text" id="total-events">{{ total }}</p>
+            <span>Anomalias detectadas</span>
+        </div>
+
+        <div class="card">
+            <h2>Tipos de Anomalia</h2>
+            <ul>
+                <li>Tentativas de login</li>
+                <li>Tráfego incomum</li>
+                <li>Falhas de sistema</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Níveis de Severidade</h2>
+                <ul>
+                    <li class="critico">Crítico: <span id="sev-critico">{{ sev.critico }}</span></li>
+                    <li class="alto">Alto: <span id="sev-alto">{{ sev.alto }}</span></li>
+                    <li class="moderado">Moderado: <span id="sev-moderado">{{ sev.moderado }}</span></li>
+                </ul>
+        </div>
+
+        <div class="card">
+            <h2>Fontes dos Eventos</h2>
+            <p>Origem dos logs (ex: servidores, aplicações, rede)</p>
+        </div>
+
+        <div class="card wide">
+            <h2>Correlação</h2>
+            <p>Eventos correlacionados detectados pelo sistema</p>
+        </div>
+
+        <div class="card wide">
+            <h2>Impacto Potencial</h2>
+            <p>Descrição do possível impacto caso a anomalia se confirme</p>
+        </div>
+
+        <div class="card">
+            <h2>Horário do Evento</h2>
+            {% if eventos and eventos[0] %}
+                <p>Início: <span id="start-time">{{ eventos[0].hora.strftime("%d/%m/%Y %H:%M") }}</span></p>
+            {% else %}
+                <p>Início: <span id="start-time">--/--/---- --:--</span></p>
+            {% endif %}
+        </div>
+
+
+        <div class="card">
+            <h2>Ações Recomendadas</h2>
+            <ul>
+                <li>Investigar atividade suspeita</li>
+                <li>Aplicar bloqueios</li>
+                <li>Atualizar sistemas</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="table-section">
+        <h2>Eventos Recentes</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Hora</th>
+                    <th>Categoria</th>
+                    <th>Severidade</th>
+                    <th>Origem</th>
+                </tr>
+            </thead>
+            <tbody id="events-tbody">
+                {% for e in eventos %}
+                <tr>
+                    <td>{{ e.hora.strftime("%d/%m/%Y %H:%M") }}</td>
+                    <td>{{ e.categoria }}</td>
+                    <td class="{% if e.severidade == 'Crítico' %}critico{% elif e.severidade == 'Alto' %}alto{% else %}moderado{% endif %}">
+                        {{ e.severidade }}
+                    </td>
+                    <td>{{ e.origem }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <footer id="footer-last-update">
+        Última atualização: {{ ultima_atualizacao.strftime("%d/%m/%Y %H:%M:%S") }}
+    </footer>
+
+</div>
+
+</body>
+
+<script>
+  function classBySeverity(sev) {
+    if (sev === "Crítico") return "critico";
+    if (sev === "Alto") return "alto";
+    return "moderado";
+  }
+
+  async function refreshDashboard() {
+    // resumo
+    const summaryResp = await fetch("/api/summary");
+    const summary = await summaryResp.json();
+
+    document.getElementById("total-events").textContent = summary.total;
+    document.getElementById("sev-critico").textContent = summary.sev.critico;
+    document.getElementById("sev-alto").textContent = summary.sev.alto;
+    document.getElementById("sev-moderado").textContent = summary.sev.moderado;
+
+    document.getElementById("footer-last-update").textContent =
+      "Última atualização: " + summary.ultima_atualizacao;
+
+    // tabela
+    const eventsResp = await fetch("/api/events");
+    const events = await eventsResp.json();
+
+    // atualizar "Horário do Evento" com o primeiro evento da lista (mais recente)
+    const startTimeEl = document.getElementById("start-time");
+    if (startTimeEl && events.length > 0) {
+        startTimeEl.textContent = events[0].hora;
+    }
+
+    const tbody = document.getElementById("events-tbody");
+    tbody.innerHTML = "";
+
+    for (const e of events) {
+      const tr = document.createElement("tr");
+
+      const tdHora = document.createElement("td");
+      tdHora.textContent = e.hora;
+
+      const tdCat = document.createElement("td");
+      tdCat.textContent = e.categoria;
+
+      const tdSev = document.createElement("td");
+      tdSev.textContent = e.severidade;
+      tdSev.className = classBySeverity(e.severidade);
+
+      const tdOrig = document.createElement("td");
+      tdOrig.textContent = e.origem;
+
+      tr.append(tdHora, tdCat, tdSev, tdOrig);
+      tbody.appendChild(tr);
+    }
+  }
+
+  // primeira carga + atualização a cada 5s
+  refreshDashboard();
+  setInterval(refreshDashboard, 5000);
+</script>
+
+</html>
