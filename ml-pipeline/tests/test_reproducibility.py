@@ -10,7 +10,7 @@ class TestConfigReproducibility:
     """Valida as constantes e variáveis de configuração em config.py."""
 
     def test_config_random_seed_is_42(self) -> None:
-        """RANDOM_SEED deve ser 42 — constante científica do projeto."""
+        """RANDOM_SEED deve ser 42"""
         import config
 
         assert config.RANDOM_SEED == 42

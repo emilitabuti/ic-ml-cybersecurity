@@ -37,7 +37,7 @@ class TestDirectoryStructure:
 
 
 class TestRequiredFiles:
-    """Valida que os arquivos-chave do scaffolding estão presentes."""
+    """Valida que os arquivos-chave da base estejam presentes."""
 
     REQUIRED_FILES = [
         "config.py",

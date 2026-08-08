@@ -1,6 +1,6 @@
 # Pipeline temporal de detecção — UNSW-NB15
 
-Este diretório contém o único fluxo científico e operacional do projeto. Ele
+Ele
 avalia generalização temporal no UNSW-NB15, com seleção de atributos dentro dos
 folds, purga nas fronteiras e uma sessão futura mantida fechada até a avaliação
 final.
@@ -82,5 +82,4 @@ cd ..
 python scripts/audit_final_documents.py
 ```
 
-Os resultados publicados ficam em `reports_temporal/unsw/`, e a auditoria
-documental em `docs/emili/relatorio-final/auditoria-final.md`.
+Os resultados publicados ficam em `reports_temporal/unsw/`.

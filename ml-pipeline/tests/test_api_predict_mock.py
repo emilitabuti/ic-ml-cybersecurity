@@ -1,5 +1,5 @@
 """
-Testes do endpoint mock de predição — Story 4.4.
+Testes do endpoint mock de predição.
 
 O mock permite que o dashboard consuma o contrato do /predict real antes do modelo
 treinado existir.

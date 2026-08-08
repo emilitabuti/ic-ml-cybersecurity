@@ -3,7 +3,7 @@ interface PlaceholderSectionProps {
   story: string;
 }
 
-/** Placeholder para seções cujas stories ainda não foram implementadas. */
+/** Placeholder para seções cujas stories ainda não foram implementadas */
 export function PlaceholderSection({ title, story }: PlaceholderSectionProps) {
   return (
     <div className="flex h-full min-h-[200px] flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-border text-center text-muted-foreground">

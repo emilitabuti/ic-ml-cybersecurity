@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { SEVERITY_CONFIG, type Severity } from "@/lib/severity";
 
 /**
- * Badge de severidade — cor + ícone + label textual (nunca só cor).
+ * Badge de severidade — cor + icone + label textual
  */
 export function SeverityBadge({ severity }: { severity: Severity }) {
   const { label, colorVar, icon: Icon } = SEVERITY_CONFIG[severity];

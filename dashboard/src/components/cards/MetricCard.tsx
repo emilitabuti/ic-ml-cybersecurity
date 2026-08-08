@@ -8,7 +8,7 @@ interface MetricCardProps {
   className?: string;
 }
 
-/** Card de métrica do header — alertas ativos, janelas analisadas, precisão, latência. */
+/** Card de metrica do header — alertas ativos, janelas analisadas, precisão e latencia */
 export function MetricCard({ label, value, icon: Icon, className }: MetricCardProps) {
   return (
     <div className={cn("flex items-center gap-3 rounded-lg border border-border bg-card p-4", className)}>

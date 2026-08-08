@@ -15,7 +15,7 @@ interface SidebarProps {
   onSelect: (section: Section) => void;
 }
 
-/** Sidebar fixa (220px) com as 4 seções do Command Center. */
+/** Sidebar fixa (220px) com as 4 seções do Command Center */
 export function Sidebar({ active, onSelect }: SidebarProps) {
   return (
     <aside className="flex h-screen w-[220px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar">

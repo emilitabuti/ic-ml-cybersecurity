@@ -1,16 +1,3 @@
-# ─────────────────────────────────────────────────────────────
-# BMAD — Configurações pessoais (não versionadas)
-# Cada colaboradora mantém sua própria config.yaml localmente.
-# Use os arquivos config.template.yaml como ponto de partida.
-# ─────────────────────────────────────────────────────────────
-_bmad/bmm/config.yaml
-_bmad/core/config.yaml
-_bmad/_memory/config.yaml
-
-# Memória de sessão pessoal dos agentes BMAD
-_bmad/_memory/storyteller-sidecar/stories-told.md
-_bmad/_memory/storyteller-sidecar/story-preferences.md
-
 # Sessões locais do Copilot
 .copilot/
 
@@ -94,7 +81,3 @@ Thumbs.db
 *.env
 ml-pipeline/.env
 dashboard/.env
-
-# Documentos pessoais do relatório final; somente o plano histórico é versionado
-docs/emili/relatorio-final/*
-!docs/emili/relatorio-final/plano-previsao-antecipada.md

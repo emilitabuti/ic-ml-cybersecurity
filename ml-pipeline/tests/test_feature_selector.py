@@ -1,4 +1,4 @@
-"""Testes do seletor de atributos ajustado somente no treino."""
+"""Testes da seleção de atributos."""
 import json
 from pathlib import Path
 

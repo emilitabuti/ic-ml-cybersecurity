@@ -2,16 +2,7 @@ import { SeverityBadge } from "@/components/alerts/SeverityBadge";
 import type { Severity } from "@/lib/severity";
 
 /**
- * RecentEventsTable — placeholder da tabela de alertas recentes.
- *
- * Estrutura de colunas inspirada no protótipo da Isabela (branch
- * `Isa252-patch-1`: Hora / Categoria / Severidade / Origem), adaptada ao
- * contrato oficial de alertas (FR27): o campo "Origem" foi descartado por não
- * ter contrapartida no schema atual do CICIDS2017 (ver nota de reconciliação
- * em epics.md, Epic 5).
- *
- * Dados aqui são estáticos (mock) — a integração real via polling
- * (`GET /history`) é escopo da Story 5.2.
+ * RecentEventsTable — placeholder da tabela de alertas recentes
  */
 interface RecentEvent {
   timestamp: string;

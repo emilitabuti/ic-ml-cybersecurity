@@ -643,7 +643,6 @@ def _logical_preprocessor_sha256(preprocessor: FoldPreprocessor) -> str:
 
 
 def _ensure_writable_numeric_conversion(frame: pd.DataFrame) -> pd.DataFrame:
-    """Usa arrays anuláveis quando Pandas 3 expõe ``to_numpy`` somente leitura."""
     if int(pd.__version__.split(".", maxsplit=1)[0]) < 3:
         return frame
     result = frame.copy()

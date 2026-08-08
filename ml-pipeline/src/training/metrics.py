@@ -1,4 +1,4 @@
-"""Métricas científicas usadas nos experimentos do Epic 3."""
+"""Métricas científicas usadas."""
 from __future__ import annotations
 
 from typing import Iterable
@@ -63,5 +63,5 @@ def summarize_fold_metrics(
 
 
 def format_mean_std(metric: dict[str, float]) -> str:
-    """Formata métrica como média ± desvio padrão para relatório."""
+    """Formata métrica como média +/- desvio padrão para relatório."""
     return f"{metric['mean']:.4f} +/- {metric['std']:.4f}"

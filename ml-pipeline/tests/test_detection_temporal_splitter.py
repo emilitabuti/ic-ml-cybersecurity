@@ -1,4 +1,4 @@
-"""Testes do split temporal auditável para detecção."""
+"""Testes do split temporal"""
 
 from __future__ import annotations
 

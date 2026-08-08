@@ -49,5 +49,5 @@
       }
     }
   },
-  "note": "A classificacao usa heuristica temporaria. Estes resultados avaliam o fluxo simulado ate o dashboard, nao desempenho de um modelo ML real."
+  "note": "A classificacao usa dados temporarios. Estes resultados avaliam o fluxo simulado ate o dashboard, nao desempenho de um modelo ML real."
 }

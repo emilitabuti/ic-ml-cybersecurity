@@ -3,7 +3,7 @@
 O seletor é ajustado nas linhas pré-processadas de treino, serializado e só
 então aplicado à validação. As saídas preservam os metadados necessários para
 que ``partition_window_builder`` realize janelas apenas com as features
-selecionadas. O teste fechado não é uma entrada deste módulo.
+selecionadas.
 
 Uso::
 
@@ -61,7 +61,7 @@ def materialize_temporal_feature_selection(
     window_batch_size: int = 25_000,
     overwrite: bool = False,
 ) -> dict[str, Any]:
-    """Ajusta a seleção no treino e produz partições selecionadas auditáveis."""
+    """Ajusta a seleção no treino e produz partições selecionadas."""
     if top_n < 1:
         raise ValueError("top_n deve ser positivo.")
     input_root = Path(input_dir)

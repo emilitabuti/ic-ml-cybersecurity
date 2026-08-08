@@ -162,7 +162,7 @@ def sort_unsw_temporal_parquet(
             "ready_for_onset_identification": True,
         },
         "next_step": (
-            "Identificar transições benigno→ataque dentro de cada source_file "
+            "Identificar transições benigno->ataque dentro de cada source_file "
             "no parquet temporal ordenado."
         ),
     }

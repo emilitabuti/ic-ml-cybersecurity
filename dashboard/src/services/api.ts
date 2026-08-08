@@ -1,8 +1,5 @@
 /**
- * api.ts — Ponto único de acesso à FastAPI.
- *
- * ⚠️ NUNCA faça fetch direto da API em componentes React.
- *    Toda comunicação com o backend passa por este módulo.
+ * api.ts — Ponto único de acesso à FastAPI
  */
 import { API_BASE_URL } from "../config";
 import type { PredictionResponse } from "@/types/api";

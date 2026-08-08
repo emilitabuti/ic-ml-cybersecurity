@@ -1,4 +1,4 @@
-"""Testes da integração real da seleção ao pipeline temporal."""
+"""Testes da integração da seleção ao pipeline temporal."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Testes da auditoria temporal para previsão prospectiva."""
+"""Testes da auditoria temporal para previsão."""
 
 from pathlib import Path
 
